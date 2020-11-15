@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:weightSum="10"
+    android:background="@color/base0">
+
+    <TextView
+        android:id="@+id/tvCollegeDetails"
+        android:layout_weight="5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="30dp"
+        android:gravity="center_horizontal|bottom"
+        android:text="College Details"
+        android:textSize="22sp"
+        android:textStyle="italic"
+        android:textColor="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="5">
+
+        <Spinner
+            android:id="@+id/ddUniversity"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_email"
+            android:background="@drawable/spiner_layout"
+            android:gravity="center"
+            android:textColor="@color/base0"
+            android:inputType="textEmailAddress" />
+
+        <Spinner
+            android:id="@+id/ddCollege"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_email"
+            android:background="@drawable/spiner_layout"
+            android:gravity="center"
+            android:textColor="@color/base0"
+            android:inputType="textEmailAddress" />
+
+        <Spinner
+            android:id="@+id/ddBranch"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_email"
+            android:background="@drawable/spiner_layout"
+            android:gravity="center"
+            android:textColor="@color/base0"
+            android:inputType="textEmailAddress" />
+
+        <Spinner
+            android:id="@+id/ddSemester"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_email"
+            android:background="@drawable/spiner_layout"
+            android:gravity="center"
+            android:textColor="@color/base0"
+            android:inputType="textEmailAddress" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
+            android:text="Register"
+            android:textColor="@color/base4"
+            android:background="@drawable/rounded_corners_buttons" />
+
+        <TextView
+            android:id="@+id/toLoginPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Already have an account?"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:textColor="@color/base4" />
+
+    </LinearLayout>
+</LinearLayout>

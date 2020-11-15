@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "354511789155",
+    "firebase_url": "https://student-connect-b96e6.firebaseio.com",
+    "project_id": "student-connect-b96e6",
+    "storage_bucket": "student-connect-b96e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354511789155:android:a6efb5a57abcd3a7906c56",
+        "android_client_info": {
+          "package_name": "com.nimitsajal.studentconnectapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354511789155-upva05vp3fr4l1m9v84i8ssm0f6304vn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLwy8I1ya4EaBnuYzF7CoVWJ0fB8aTdIA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354511789155-upva05vp3fr4l1m9v84i8ssm0f6304vn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:weightSum="10"
+    android:background="@color/base0">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/student_connect_logo"
+        android:layout_marginTop="60dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="5">
+
+        <EditText
+            android:id="@+id/etEmail_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_email"
+            android:background="@drawable/rounded_corners_textfields"
+            android:gravity="center"
+            android:hint="Email"
+            android:textColorHint="@color/base1"
+            android:textColor="@color/base0"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/etPassword_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
+            android:autofillHints="Empty_password"
+            android:background="@drawable/rounded_corners_textfields"
+            android:gravity="center"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColorHint="@color/base1"
+            android:textColor="@color/base0"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogin_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
+            android:text="LOGIN"
+            android:textColor="@color/base4"
+            android:background="@drawable/rounded_corners_buttons" />
+
+        <TextView
+            android:id="@+id/toSignup_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Don't have an account?"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:textColor="@color/base4" />
+
+    </LinearLayout>
+
+</LinearLayout>

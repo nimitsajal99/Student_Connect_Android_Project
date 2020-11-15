@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/base0">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/circularImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:civ_border_width="4dp"
+        app:civ_border_color="@color/base2"
+        app:layout_constraintBottom_toBottomOf="@id/btnDP"
+        app:layout_constraintLeft_toLeftOf="@+id/btnDP"
+        app:layout_constraintRight_toRightOf="@+id/btnDP"
+        app:layout_constraintTop_toTopOf="@+id/btnDP" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnDP"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/profile"
+        app:layout_constraintBottom_toTopOf="@id/etName_signup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/etName_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="0dp"
+        android:autofillHints="Empty_email"
+        android:background="@drawable/rounded_corners_textfields"
+        android:gravity="center"
+        android:hint="Name"
+        android:textColorHint="@color/base1"
+        android:textColor="@color/base0"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@id/etUserName_signup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnDP" />
+
+    <EditText
+        android:id="@+id/etUserName_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="0dp"
+        android:autofillHints="Empty_email"
+        android:background="@drawable/rounded_corners_textfields"
+        android:gravity="center"
+        android:hint="User Name"
+        android:textColorHint="@color/base1"
+        android:textColor="@color/base0"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@id/etEmail_signup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etName_signup" />
+
+    <EditText
+        android:id="@+id/etEmail_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="0dp"
+        android:autofillHints="Empty_email"
+        android:background="@drawable/rounded_corners_textfields"
+        android:gravity="center"
+        android:hint="Email"
+        android:textColorHint="@color/base1"
+        android:textColor="@color/base0"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@id/etPhone_signup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etUserName_signup" />
+
+    <EditText
+        android:id="@+id/etPhone_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="0dp"
+        android:autofillHints="Empty_email"
+        android:background="@drawable/rounded_corners_textfields"
+        android:gravity="center"
+        android:hint="Phone"
+        android:textColorHint="@color/base1"
+        android:textColor="@color/base0"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@id/etPassword_signup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etEmail_signup" />
+
+    <EditText
+        android:id="@+id/etPassword_signup"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:autofillHints="Empty_password"
+        android:background="@drawable/rounded_corners_textfields"
+        android:gravity="center"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColorHint="@color/base1"
+        android:textColor="@color/base0"
+        app:layout_constraintBottom_toTopOf="@id/btnContinueToClgDetails"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etPhone_signup" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnContinueToClgDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:text="CONTINUE"
+        android:textColor="@color/base4"
+        android:background="@drawable/rounded_corners_buttons"
+        app:layout_constraintBottom_toTopOf="@id/toLoginPage"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etPassword_signup" />
+
+    <TextView
+        android:id="@+id/toLoginPage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="45dp"
+        android:gravity="center"
+        android:text="Already have an account?"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        android:textColor="@color/base4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnContinueToClgDetails" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
