@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.NoActionBar">
-        <activity android:name=".profilePage"></activity>
+        <activity android:name=".chat"></activity>
+        <activity android:name=".newChat" />
+        <activity android:name=".currentChats" />
+        <activity android:name=".profilePage" />
         <activity android:name=".mainFeed" />
         <activity android:name=".collegeDetailsDatabase" />
         <activity android:name=".Sign_up" />

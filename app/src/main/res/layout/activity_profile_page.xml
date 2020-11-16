@@ -106,6 +106,18 @@
                     android:layout_marginBottom="3dp"
                     android:textColor="@color/base3"/>
 
+<!--                <com.kassisdion.library.ViewPagerWithIndicator-->
+<!--                    app:arrow.enable="true"-->
+<!--                    app:arrow.width="50dp"-->
+<!--                    app:arrow.height="50dp"-->
+<!--                    app:round.enable="true"-->
+<!--                    app:round.size="15dip"-->
+<!--                    app:round.color.default="@color/base3"-->
+<!--                    app:round.color.selected="@android:color/holo_blue_light"-->
+<!--                    android:id="@+id/viewPagerWithIndicator"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"/>-->
+
                 <TextView
                     android:id="@+id/tvDetails"
                     android:layout_width="match_parent"
@@ -128,14 +140,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Descrption : "
+                android:padding="15dp"
                 android:textColor="@color/base3"
                 android:textStyle="normal"
                 android:textSize="20sp"/>

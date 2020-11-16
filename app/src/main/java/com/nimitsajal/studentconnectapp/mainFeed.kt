@@ -23,6 +23,12 @@ class mainFeed : AppCompatActivity() {
             finish()
         }
 
+        btnChat.setOnClickListener {
+            val intent = Intent(this, currentChats::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+        }
+
         btnProfile.setOnClickListener {
             val intent = Intent(this, profilePage::class.java)
             intent.putExtra("username", username)

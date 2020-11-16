@@ -2,6 +2,7 @@ package com.nimitsajal.studentconnectapp
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,7 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.*
 import java.util.regex.Pattern
 
@@ -172,6 +176,20 @@ class Sign_up : AppCompatActivity() {
 //            Toast.makeText(this, "Photo was selected", Toast.LENGTH_SHORT).show()
             selectedPhotoUrl = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUrl)
+
+//            if(selectedPhotoUrl != null){
+//                val file = File(selectedPhotoUrl!!.path.toString())
+//                val compressedImageFile = Compressor.compress(this, file)
+//            }
+
+
+//            val bytes = ByteArrayOutputStream()
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+//            val path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), bitmap, "Title", null)
+//            Uri.parse(path)
+
+//            val compressedImageFile = Compressor.compress(this, data.)
+
             circularImageView.setImageBitmap(bitmap)
             btnDP.alpha = 0f
 
