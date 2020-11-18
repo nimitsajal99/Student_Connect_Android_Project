@@ -1,11 +1,8 @@
 package com.nimitsajal.studentconnectapp
 
-import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore.Images
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -18,7 +15,6 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_college_details_databasse.*
 import kotlinx.android.synthetic.main.activity_sign_up.toLoginPage
-import java.io.ByteArrayOutputStream
 import java.util.*
 
 
@@ -533,9 +529,14 @@ class collegeDetailsDatabase : AppCompatActivity() {
         user.put("Description", "")
         user.put("College", university)
 
-        val db = FirebaseFirestore.getInstance()
         var inner: HashMap<String, Any> = hashMapOf<String, Any>()
         inner.put("Info", "Info")
+
+//        val university = University_class(university_name, college_name, branch_name, semester_name)
+//        val user = User_class(userName, userEmail, userPhone, selectedPhotoUrl, "", university)
+//        val inner = Inner_class("info")
+
+        val db = FirebaseFirestore.getInstance()
 
         db.collection("Users").document(userUserName)
             .set(user)
@@ -733,3 +734,16 @@ class collegeDetailsDatabase : AppCompatActivity() {
 
     }
 }
+
+
+//class Inner_class(val info: String){
+//    constructor(): this("")
+//}
+//
+//class User_class(val Name: String, val Email: String, val PhoneNumber: String, val Picture_Uri: String, val Description: String, val College: University_class){
+//    constructor(): this("", "", "", "", "", University_class())
+//}
+//
+//class University_class(val University: String, val College: String, val Branch: String, val Semester: String){
+//    constructor(): this("", "", "", "")
+//}
