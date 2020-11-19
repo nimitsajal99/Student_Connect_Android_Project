@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_margin="2dp">
 
     <TextView
-        android:id="@+id/tvToChat"
+        android:id="@+id/tvSend"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/base3"
+        android:textSize="18dp"
         android:layout_marginRight="5dp"
         android:background="@drawable/rounded_corners_textfields_base1"
         android:maxWidth="240dp"
@@ -18,8 +19,8 @@
         android:paddingTop="7dp"
         android:paddingRight="14dp"
         android:paddingBottom="7dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
         android:layout_marginEnd="7dp"
         android:text="This a random sample textThis a random sample text to show that the text in this. "
         app:layout_constraintBottom_toBottomOf="parent"

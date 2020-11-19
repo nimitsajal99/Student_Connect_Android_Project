@@ -3,6 +3,7 @@ package com.nimitsajal.studentconnectapp
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,17 +13,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.activity_sign_up.*
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.util.*
+import java.io.*
 import java.util.regex.Pattern
 
 class Sign_up : AppCompatActivity() {
 
     private var selectedPhotoUrl: Uri? = null
+    private var compressed_uri: Uri? = null
     private lateinit var auth: FirebaseAuth
 
     private var isUserPresent = true
@@ -30,6 +28,7 @@ class Sign_up : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+
 
         auth = FirebaseAuth.getInstance()
 
@@ -42,6 +41,7 @@ class Sign_up : AppCompatActivity() {
 
         btnDP.setOnClickListener {
             photoPicker()
+//            putDpInCircularView()
         }
 
         btnContinueToClgDetails.setOnClickListener {
@@ -154,7 +154,7 @@ class Sign_up : AppCompatActivity() {
                     intent.putExtra("userPassword_signup", userPassword)
                     intent.putExtra("userUserName_signup", userUserName)
                     intent.putExtra("userPhone_signup", userPhone)
-                    intent.putExtra("dpImage_string", selectedPhotoUrl.toString())
+                    intent.putExtra("dpImage_string", compressed_uri.toString())
                     startActivity(intent)
                     //finish()
                 } else {
@@ -166,8 +166,16 @@ class Sign_up : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.d("ret", " in failure, isUserPresent = $exception")
             }
+    }
 
-
+    private fun putDpInCircularView(){
+        val file = File(selectedPhotoUrl!!.path.toString())
+//        val compressedImageFile = Compressor.compress(this, file)
+        val bitmap_original = BitmapFactory.decodeFile(file.path)
+        val bitmap_compressed = Bitmap.createScaledBitmap(bitmap_original, 110, 110, true)
+        Toast.makeText(this, "in putDpCircularView function", Toast.LENGTH_SHORT).show()
+        circularImageView.setImageBitmap(bitmap_compressed)
+        btnDP.alpha = 0f
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -175,26 +183,60 @@ class Sign_up : AppCompatActivity() {
         if (requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
 //            Toast.makeText(this, "Photo was selected", Toast.LENGTH_SHORT).show()
             selectedPhotoUrl = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUrl)
 
+//            val file = File(selectedPhotoUrl!!.path.toString())
+//            val compressedImageFile = Compressor.compress(this, file)
+//            val bitmap_original = BitmapFactory.decodeFile(file.path)
+//            val bitmap_compressed = Bitmap.createScaledBitmap(bitmap_original, 110, 110, true)
+
+            var imageStream: InputStream? = null
+            try {
+                imageStream = contentResolver.openInputStream(
+                    selectedPhotoUrl!!
+                )
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace()
+            }
+
+            val bmp = BitmapFactory.decodeStream(imageStream)
+
+            var stream: ByteArrayOutputStream? = ByteArrayOutputStream()
+            bmp.compress(Bitmap.CompressFormat.PNG, 1, stream)
+            val byteArray: ByteArray = (stream?.toByteArray() ?: try {
+                if (stream != null) {
+                    stream.close()
+                }
+                stream = null
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }) as ByteArray
+            Toast.makeText(this, "in putDpCircularView function", Toast.LENGTH_SHORT).show()
+            circularImageView.setImageBitmap(bmp)
+            btnDP.alpha = 0f
+
+//            val bytes = ByteArrayOutputStream()
+//            bmp.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+//            val path = MediaStore.Images.Media.insertImage(this.contentResolver, bmp, "Title", null)
+//            compressed_uri =  Uri.parse(path.toString())
+
+
+//            val file = File(selectedPhotoUrl!!.path.toString())
+//            val compressedImageFile = Compressor.compress(this, file)
+//            val bitmap = BitmapFactory.decodeFile(compressedImageFile.path)
+//            circularImageView.setImageBitmap(bitmap)
+//            btnDP.alpha = 0f
+//            val bitmapDrawable = BitmapDrawable(bitmap)
+//            btnDP.setBackgroundDrawable(bitmapDrawable)
+//            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUrl)
 //            if(selectedPhotoUrl != null){
 //                val file = File(selectedPhotoUrl!!.path.toString())
 //                val compressedImageFile = Compressor.compress(this, file)
 //            }
-
-
 //            val bytes = ByteArrayOutputStream()
 //            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
 //            val path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), bitmap, "Title", null)
 //            Uri.parse(path)
-
 //            val compressedImageFile = Compressor.compress(this, data.)
-
-            circularImageView.setImageBitmap(bitmap)
-            btnDP.alpha = 0f
-
-//            val bitmapDrawable = BitmapDrawable(bitmap)
-//            btnDP.setBackgroundDrawable(bitmapDrawable)
         }
     }
 

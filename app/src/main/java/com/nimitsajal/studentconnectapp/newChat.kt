@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -42,11 +43,76 @@ class newChat : AppCompatActivity() {
             val intent = Intent(this, currentChats::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            finish()
         }
 
         fetchUsers(username!!)
 
     }
+
+    private  fun already(from: String, to: String)
+    {
+        val intent = Intent(this, chat::class.java)
+        intent.putExtra("from", from)
+        intent.putExtra("to", to)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun notAlready(from: String, to: String)
+    {
+        val db = FirebaseFirestore.getInstance()
+
+        val message = hashMapOf(
+            "From" to "System",
+            "To" to to,
+            "Text" to "Say Hi",
+            "Time" to FieldValue.serverTimestamp()
+        )
+
+        val info = hashMapOf(
+            "Info" to "Info"
+        )
+
+        db.collection("Users").document(from).collection("Chats").document(to)
+            .set(message)
+            .addOnCompleteListener{
+                if(it.isSuccessful)
+                {
+                    db.collection("Users").document(from).collection("Chats").document(to).collection("Next")
+                        .add(message)
+                        .addOnCompleteListener{it1->
+                            if(it1.isSuccessful)
+                            {
+                                db.collection("Users").document(to).collection("Chats").document(from)
+                                    .set(message)
+                                    .addOnCompleteListener{it2->
+                                        if(it2.isSuccessful)
+                                        {
+                                            db.collection("Users").document(to).collection("Chats").document(from).collection("Next")
+                                                .add(message)
+                                                .addOnCompleteListener{it3->
+                                                    if(it3.isSuccessful)
+                                                    {
+                                                        val intent = Intent(this, chat::class.java)
+                                                        intent.putExtra("from", from)
+                                                        intent.putExtra("to", to)
+                                                        startActivity(intent)
+                                                        finish()
+                                                    }
+
+                                                }
+                                        }
+
+                                    }
+                            }
+
+                        }
+                }
+            }
+    }
+
+
 
     @SuppressLint("RestrictedApi")
     private fun fetchUsers(username: String){
@@ -71,7 +137,23 @@ class newChat : AppCompatActivity() {
             adapter.setOnItemClickListener { item, view ->
                 val userItem: UserItem = item as UserItem
                 //val intent = Intent(view.context, ChatActivity:class.java)
-                Toast.makeText(this, "Username = ${userItem.username}, Link = ${userItem.link}", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "Username = ${userItem.username}, Link = ${userItem.link}", Toast.LENGTH_SHORT).show()
+                db.collection("Users").document(username).collection("Chats")
+                    .get()
+                    .addOnSuccessListener{
+                        for(document in it)
+                        {
+                            if(document.id == userItem.username)
+                            {
+                                Toast.makeText(this, "Already exixts", Toast.LENGTH_SHORT).show()
+                                already(username,userItem.username)
+                                return@addOnSuccessListener
+                            }
+                        }
+                        Toast.makeText(this, "Doesn't exist", Toast.LENGTH_SHORT).show()
+                        notAlready(username,userItem.username)
+                        return@addOnSuccessListener
+                    }
             }
             rvNewChats.adapter = adapter
         }

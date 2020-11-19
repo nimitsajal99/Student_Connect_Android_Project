@@ -60,6 +60,9 @@ android {
         implementation "com.xwray:groupie:2.8.1"   //Groupie view holder for RecyclerView
 
         implementation 'com.github.kassisdion:ViewPagerWithIndicator:v1.0'
+
+        compile 'me.biubiubiu.justifytext:library:1.1'  //Justify text
+
     }
 }
 

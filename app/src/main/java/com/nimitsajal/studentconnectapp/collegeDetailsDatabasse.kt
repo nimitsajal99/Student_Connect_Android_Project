@@ -683,7 +683,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
                                                                                                                                                 "database",
                                                                                                                                                 "User enrolled in College"
                                                                                                                                             )
-                                                                                                                                            //TODO: CHATS CREATED
                                                                                                                                             db.collection("Users").document(userUserName)
                                                                                                                                                 .collection("Chats").document("Info")
                                                                                                                                                 .set(inner)
