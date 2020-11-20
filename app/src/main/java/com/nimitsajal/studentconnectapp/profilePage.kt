@@ -216,3 +216,5 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
     }
 
 }
+
+//useless text
