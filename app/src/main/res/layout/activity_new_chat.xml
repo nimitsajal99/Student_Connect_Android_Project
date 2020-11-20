@@ -46,6 +46,23 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="NotSibling" />
 
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:hint="Search Usernames"
+            android:textColorHint="@color/base2"
+            android:textColor="@color/base3"
+            android:textSize="17sp"
+            android:text=""
+            android:paddingLeft="15dp"
+            android:background="@color/base0light"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/btnBack"
+            app:layout_constraintRight_toLeftOf="@id/btnSearch"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

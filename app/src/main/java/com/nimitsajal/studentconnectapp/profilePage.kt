@@ -14,11 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
 import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.btnChat
+import kotlinx.android.synthetic.main.details_adapter.view.*
 
 
 class profilePage : AppCompatActivity() {
@@ -48,8 +52,7 @@ class profilePage : AppCompatActivity() {
 
 
 
-        tvDetails.setText("").toString()
-
+//        tvDetails.setText("").toString()
 
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -151,6 +154,21 @@ class profilePage : AppCompatActivity() {
                     expand(tvDescription, 999)
                     tvDescription.setText(it.getString("Description").toString()).toString()
                 }
+                val arrayDetails = mutableListOf<String>()
+                val adapter = GroupAdapter<GroupieViewHolder>()
+                db.collection("Users").document(username).collection("Medals")
+                    .get()
+                    .addOnSuccessListener {
+                        for(document in it){
+                            arrayDetails.add(document.id.toString())
+                        }
+                        for(i in 0 until arrayDetails.size){
+                            var num = (0 until arrayDetails.size).random()
+                            adapter.add(details_class(arrayDetails.get(num)))
+                            arrayDetails.removeAt(num)
+                        }
+                        rvDetails.adapter = adapter
+                    }
 
                 var selectedPhotoUrl_string = it.getString("Picture")
                 val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
@@ -184,6 +202,17 @@ class profilePage : AppCompatActivity() {
                     btnFriends.setText(friends).toString()
                 }
             }
+    }
+
+}
+
+class details_class(val text: String): Item<GroupieViewHolder>(){
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.tvdetails.text = text
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.details_adapter
     }
 
 }

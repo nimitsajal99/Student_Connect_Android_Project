@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/base0"
         android:textStyle="bold|italic"
-        android:textSize="17dp"
+        android:textSize="17sp"
         android:layout_marginRight="5dp"
         android:textAlignment="center"
         android:background="@drawable/rounded_corners_buttons"

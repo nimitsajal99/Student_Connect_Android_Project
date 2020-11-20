@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/base3"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:layout_marginRight="5dp"
         android:background="@drawable/rounded_corners_textfields_base1"
         android:maxWidth="240dp"

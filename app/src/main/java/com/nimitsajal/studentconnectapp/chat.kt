@@ -1,6 +1,7 @@
 package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -63,7 +64,10 @@ class chat : AppCompatActivity() {
         }
 
         btnBack.setOnClickListener {
-
+            val intent = Intent(this, mainFeed::class.java)
+            intent.putExtra("username", From)
+            startActivity(intent)
+            finish()
         }
 
         if (To != null) {

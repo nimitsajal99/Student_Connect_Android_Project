@@ -2,11 +2,11 @@ package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
@@ -14,18 +14,21 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_current_chats.*
-import kotlinx.android.synthetic.main.activity_main_feed.*
 import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import kotlinx.android.synthetic.main.current_chat_adapter.view.*
-import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 
 class currentChats : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_current_chats)
 //        var username = ""
+
+        val adapter = GroupAdapter<GroupieViewHolder>()
+
+        var arrayUser = mutableListOf<usersList>()
+
         var username = intent.getStringExtra("username")
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -36,7 +39,7 @@ class currentChats : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
-                    fetchUser(username!!)
+                    fetchUser(username!!, adapter, arrayUser)
                 }
                 else{
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
@@ -78,12 +81,25 @@ class currentChats : AppCompatActivity() {
             startActivity(intent)
         }
 
+        etSearch.addTextChangedListener(){
+            if(username != null){
+                adapter.clear()
+                searching(arrayUser, adapter, username!!)
+            }
+        }
 
+//        btnSearch_currentChat.setOnClickListener {
+//            adapter.clear()
+//            fetchUser(username!!, adapter, arrayUser)
+//        }
     }
 
     @SuppressLint("RestrictedApi")
-    private fun fetchUser(username: String){
-        val adapter = GroupAdapter<GroupieViewHolder>()
+    private fun fetchUser(
+        username: String,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        arrayUser: MutableList<usersList>
+    ){
         val db = FirebaseFirestore.getInstance()
         val user = db.collection("Users").document(username).collection("Chats")
         user.addSnapshotListener { value, error ->
@@ -94,11 +110,11 @@ class currentChats : AppCompatActivity() {
 
             for(document in value.documents){
                 if(document.id != "Info"){
-                    Log.d("adapter", "Document id = ${document.id}")
-                    //Toast.makeText(this, "Document id = ${document.id}", Toast.LENGTH_SHORT).show()
-                    adapter.add(CurrentChat_class(document.id, document["Text"].toString()))
-                    Log.d("adapter", "Done")
-                    //Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
+                        Log.d("adapter", "Document id = ${document.id}")
+                        //Toast.makeText(this, "Document id = ${document.id}", Toast.LENGTH_SHORT).show()
+                        adapter.add(CurrentChat_class(document.id, document["Text"].toString(), document["Name"].toString(), arrayUser))
+                        Log.d("adapter", "Done")
+                        //Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
                 }
             }
             adapter.setOnItemClickListener { item, view ->
@@ -114,11 +130,38 @@ class currentChats : AppCompatActivity() {
         }
     }
 
+    private fun searching(arrayUser: MutableList<usersList>, adapter: GroupAdapter<GroupieViewHolder>, username: String){
+        val search = etSearch.text.toString()
+        val pattern = search.toRegex(RegexOption.IGNORE_CASE)
+        if(search == "" || search == null){
+            for(document in arrayUser){
+                adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url))
+            }
+        }
+        else{
+            for(document in arrayUser){
+                if(pattern.containsMatchIn(document.name) || pattern.containsMatchIn(document.username)){
+                    adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url))
+                }
+            }
+        }
+        adapter.setOnItemClickListener { item, view ->
+            val currentChatSearch_class: CurrentChatSearch_class = item as CurrentChatSearch_class
+            val to = currentChatSearch_class.username
+            val intent = Intent(this, chat::class.java)
+            intent.putExtra("from", username)
+            intent.putExtra("to", to)
+            startActivity(intent)
+            finish()
+        }
+        rvCurrentChats.adapter = adapter
+    }
 }
 
+data class usersList(var username: String, var text: String, var name: String, var url: String){
+}
 
-
-class CurrentChat_class(val username: String, val text: String): Item<GroupieViewHolder>(){
+class CurrentChat_class(val username: String, val text: String, val Name: String, val arrayUser: MutableList<usersList>): Item<GroupieViewHolder>(){
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         val db = FirebaseFirestore.getInstance()
@@ -127,11 +170,27 @@ class CurrentChat_class(val username: String, val text: String): Item<GroupieVie
             .get()
             .addOnSuccessListener {
                 url = it.getString("Picture").toString()
+                val temp = usersList(username, text, Name, url)
+                arrayUser.add(temp)
                 viewHolder.itemView.tv_usernames_latestMessage.text = username
                 viewHolder.itemView.tv_text_latestMessage.text = text
                 Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage)
                 Log.d("adapter", "adapter added")
             }
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.current_chat_adapter
+    }
+
+}
+
+class CurrentChatSearch_class(val username: String, val text: String, val Name: String, val url: String): Item<GroupieViewHolder>(){
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.tv_usernames_latestMessage.text = username
+        viewHolder.itemView.tv_text_latestMessage.text = text
+        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage)
+        Log.d("adapter", "adapter added")
     }
 
     override fun getLayout(): Int {

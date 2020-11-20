@@ -529,6 +529,8 @@ class collegeDetailsDatabase : AppCompatActivity() {
         user.put("Description", "")
         user.put("College", university)
 
+
+
         var inner: HashMap<String, Any> = hashMapOf<String, Any>()
         inner.put("Info", "Info")
 
@@ -548,12 +550,12 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener { it2 ->
                             if (it2.isSuccessful) {
                                 db.collection("Users").document(userUserName).collection("Medals")
-                                    .document("Info")
+                                    .document(college_name)
                                     .set(inner)
                                     .addOnCompleteListener { it3 ->
                                         if (it3.isSuccessful) {
                                             db.collection("Users").document(userUserName)
-                                                .collection("Medals").document("Info")
+                                                .collection("Medals").document(branch_name)
                                                 .set(inner)
                                                 .addOnCompleteListener { it4 ->
                                                     if (it4.isSuccessful) {
