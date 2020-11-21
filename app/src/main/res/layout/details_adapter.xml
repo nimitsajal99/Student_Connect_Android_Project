@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/swipe"
-        android:layout_width="15sp"
-        android:layout_height="15sp"
+        android:layout_width="18sp"
+        android:layout_height="18sp"
         android:src="@drawable/swipe"
         app:layout_constraintRight_toLeftOf="@id/tvdetails"
         app:layout_constraintTop_toTopOf="parent"
@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/tvdetails"
-        android:layout_width="wrap_content"
+        android:layout_width="230dp"
         android:layout_height="match_parent"
         android:text="Details"
         android:textStyle="italic"

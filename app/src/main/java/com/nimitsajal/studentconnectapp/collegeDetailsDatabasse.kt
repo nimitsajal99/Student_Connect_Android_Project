@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -15,6 +16,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_college_details_databasse.*
 import kotlinx.android.synthetic.main.activity_sign_up.toLoginPage
+import kotlinx.android.synthetic.main.toast_login_adapter.*
 import java.util.*
 
 
@@ -487,7 +489,13 @@ class collegeDetailsDatabase : AppCompatActivity() {
                                     }
                                 }
                         }
-                        Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+                        val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_constraint_layout)
+                        Toast(this).apply {
+                            duration = Toast.LENGTH_SHORT
+                            setGravity(Gravity.CENTER, 0, 0)
+                            view = layout
+                        }.show()
                         val intent = Intent(this, mainFeed::class.java)
                         intent.putExtra("username", userUserName)
                         startActivity(intent)
@@ -528,8 +536,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
         user.put("Picture", selectedPhotoUrl)
         user.put("Description", "")
         user.put("College", university)
-
-
 
         var inner: HashMap<String, Any> = hashMapOf<String, Any>()
         inner.put("Info", "Info")

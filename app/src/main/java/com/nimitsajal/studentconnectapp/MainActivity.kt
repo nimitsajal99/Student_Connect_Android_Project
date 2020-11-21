@@ -5,10 +5,12 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toast_login_adapter.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +21,13 @@ class MainActivity : AppCompatActivity() {
 
         val auth = FirebaseAuth.getInstance()
         if(auth.currentUser != null){
-            Toast.makeText(this,"Welcome Student", Toast.LENGTH_SHORT).show()
+            val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_constraint_layout)
+            Toast(this).apply {
+                duration = Toast.LENGTH_SHORT
+                setGravity(Gravity.CENTER, 0, 0)
+                view = layout
+            }.show()
+//            Toast.makeText(this,"Welcome Student", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, mainFeed::class.java)
             startActivity(intent)
         }
@@ -47,7 +55,13 @@ class MainActivity : AppCompatActivity() {
                 btnLogin_login.isEnabled = true
                 Log.d("login", "Went to database")
                 if(it.isSuccessful) {
-                    Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+                    val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_constraint_layout)
+                    Toast(this).apply {
+                        duration = Toast.LENGTH_SHORT
+                        setGravity(Gravity.CENTER, 0, 0)
+                        view = layout
+                    }.show()
                     val intent = Intent(this, mainFeed::class.java)
                     val user = auth.currentUser
                     var username = ""

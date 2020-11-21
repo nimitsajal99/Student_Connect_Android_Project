@@ -63,6 +63,10 @@ android {
 
         compile 'me.biubiubiu.justifytext:library:1.1'  //Justify text
 
+        implementation 'com.muddzdev:styleabletoast:2.2.4'      //Toast Style
+
+        compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'  //Square imageview
+
     }
 }
 

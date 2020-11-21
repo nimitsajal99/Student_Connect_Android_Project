@@ -48,6 +48,7 @@
 
         <EditText
             android:id="@+id/etSearch"
+            android:visibility="invisible"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:hint="Search Usernames"

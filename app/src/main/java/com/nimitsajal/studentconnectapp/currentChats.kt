@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -82,16 +83,30 @@ class currentChats : AppCompatActivity() {
         }
 
         etSearch.addTextChangedListener(){
+            if(etSearch.text.toString() == "")
+            {
+                etSearch.isVisible=false
+            }
+            else{
+                etSearch.isVisible = true
+            }
+
             if(username != null){
                 adapter.clear()
                 searching(arrayUser, adapter, username!!)
             }
         }
 
-//        btnSearch_currentChat.setOnClickListener {
-//            adapter.clear()
-//            fetchUser(username!!, adapter, arrayUser)
-//        }
+        btnSearch_currentChat.setOnClickListener {
+            if(etSearch.isVisible==true){
+                etSearch.isVisible=false
+            }
+            else
+            {
+                etSearch.isVisible=true
+
+            }
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -182,7 +197,6 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
     override fun getLayout(): Int {
         return R.layout.current_chat_adapter
     }
-
 }
 
 class CurrentChatSearch_class(val username: String, val text: String, val Name: String, val url: String): Item<GroupieViewHolder>(){

@@ -6,5 +6,13 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    
+<!--    <style name="toast_style">-->
+<!--        <item name="background">@color/base0light</item>-->
+<!--        <item name="android:textColor">@color/base2</item>-->
+<!--        <item name="android:strokeColor">@color/base2</item>-->
+<!--        <item name="android:strokeWidth">3</item>-->
+<!--        <item name="cornerRadius">10dp</item>-->
+<!--    </style>-->
 
 </resources>

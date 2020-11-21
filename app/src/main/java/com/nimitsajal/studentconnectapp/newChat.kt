@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -53,12 +54,23 @@ class newChat : AppCompatActivity() {
             finish()
         }
 
-//        btnSearch.setOnClickListener {
-//            adapter.clear()
-//            fetchUsers(username!!, adapter)
-//        }
+        btnSearch.setOnClickListener {
+            if (etSearch.isVisible == true) {
+                etSearch.isVisible = false
+            } else {
+                etSearch.isVisible = true
+            }
+        }
 
         etSearch.addTextChangedListener(){
+            if(etSearch.text.toString() == "")
+            {
+                etSearch.isVisible = false
+            }
+            else{
+                etSearch.isVisible = true
+            }
+
             if(username != null){
                 adapter.clear()
                 searching(username!!, adapter, arrayUser)
