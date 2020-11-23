@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp"
-    android:orientation="horizontal">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="2dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/base0card"
+    android:clickable="true"
+    android:focusable="true">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/cv_dp_newMessage"
-        android:layout_height="60dp"
-        android:layout_width="60dp"
-        app:civ_border_color="@color/base2"
-        app:civ_border_width="3dp" />
-
-    <TextView
-        android:id="@+id/tv_usernames_newMessage"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Username"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginStart="15dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/base3"
-        />
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:orientation="horizontal">
 
-</LinearLayout>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/cv_dp_newMessage"
+            android:layout_height="60dp"
+            android:layout_width="60dp"
+            app:civ_border_color="@color/base2"
+            app:civ_border_width="3dp" />
+
+        <TextView
+            android:id="@+id/tv_usernames_newMessage"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Username"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginStart="15dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/base3"
+            />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

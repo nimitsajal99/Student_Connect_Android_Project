@@ -65,7 +65,12 @@ android {
 
         implementation 'com.muddzdev:styleabletoast:2.2.4'      //Toast Style
 
-        compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'  //Square imageview
+        compile 'com.github.siyamed:android-shape-imageview:0.9.3@aar'  //Square imageview
+
+
+        implementation "androidx.cardview:cardview:1.0.0"   //CardView
+
+        implementation 'androidx.palette:palette:1.0.0'     //palette
 
     }
 }

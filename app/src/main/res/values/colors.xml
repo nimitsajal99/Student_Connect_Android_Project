@@ -10,4 +10,5 @@
     <color name="base3">#F4C8C1</color>
     <color name="base4">#ffeadb</color>
     <color name="base0light">#272d55</color>
+    <color name="base0card">#212647</color>
 </resources>

@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.NoActionBar">
-        <activity android:name=".upload_post"></activity>
+        <activity android:name=".others_profile_page"></activity>
+        <activity android:name=".upload_post" />
         <activity android:name=".chat" />
         <activity android:name=".newChat" />
         <activity android:name=".currentChats" />

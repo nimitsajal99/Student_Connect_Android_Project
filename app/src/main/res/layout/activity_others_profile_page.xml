@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -32,8 +33,9 @@
             />
 
 
+
         <ImageButton
-            android:id="@+id/btnLogout"
+            android:id="@+id/btnLogoutOthers"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="5dp"
@@ -68,7 +70,7 @@
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/circularImageView"
+                android:id="@+id/circularImageViewOthers"
                 android:layout_width="110dp"
                 android:layout_height="110dp"
                 app:civ_border_width="4dp"
@@ -82,7 +84,7 @@
                 android:gravity="start">
 
                 <TextView
-                    android:id="@+id/tvUsername"
+                    android:id="@+id/tvUsernameOthers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Username"
@@ -93,7 +95,7 @@
                     android:textColor="@color/base3"/>
 
                 <TextView
-                    android:id="@+id/tvName"
+                    android:id="@+id/tvNameOthers"
                     android:layout_width="wrap_content"
                     android:maxWidth="230dp"
                     android:layout_height="wrap_content"
@@ -107,34 +109,34 @@
 
 
                 <!--                <com.kassisdion.library.ViewPagerWithIndicator-->
-<!--                    app:arrow.enable="true"-->
-<!--                    app:arrow.width="50dp"-->
-<!--                    app:arrow.height="50dp"-->
-<!--                    app:round.enable="true"-->
-<!--                    app:round.size="15dip"-->
-<!--                    app:round.color.default="@color/base3"-->
-<!--                    app:round.color.selected="@android:color/holo_blue_light"-->
-<!--                    android:id="@+id/viewPagerWithIndicator"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"/>-->
+                <!--                    app:arrow.enable="true"-->
+                <!--                    app:arrow.width="50dp"-->
+                <!--                    app:arrow.height="50dp"-->
+                <!--                    app:round.enable="true"-->
+                <!--                    app:round.size="15dip"-->
+                <!--                    app:round.color.default="@color/base3"-->
+                <!--                    app:round.color.selected="@android:color/holo_blue_light"-->
+                <!--                    android:id="@+id/viewPagerWithIndicator"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"/>-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/tvDetails"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Details"-->
-<!--                    android:textStyle="italic"-->
-<!--                    android:textSize="17sp"-->
-<!--                    android:layout_marginLeft="15dp"-->
-<!--                    android:layout_marginTop="3dp"-->
-<!--                    android:textColor="@color/base3"-->
-<!--                    android:ellipsize="marquee"-->
-<!--                    android:marqueeRepeatLimit="marquee_forever"-->
-<!--                    android:scrollHorizontally="true"-->
-<!--                    android:singleLine="true"/>-->
+                <!--                <TextView-->
+                <!--                    android:id="@+id/tvDetails"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:text="Details"-->
+                <!--                    android:textStyle="italic"-->
+                <!--                    android:textSize="17sp"-->
+                <!--                    android:layout_marginLeft="15dp"-->
+                <!--                    android:layout_marginTop="3dp"-->
+                <!--                    android:textColor="@color/base3"-->
+                <!--                    android:ellipsize="marquee"-->
+                <!--                    android:marqueeRepeatLimit="marquee_forever"-->
+                <!--                    android:scrollHorizontally="true"-->
+                <!--                    android:singleLine="true"/>-->
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvDetails"
+                    android:id="@+id/rvDetailsOthers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -155,7 +157,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvDescription"
+                android:id="@+id/tvDescriptionOthers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Descrption : "
@@ -175,13 +177,13 @@
             android:weightSum="2"
             android:paddingLeft="15dp"
             android:paddingRight="15dp">
-            
+
             <Button
-                android:id="@+id/btnFriends"
+                android:id="@+id/btnFriendsOthers"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Friends (2345)"
+                android:text="Add friend (3445)"
                 android:background="@drawable/rounded_corners_buttons"
                 android:textColor="@color/base0"
                 android:textStyle="bold"
@@ -189,11 +191,11 @@
                 android:layout_marginRight="7dp"
                 />
             <Button
-                android:id="@+id/btnEdit"
+                android:id="@+id/btnMessageOthers"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Edit"
+                android:text="Message"
                 android:background="@drawable/rounded_corners_buttons"
                 android:textColor="@color/base0"
                 android:textStyle="bold"
@@ -213,7 +215,7 @@
             android:paddingTop="10dp">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvProfilePage"
+                android:id="@+id/rvProfilePageOthers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
@@ -235,7 +237,7 @@
         app:layout_constraintRight_toRightOf="parent">
 
         <ImageButton
-            android:id="@+id/btnFeed"
+            android:id="@+id/btnFeedOthers"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
@@ -243,42 +245,42 @@
             android:background="@drawable/home_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/btnEvent"
+            app:layout_constraintRight_toLeftOf="@id/btnEventOthers"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/btnEvent"
+            android:id="@+id/btnEventOthers"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/event_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btnFeed"
-            app:layout_constraintRight_toLeftOf="@id/btnProfile"
+            app:layout_constraintLeft_toRightOf="@id/btnFeedOthers"
+            app:layout_constraintRight_toLeftOf="@id/btnProfileOthers"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/btnProfile"
+            android:id="@+id/btnProfileOthers"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/profile_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btnEvent"
-            app:layout_constraintRight_toLeftOf="@id/btnChat"
+            app:layout_constraintLeft_toRightOf="@id/btnEventOthers"
+            app:layout_constraintRight_toLeftOf="@id/btnChatOthers"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/btnChat"
+            android:id="@+id/btnChatOthers"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/chat_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btnProfile"
+            app:layout_constraintLeft_toRightOf="@id/btnProfileOthers"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

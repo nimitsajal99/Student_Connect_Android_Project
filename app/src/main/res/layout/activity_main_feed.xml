@@ -133,14 +133,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <Button
         android:id="@+id/btnUpload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/plus"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/upload_button"
         android:contentDescription="Upload"
         android:layout_margin="16dp"
-        android:backgroundTint="@color/base2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"/>
 
