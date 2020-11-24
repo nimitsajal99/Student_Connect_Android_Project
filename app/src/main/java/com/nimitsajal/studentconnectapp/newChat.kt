@@ -57,8 +57,11 @@ class newChat : AppCompatActivity() {
         btnSearch.setOnClickListener {
             if (etSearch.isVisible == true) {
                 etSearch.isVisible = false
+                etSearch.setText("").toString()
+                studentConnectNewChat.isVisible = true
             } else {
                 etSearch.isVisible = true
+                studentConnectNewChat.isVisible = false
             }
         }
 
@@ -66,9 +69,11 @@ class newChat : AppCompatActivity() {
             if(etSearch.text.toString() == "")
             {
                 etSearch.isVisible = false
+                studentConnectNewChat.isVisible = true
             }
             else{
                 etSearch.isVisible = true
+                studentConnectNewChat.isVisible = false
             }
 
             if(username != null){
@@ -120,40 +125,39 @@ class newChat : AppCompatActivity() {
 
         db.collection("Users").document(from).collection("Chats").document(to)
             .set(messageFrom)
-            .addOnCompleteListener{
-                if(it.isSuccessful)
-                {
-                    db.collection("Users").document(from).collection("Chats").document(to).collection("Next")
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    db.collection("Users").document(from).collection("Chats").document(to)
+                        .collection("Next")
                         .add(message)
-                        .addOnCompleteListener{it1->
-                            if(it1.isSuccessful)
-                            {
-                                db.collection("Users").document(to).collection("Chats").document(from)
-                                    .set(messageTo)
-                                    .addOnCompleteListener{it2->
-                                        if(it2.isSuccessful)
-                                        {
-                                            db.collection("Users").document(to).collection("Chats").document(from).collection("Next")
-                                                .add(message)
-                                                .addOnCompleteListener{it3->
-                                                    if(it3.isSuccessful)
-                                                    {
-                                                        val intent = Intent(this, chat::class.java)
-                                                        intent.putExtra("from", from)
-                                                        intent.putExtra("to", to)
-                                                        startActivity(intent)
-                                                        finish()
-                                                    }
-
-                                                }
-                                        }
-
-                                    }
+                        .addOnCompleteListener { it1 ->
+                            if (it1.isSuccessful) {
+                                Log.d("adapter", "chat created in user")
                             }
-
                         }
                 }
             }
+        db.collection("Users").document(to).collection("Chats").document(from)
+            .set(messageTo)
+            .addOnCompleteListener{it2->
+                if(it2.isSuccessful)
+                {
+                    db.collection("Users").document(to).collection("Chats").document(from).collection("Next")
+                        .add(message)
+                        .addOnCompleteListener{it3->
+                            if(it3.isSuccessful)
+                            {
+                                val intent = Intent(this, chat::class.java)
+                                intent.putExtra("from", from)
+                                intent.putExtra("to", to)
+                                startActivity(intent)
+                                finish()
+                            }
+                        }
+                }
+
+            }
+
     }
 
 
@@ -181,38 +185,43 @@ class newChat : AppCompatActivity() {
                 val userItem: UserItem = item as UserItem
                 //val intent = Intent(view.context, ChatActivity:class.java)
 //                Toast.makeText(this, "Username = ${userItem.username}, Link = ${userItem.link}", Toast.LENGTH_SHORT).show()
-                db.collection("Users").document(username).collection("Chats")
+                db.collection("Users").document(username).collection("Chats").document(userItem.username)
                     .get()
-                    .addOnSuccessListener{
-                        for(document in it)
+                    .addOnCompleteListener {
+                        if(it.isSuccessful)
                         {
-                            if(document.id == userItem.username)
-                            {
-                                Toast.makeText(this, "Already exixts", Toast.LENGTH_SHORT).show()
-                                already(username,userItem.username)
-                                return@addOnSuccessListener
-                            }
-                        }
-                        Toast.makeText(this, "Doesn't exist", Toast.LENGTH_SHORT).show()
-                        var fromName = ""
-                        var toName = ""
-                        db.collection("Users").document(username)
-                            .get()
-                            .addOnSuccessListener {
-                                if(it != null){
-                                    fromName = it.getString("Name").toString()
-                                    db.collection("Users").document(userItem.username)
+                            val temp = it.getResult()
+                            if (temp != null) {
+                                if(temp.exists())
+                                {
+                                    Toast.makeText(this, "Already exixts", Toast.LENGTH_SHORT).show()
+                                    already(username,userItem.username)
+                                    return@addOnCompleteListener
+                                }
+                                else
+                                {
+                                    Toast.makeText(this, "Doesn't exist", Toast.LENGTH_SHORT).show()
+                                    var fromName = ""
+                                    var toName = ""
+                                    db.collection("Users").document(username)
                                         .get()
-                                        .addOnSuccessListener {it2 ->
-                                            if(it2 != null){
-                                                toName = it2.getString("Name").toString()
-                                                notAlready(username,userItem.username, fromName, toName)
-                                                return@addOnSuccessListener
+                                        .addOnSuccessListener {
+                                            if(it != null){
+                                                fromName = it.getString("Name").toString()
+                                                db.collection("Users").document(userItem.username)
+                                                    .get()
+                                                    .addOnSuccessListener {it2 ->
+                                                        if(it2 != null){
+                                                            toName = it2.getString("Name").toString()
+                                                            notAlready(username,userItem.username, fromName, toName)
+                                                            return@addOnSuccessListener
+                                                        }
+                                                    }
                                             }
                                         }
                                 }
                             }
-
+                        }
                     }
             }
             rvNewChats.adapter = adapter
@@ -239,38 +248,43 @@ class newChat : AppCompatActivity() {
             val db = FirebaseFirestore.getInstance()
             //val intent = Intent(view.context, ChatActivity:class.java)
 //                Toast.makeText(this, "Username = ${userItem.username}, Link = ${userItem.link}", Toast.LENGTH_SHORT).show()
-            db.collection("Users").document(username).collection("Chats")
+            db.collection("Users").document(username).collection("Chats").document(userItemSearch.username)
                 .get()
-                .addOnSuccessListener{
-                    for(document in it)
+                .addOnCompleteListener{
+                    if(it.isSuccessful)
                     {
-                        if(document.id == userItemSearch.username)
+                        val temp = it.getResult()
+                        if(temp!=null)
                         {
-                            Toast.makeText(this, "Already exixts", Toast.LENGTH_SHORT).show()
-                            already(username,userItemSearch.username)
-                            return@addOnSuccessListener
-                        }
-                    }
-                    Toast.makeText(this, "Doesn't exist", Toast.LENGTH_SHORT).show()
-                    var fromName = ""
-                    var toName = ""
-                    db.collection("Users").document(username)
-                        .get()
-                        .addOnSuccessListener {
-                            if(it != null){
-                                fromName = it.getString("Name").toString()
-                                db.collection("Users").document(userItemSearch.username)
+                            if(temp.exists())
+                            {
+                                Toast.makeText(this, "Already exixts", Toast.LENGTH_SHORT).show()
+                                already(username,userItemSearch.username)
+                                return@addOnCompleteListener
+                            }
+                            else
+                            {
+                                Toast.makeText(this, "Doesn't exist", Toast.LENGTH_SHORT).show()
+                                var fromName = ""
+                                var toName = ""
+                                db.collection("Users").document(username)
                                     .get()
-                                    .addOnSuccessListener {it2 ->
-                                        if(it2 != null){
-                                            toName = it2.getString("Name").toString()
-                                            notAlready(username,userItemSearch.username, fromName, toName)
-                                            return@addOnSuccessListener
+                                    .addOnSuccessListener {
+                                        if(it != null){
+                                            fromName = it.getString("Name").toString()
+                                            db.collection("Users").document(userItemSearch.username)
+                                                .get()
+                                                .addOnSuccessListener {it2 ->
+                                                    if(it2 != null){
+                                                        toName = it2.getString("Name").toString()
+                                                        notAlready(username,userItemSearch.username, fromName, toName)
+                                                        return@addOnSuccessListener                                           }
+                                                }
                                         }
                                     }
                             }
                         }
-
+                    }
                 }
         }
         rvNewChats.adapter = adapter

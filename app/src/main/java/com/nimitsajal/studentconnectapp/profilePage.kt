@@ -132,44 +132,6 @@ class profilePage : AppCompatActivity() {
         user_info.get().addOnSuccessListener {
             if(it != null){
 
-//                if(it.getString("Name").toString() == ""){
-//                    //collapse(tvName)
-//                    tvName.setText(it.getString("Name").toString()).toString()
-//                    expand(tvName, 999)
-//                }
-//                else{
-//                    expand(tvName, 999)
-//                    tvName.setText(it.getString("Name").toString()).toString()
-//                }
-
-                tvName.setText(it.getString("Name").toString()).toString()
-
-
-                if(it.getString("Description").toString() == ""){
-                    collapse(tvDescription)
-//                    tvDescription.setText(it.getString("Description").toString()).toString()
-//                    expand(tvName, 999)
-                }
-                else{
-                    expand(tvDescription, 999)
-                    tvDescription.setText(it.getString("Description").toString()).toString()
-                }
-                val arrayDetails = mutableListOf<String>()
-                val adapter = GroupAdapter<GroupieViewHolder>()
-                db.collection("Users").document(username).collection("Medals")
-                    .get()
-                    .addOnSuccessListener {
-                        for(document in it){
-                            arrayDetails.add(document.id.toString())
-                        }
-                        for(i in 0 until arrayDetails.size){
-                            var num = (0 until arrayDetails.size).random()
-                            adapter.add(details_class(arrayDetails.get(num)))
-                            arrayDetails.removeAt(num)
-                        }
-                        rvDetails.adapter = adapter
-                    }
-
                 var selectedPhotoUrl_string = it.getString("Picture")
                 val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
 //                val selectedPhotoUrl = selectedPhotoUrl_string.toUri()
@@ -188,10 +150,38 @@ class profilePage : AppCompatActivity() {
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
                 })
+
+
+                tvName.setText(it.getString("Name").toString()).toString()
+
+
+                if(it.getString("Description").toString() == ""){
+                    collapse(tvDescription)
+//                    tvDescription.setText(it.getString("Description").toString()).toString()
+//                    expand(tvName, 999)
+                }
+                else{
+                    expand(tvDescription, 999)
+                    tvDescription.setText(it.getString("Description").toString()).toString()
+                }
             }
         }
 
-
+        val arrayDetails = mutableListOf<String>()
+        val adapter = GroupAdapter<GroupieViewHolder>()
+        db.collection("Users").document(username).collection("Medals")
+            .get()
+            .addOnSuccessListener {
+                for(document in it){
+                    arrayDetails.add(document.id.toString())
+                }
+                for(i in 0 until arrayDetails.size){
+                    var num = (0 until arrayDetails.size).random()
+                    adapter.add(details_class(arrayDetails.get(num)))
+                    arrayDetails.removeAt(num)
+                }
+                rvDetails.adapter = adapter
+            }
 
         var friends = "Friends ("
         val FriendsCount = user_info.collection("Friends").get()

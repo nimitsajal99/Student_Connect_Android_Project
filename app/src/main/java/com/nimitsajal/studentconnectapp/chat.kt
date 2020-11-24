@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -14,6 +15,8 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.activity_chat.circularImageView
+import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.chat_recieve.view.*
 import kotlinx.android.synthetic.main.chat_recieve.view.tvRecieve
 import kotlinx.android.synthetic.main.chat_send.view.*
@@ -70,9 +73,52 @@ class chat : AppCompatActivity() {
             finish()
         }
 
+        username.setOnClickListener {
+            if(To!=null)
+            {
+                val intent = Intent(this, others_profile_page::class.java)
+                intent.putExtra("usernameOthers", To)
+                startActivity(intent)
+            }
+        }
+
+        circularImageView.setOnClickListener {
+            if(To!=null)
+            {
+                val intent = Intent(this, others_profile_page::class.java)
+                intent.putExtra("usernameOthers", To)
+                startActivity(intent)
+            }
+        }
+
         if (To != null) {
             if (From != null) {
                 loadChat(To, From)
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
+
+        var username = ""
+        val db = FirebaseFirestore.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if(user != null){
+            val user_table = db.collection("User Table").document(user.uid.toString())
+            user_table.get().addOnSuccessListener { result ->
+                if(result != null){
+                    username = result.getString("Username").toString()
+                    Log.d("profilePage", username.toString())
+                    val intent = Intent(this, mainFeed::class.java)
+                    intent.putExtra("usernameOthers", username)
+                    startActivity(intent)
+                }
+                else{
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
             }
         }
     }

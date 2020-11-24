@@ -129,41 +129,31 @@ class Sign_up : AppCompatActivity() {
 
         val db = FirebaseFirestore.getInstance()
 
-        db.collection("Users")
+        db.collection("Users").document(userUserName)
             .get()
-            .addOnSuccessListener { result ->
-                var truth = false
-                for (document in result) {
-                    Log.d("database", "-${document.id}-")
-                    if (document.id == userUserName) {
-                        truth = true
-                        break
+            .addOnCompleteListener {
+                if(it.isSuccessful)
+                {
+                    val temp = it.getResult()
+                    if (temp != null) {
+                        if(temp.exists()) {
+                            Log.d("database", "Username present -$userUserName-")
+                            Toast.makeText(this, "Username already exists!", Toast.LENGTH_SHORT).show()
+                            btnContinueToClgDetails.isEnabled = true
+                        }
+                        else
+                        {
+                            val intent = Intent(this, collegeDetailsDatabase::class.java)
+                            intent.putExtra("userName_signup", userName)
+                            intent.putExtra("userEmail_signup", userEmail)
+                            intent.putExtra("userPassword_signup", userPassword)
+                            intent.putExtra("userUserName_signup", userUserName)
+                            intent.putExtra("userPhone_signup", userPhone)
+                            intent.putExtra("dpImage_string", selectedPhotoUrl.toString())
+                            startActivity(intent)
+                        }
                     }
                 }
-                Log.d("database", "Username present -$truth-")
-                //TODO: Switching The button Back On
-                btnContinueToClgDetails.isEnabled = true
-                if (result.contains(userUserName))
-                    Log.d("database", "Username present -$userUserName-")
-
-                if (!truth) {
-                    val intent = Intent(this, collegeDetailsDatabase::class.java)
-                    intent.putExtra("userName_signup", userName)
-                    intent.putExtra("userEmail_signup", userEmail)
-                    intent.putExtra("userPassword_signup", userPassword)
-                    intent.putExtra("userUserName_signup", userUserName)
-                    intent.putExtra("userPhone_signup", userPhone)
-                    intent.putExtra("dpImage_string", selectedPhotoUrl.toString())
-                    startActivity(intent)
-                    //finish()
-                } else {
-                    Toast.makeText(this, "Username already exists!", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-
-            .addOnFailureListener { exception ->
-                Log.d("ret", " in failure, isUserPresent = $exception")
             }
     }
 

@@ -110,31 +110,46 @@ class upload_post : AppCompatActivity() {
                                 db.collection("Post").document(postObject.id).collection("Comments").document("Info")
                                     .set(info)
                                     .addOnSuccessListener {
-                                        db.collection("Post").document(postObject.id).collection("Tags").document("Info")
-                                            .set(info)
-                                            .addOnSuccessListener {
-                                                db.collection("Users").document(username).collection("My Posts").document(postObject.id)
+                                        Log.d(
+                                            "Registration",
+                                            "Comments collection created: ${img.metadata?.path}"
+                                        )
+                                    }
+
+                                db.collection("Post").document(postObject.id).collection("Tags").document("Info")
+                                    .set(info)
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            "Registration",
+                                            "Tags collection created: ${img.metadata?.path}"
+                                        )
+                                    }
+
+                                db.collection("Users").document(username).collection("My Posts").document(postObject.id)
+                                    .set(linkPost)
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            "Registration",
+                                            "Image added into my post: ${img.metadata?.path}"
+                                        )
+                                    }
+
+                                db.collection("Users").document(username).collection("Friends")
+                                    .get()
+                                    .addOnSuccessListener {friendList ->
+                                        for(document in friendList){
+                                            if(document.id != "Info"){
+                                                db.collection("Users").document(document.id).collection("My Feed").document(postObject.id)
                                                     .set(linkPost)
                                                     .addOnSuccessListener {
-                                                        db.collection("Users").document(username).collection("Friends")
-                                                            .get()
-                                                            .addOnSuccessListener {friendList ->
-                                                                for(document in friendList){
-                                                                    if(document.id != "Info"){
-                                                                        db.collection("Users").document(document.id).collection("My Feed").document(postObject.id)
-                                                                            .set(linkPost)
-                                                                            .addOnSuccessListener {
-                                                                                Log.d("post", "Post in the feed of ${document.id}")
-                                                                            }
-                                                                    }
-                                                                }
-                                                                val intent = Intent(this, mainFeed::class.java)
-                                                                intent.putExtra("username", username)
-                                                                startActivity(intent)
-                                                                finish()
-                                                            }
+                                                        Log.d("post", "Post in the feed of ${document.id}")
                                                     }
                                             }
+                                        }
+                                        val intent = Intent(this, mainFeed::class.java)
+                                        intent.putExtra("username", username)
+                                        startActivity(intent)
+                                        finish()
                                     }
                             }
                     }

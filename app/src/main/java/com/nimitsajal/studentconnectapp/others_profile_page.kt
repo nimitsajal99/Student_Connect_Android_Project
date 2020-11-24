@@ -297,36 +297,6 @@ class others_profile_page : AppCompatActivity() {
         user_info.get().addOnSuccessListener {
             if(it != null){
 
-
-                tvNameOthers.setText(it.getString("Name").toString()).toString()
-                friend.name = it.getString("Name").toString()
-
-
-                if(it.getString("Description").toString() == ""){
-                    collapse(tvDescriptionOthers)
-//                    tvDescription.setText(it.getString("Description").toString()).toString()
-//                    expand(tvName, 999)
-                }
-                else{
-                    expand(tvDescriptionOthers, 999)
-                    tvDescriptionOthers.setText(it.getString("Description").toString()).toString()
-                }
-                val arrayDetails = mutableListOf<String>()
-                val adapter = GroupAdapter<GroupieViewHolder>()
-                db.collection("Users").document(username).collection("Medals")
-                    .get()
-                    .addOnSuccessListener {
-                        for(document in it){
-                            arrayDetails.add(document.id.toString())
-                        }
-                        for(i in 0 until arrayDetails.size){
-                            var num = (0 until arrayDetails.size).random()
-                            adapter.add(details_class(arrayDetails.get(num)))
-                            arrayDetails.removeAt(num)
-                        }
-                        rvDetailsOthers.adapter = adapter
-                    }
-
                 var selectedPhotoUrl_string = it.getString("Picture").toString()
                 val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
 //                val selectedPhotoUrl = selectedPhotoUrl_string.toUri()
@@ -334,7 +304,6 @@ class others_profile_page : AppCompatActivity() {
 //                circularImageView.setImageBitmap(bitmap)
 
                 friend.url = selectedPhotoUrl_string
-
 
                 Picasso.get().load(selectedPhotoUrl_string).into(object :
                     com.squareup.picasso.Target {
@@ -347,10 +316,38 @@ class others_profile_page : AppCompatActivity() {
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
                 })
+
+                tvNameOthers.setText(it.getString("Name").toString()).toString()
+                friend.name = it.getString("Name").toString()
+
+                if(it.getString("Description").toString() == ""){
+                    collapse(tvDescriptionOthers)
+//                    tvDescription.setText(it.getString("Description").toString()).toString()
+//                    expand(tvName, 999)
+                }
+                else{
+                    expand(tvDescriptionOthers, 999)
+                    tvDescriptionOthers.setText(it.getString("Description").toString()).toString()
+                }
+
             }
         }
 
-
+        val arrayDetails = mutableListOf<String>()
+        val adapter = GroupAdapter<GroupieViewHolder>()
+        db.collection("Users").document(username).collection("Medals")
+            .get()
+            .addOnSuccessListener {
+                for(document in it){
+                    arrayDetails.add(document.id.toString())
+                }
+                for(i in 0 until arrayDetails.size){
+                    var num = (0 until arrayDetails.size).random()
+                    adapter.add(details_class(arrayDetails.get(num)))
+                    arrayDetails.removeAt(num)
+                }
+                rvDetailsOthers.adapter = adapter
+            }
 
         var friends = ""
         if(friend.isFriend == true){

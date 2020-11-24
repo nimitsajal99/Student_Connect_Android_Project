@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import kotlinx.android.synthetic.main.current_chat_adapter.view.*
+import kotlinx.android.synthetic.main.new_chat_adapter.*
 
 class currentChats : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,9 +87,13 @@ class currentChats : AppCompatActivity() {
             if(etSearch.text.toString() == "")
             {
                 etSearch.isVisible=false
+
+                studentConnectCurrentChat.isVisible = true
             }
             else{
                 etSearch.isVisible = true
+
+                studentConnectCurrentChat.isVisible = false
             }
 
             if(username != null){
@@ -100,11 +105,13 @@ class currentChats : AppCompatActivity() {
         btnSearch_currentChat.setOnClickListener {
             if(etSearch.isVisible==true){
                 etSearch.isVisible=false
+                etSearch.setText("").toString()
+                studentConnectCurrentChat.isVisible = true
             }
             else
             {
                 etSearch.isVisible=true
-
+                studentConnectCurrentChat.isVisible = false
             }
         }
     }

@@ -64,6 +64,14 @@ class mainFeed : AppCompatActivity() {
 //            }.show()
 //        }
 
+        btnEvent.setOnClickListener {
+            val intent = Intent(this, collegeProfilePage::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("collegeName", " BMSCE - BMS College of Engineering")
+            intent.putExtra("universityName", "BMS University")
+            startActivity(intent)
+        }
+
         btnUpload.setOnClickListener{
             val intent = Intent(this, upload_post::class.java)
             intent.putExtra("username", username)

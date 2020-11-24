@@ -72,6 +72,8 @@ android {
 
         implementation 'androidx.palette:palette:1.0.0'     //palette
 
+        implementation 'com.google.android.gms:play-services-maps:17.0.0'   //map
+
     }
 }
 

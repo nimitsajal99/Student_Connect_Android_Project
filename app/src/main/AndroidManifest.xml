@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nimitsajal.studentconnectapp">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,7 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.NoActionBar">
-        <activity android:name=".others_profile_page"></activity>
+        <meta-data
+            android:name="com.google.geo.API_KEY"
+            android:value="AIzaSyAgSCTZvb3WJy0hc8PryEAxgihFd_JN92k"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <activity android:name=".collegeProfilePage"></activity>
+        <activity android:name=".others_profile_page" />
         <activity android:name=".upload_post" />
         <activity android:name=".chat" />
         <activity android:name=".newChat" />
@@ -24,6 +34,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="com.google.geo.API_KEY"
+                android:value="AIzaSyAgSCTZvb3WJy0hc8PryEAxgihFd_JN92k"/>
         </activity>
     </application>
 

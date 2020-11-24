@@ -19,7 +19,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/studentConnectCurrentChat"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:src="@drawable/rutu_logo"
@@ -27,42 +26,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="18dp"
-            android:visibility="visible"
             />
-
-        <EditText
-            android:id="@+id/etSearch"
-            android:visibility="invisible"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:hint="Search Usernames"
-            android:textColorHint="@color/base2"
-            android:textColor="@color/base3"
-            android:textSize="17sp"
-            android:text=""
-            android:paddingLeft="15dp"
-            android:background="@color/base0light"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/btnSearch"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            tools:ignore="NotSibling" />
-
-        <ImageButton
-            android:id="@+id/btnSearch_currentChat"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/search_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toLeftOf="@id/btnLogout"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="NotSibling" />
 
         <ImageButton
             android:id="@+id/btnLogout"
@@ -81,18 +45,100 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCurrentChats"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="60dp"
-        android:padding="10dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="60dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/ivCollege"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/rounded_corners_textfields"/>
+
+            <TextView
+                android:id="@+id/tvCollegeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="College Name"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/base3"
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                />
+
+            <TextView
+                android:id="@+id/tvCollegeAbout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="College Name"
+                android:textSize="15sp"
+                android:textStyle="italic"
+                android:textColor="@color/base4"
+                android:layout_marginTop="7dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                />
+
+            <ImageView
+                android:id="@+id/ivCollegeMap"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/rounded_corners_buttons"/>
+
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textStyle="italic"
+                android:text="Address"
+                android:textSize="15sp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7sp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBranchNames"
+
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:layout_margin="7dp"/>
+
+
+<!--            <fragment-->
+<!--                android:id="@+id/map"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="180dp"-->
+<!--                tools:context=".collegeProfilePage"-->
+<!--                android:name="com.google.android.gms.maps.SupportMapFragment"-->
+<!--                />-->
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomBar"
@@ -107,7 +153,7 @@
         app:layout_constraintRight_toRightOf="parent">
 
         <ImageButton
-            android:id="@+id/btnFeed"
+            android:id="@+id/btnFeedCollege"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
@@ -126,7 +172,7 @@
             android:layout_weight="1"
             android:background="@drawable/event_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btnFeed"
+            app:layout_constraintLeft_toRightOf="@id/btnFeedCollege"
             app:layout_constraintRight_toLeftOf="@id/btnProfile"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -156,15 +202,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/btnNewChat"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:background="@drawable/new_chat_button"
-        android:contentDescription="Upload"
-        android:layout_margin="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -172,6 +209,5 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
