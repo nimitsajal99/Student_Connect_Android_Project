@@ -120,3 +120,4 @@ class College_class(val collegeName: String): Item<GroupieViewHolder>(){
         return R.layout.branchnames_adapter
     }
 }
+//useless text
