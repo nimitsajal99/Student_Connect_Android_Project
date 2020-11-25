@@ -11,7 +11,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
+import com.google.android.gms.maps.GoogleMap
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -21,6 +24,8 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
+import kotlinx.android.synthetic.main.branchnames_adapter.view.*
+import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
 
@@ -44,8 +49,7 @@ class mainFeed : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
-                    //loadFeed(arrayPost, adapter, username!!, db)
-                    loadSearch(username!!, db, adapter, arraySearch)
+                    loadFeed(arrayPost, adapter, username!!, db)
                 }
                 else{
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
@@ -64,13 +68,13 @@ class mainFeed : AppCompatActivity() {
 //            }.show()
 //        }
 
-        btnEvent.setOnClickListener {
-            val intent = Intent(this, collegeProfilePage::class.java)
-            intent.putExtra("username", username)
-            intent.putExtra("collegeName", " BMSCE - BMS College of Engineering")
-            intent.putExtra("universityName", "BMS University")
-            startActivity(intent)
-        }
+//        btnEvent.setOnClickListener {
+//            val intent = Intent(this, mapCollegeProfile::class.java)
+//            intent.putExtra("username", username)
+//            intent.putExtra("collegeName", " BMSCE - BMS College of Engineering")
+//            intent.putExtra("universityName", "BMS University")
+//            startActivity(intent)
+//        }
 
         btnUpload.setOnClickListener{
             val intent = Intent(this, upload_post::class.java)
@@ -104,6 +108,50 @@ class mainFeed : AppCompatActivity() {
 //            intent.putExtra("username", username)
 //            startActivity(intent)
 //        }
+
+        btnSearch.setOnClickListener {
+            if(etSearchMainFeed.isVisible==true){
+                etSearchMainFeed.isVisible=false
+                etSearchMainFeed.setText("").toString()
+                adapter.clear()
+                loadFeed(arrayPost, adapter, username!!, db)
+                logoMainFeed.isVisible = true
+            }
+            else
+            {
+                etSearchMainFeed.isEnabled = true
+                etSearchMainFeed.isVisible=true
+                adapter.clear()
+                if(etSearchMainFeed.text.toString() != "")
+                {
+                    adapter.clear()
+                    loadSearch(username!!, db, adapter, arraySearch)
+                }
+                logoMainFeed.isVisible = false
+            }
+        }
+
+        etSearchMainFeed.addTextChangedListener(){
+            adapter.clear()
+            if(etSearchMainFeed.text.toString() == "" || etSearchMainFeed==null)
+            {
+                etSearchMainFeed.isEnabled = false
+                etSearchMainFeed.isVisible=false
+                logoMainFeed.isVisible = true
+                adapter.clear()
+                adapter.clear()
+                loadFeed(arrayPost, adapter, username!!, db)
+            }
+            else{
+                etSearchMainFeed.isVisible = true
+                logoMainFeed.isVisible = false
+                adapter.clear()
+                if(username != null){
+                    adapter.clear()
+                    loadSearch(username!!,db,adapter,arraySearch)
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -112,69 +160,160 @@ class mainFeed : AppCompatActivity() {
     }
 
     private fun loadSearch(username: String, db: FirebaseFirestore, adapter: GroupAdapter<GroupieViewHolder>, arraySearch: MutableList<usersList>){
-        db.collection("Users")
+        val search = etSearchMainFeed.text.toString()
+        val str = search[0]
+        val remString = search.drop(1)
+        if(search != "" || search != null)
+        {
+            if(str != '@')
+            {
+                val words = search.split("\\s+".toRegex()).map { word ->
+                    word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+                }
+//                for(word in words)
+//                {
+//                    Log.d("mainfeed", word)
+//                }
+                db.collection("Users")
+                    .addSnapshotListener { value, error ->
+                        if(value == null || error != null){
+                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                            return@addSnapshotListener
+                        }
+                        for(document in value.documents){
+                            if(document.id != "Info" && document.id != username){
+                                var contains = true
+                                for(word in words){
+                                    val pattern = word.toRegex(RegexOption.IGNORE_CASE)
+                                    if(pattern.containsMatchIn(document["Name"].toString()) || pattern.containsMatchIn(document.id) || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(document["Branch"].toString()))
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        contains = false
+                                        break
+                                    }
+                                }
+                                if(contains)
+                                {
+                                    val temp = usersList(document.id, "", document["Name"].toString(), document["Picture"].toString())
+                                    arraySearch.add(temp)
+                                    adapter.add(UserSearch(document.id, document["Picture"].toString(), document["Name"].toString(),true))
+                                }
+
+                            }
+                        }
+
+                        adapter.setOnItemClickListener { item, view ->
+                            val searchItem: UserSearch = item as UserSearch
+                            val to = searchItem.username
+                            val intent = Intent(this, others_profile_page::class.java)
+                            intent.putExtra("usernameOthers", to)
+                            startActivity(intent)
+                            adapter.clear()
+
+                        }
+                        rvFeed.adapter = adapter
+                    }
+            }
+            else
+            {
+                val words = remString.split("\\s+".toRegex()).map { word ->
+                    word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+                }
+//                for(word in words)
+//                {
+//                    Log.d("mainfeed", word)
+//                }
+//                val patternRem = remString.toRegex(RegexOption.IGNORE_CASE)
+                db.collection("University")
+                    .addSnapshotListener { value, error ->
+                        if(value == null || error != null){
+                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                            return@addSnapshotListener
+                        }
+                        for(document in value.documents)
+                        {
+                            if(document.id != "Next")
+                            {
+                                db.collection("University").document("Next").collection(document.id)
+                                    .addSnapshotListener { value2, error2 ->
+                                        if(value2 == null || error2 != null){
+                                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                                            return@addSnapshotListener
+                                        }
+                                        for(doc in value2.documents)
+                                        {
+                                            if(doc.id!="Next")
+                                            {
+                                                var contains = true
+                                                for(word in words){
+                                                    val pattern = word.toRegex(RegexOption.IGNORE_CASE)
+                                                    if(pattern.containsMatchIn(doc.id.toString()))
+                                                    {
+
+                                                    }
+                                                    else
+                                                    {
+                                                        contains = false
+                                                        break
+                                                    }
+                                                }
+                                                if(contains)
+                                                {
+                                                    adapter.add(UserSearch(doc.id, "", document.id,false))
+                                                    rvFeed.adapter = adapter
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                        adapter.setOnItemClickListener { item, view ->
+                            val searchItem: UserSearch = item as UserSearch
+
+                            val intent = Intent(this, mapCollegeProfile::class.java)
+                            intent.putExtra("username", username)
+                            intent.putExtra("collegeName", searchItem.username)
+                            intent.putExtra("universityName", searchItem.Name)
+                            startActivity(intent)
+                            adapter.clear()
+
+                        }
+                    }
+            }
+
+        }
+
+    }
+
+    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore)
+    {
+
+        adapter.clear()
+        val user = db.collection("Users").document(username).collection("My Feed")
+        user
+            .orderBy("Time", Query.Direction.ASCENDING)
             .addSnapshotListener { value, error ->
                 if(value == null || error != null){
                     Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
                 for(document in value.documents){
-                    if(document.id != "Info" && document.id != username){
-                        val temp = usersList(document.id, "", document["Name"].toString(), document["Picture"].toString())
-                        arraySearch.add(temp)
-                        adapter.add(UserItemSearch(document.id, document["Picture"].toString(), document["Name"].toString()))
+                    if(document.id != "Info"){
+                        db.collection("Post").document(document.id)
+                            .get()
+                            .addOnSuccessListener {
+                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString())
+                                //TODO: temp added
+                                arrayPost.add(temp)
+                                adapter.add(post_class(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString()))
+                            }
                     }
                 }
-                adapter.setOnItemClickListener { item, view ->
-                    val searchItem: UserItemSearch = item as UserItemSearch
-                    val to = searchItem.username
-                    val intent = Intent(this, others_profile_page::class.java)
-                    intent.putExtra("usernameOthers", to)
-                    startActivity(intent)
-                    finish()
-                }
                 rvFeed.adapter = adapter
             }
-    }
-
-    private fun loadFeed(
-        arrayPost: MutableList<postList>,
-        adapter: GroupAdapter<GroupieViewHolder>,
-        username: String,
-        db: FirebaseFirestore
-    ){
-        val user = db.collection("Users").document(username).collection("My Feed")
-        user
-            .orderBy("Time", Query.Direction.ASCENDING)
-            .addSnapshotListener { value, error ->
-            if(value == null || error != null){
-                Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
-                return@addSnapshotListener
-            }
-            for(document in value.documents){
-                if(document.id != "Info"){
-                    db.collection("Post").document(document.id)
-                        .get()
-                        .addOnSuccessListener {
-                            val temp = postList(
-                                it["From"].toString(),
-                                it["Picture"].toString(),
-                                it["Dp"].toString(),
-                                it["Description"].toString()
-                            )
-                            adapter.add(
-                                post_class(
-                                    it["From"].toString(),
-                                    it["Picture"].toString(),
-                                    it["Dp"].toString(),
-                                    it["Description"].toString()
-                                )
-                            )
-                        }
-                }
-            }
-                rvFeed.adapter = adapter
-        }
     }
 }
 
@@ -249,6 +388,33 @@ class post_class(
 
     override fun getLayout(): Int {
         return R.layout.post_adapter_cardiew
+    }
+}
+
+class UserSearch(val username: String,val url: String, val Name: String, val isUser: Boolean): Item<GroupieViewHolder>(){
+    override fun getLayout(): Int {
+        if (isUser) {
+            return R.layout.new_chat_adapter
+        }
+        else
+        {
+            return R.layout.branchnames_adapter
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        if(isUser)
+        {
+            viewHolder.itemView.tv_usernames_newMessage.text = username
+            Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage)
+            Log.d("adapter", "adapter added")
+        }
+        else
+        {
+            viewHolder.itemView.tvBranchNames.text = username
+        }
+
     }
 }
 

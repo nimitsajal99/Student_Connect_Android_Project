@@ -99,6 +99,12 @@ class profilePage : AppCompatActivity() {
             startActivity(intent)
         }
 
+        btnEdit.setOnClickListener {
+            val intent = Intent(this, editProfile::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+        }
+
     }
 
 

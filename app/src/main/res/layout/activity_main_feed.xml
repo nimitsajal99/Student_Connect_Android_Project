@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/logoMainFeed"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:src="@drawable/rutu_logo"
@@ -26,7 +27,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="18dp"
+            android:visibility="visible"
             />
+
+        <EditText
+            android:id="@+id/etSearchMainFeed"
+            android:visibility="invisible"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:hint="Search Usernames"
+            android:textColorHint="@color/base2"
+            android:textColor="@color/base3"
+            android:textSize="17sp"
+            android:text=""
+            android:paddingLeft="15dp"
+            android:background="@color/base0light"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/btnSearch"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:ignore="NotSibling" />
 
         <ImageButton
             android:id="@+id/btnSearch"
