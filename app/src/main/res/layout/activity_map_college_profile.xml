@@ -145,10 +145,8 @@
                     android:orientation="vertical">
 
                     <androidx.cardview.widget.CardView
-                        xmlns:android="http://schemas.android.com/apk/res/android"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        xmlns:app="http://schemas.android.com/apk/res-auto"
                         app:cardCornerRadius="4dp"
                         app:cardUseCompatPadding="true"
                         app:cardElevation="5dp"
@@ -158,10 +156,11 @@
 
                         <fragment
                             android:id="@+id/map"
+                            xmlns:map="http://schemas.android.com/apk/res-auto"
                             android:name="com.google.android.gms.maps.SupportMapFragment"
                             android:layout_width="match_parent"
                             android:layout_height="190dp"
-                            tools:context=".mapCollegeProfile" />
+                            tools:context="com.nimitsajal.studentconnectapp.mapCollegeProfile" />
 
                     </androidx.cardview.widget.CardView>
 

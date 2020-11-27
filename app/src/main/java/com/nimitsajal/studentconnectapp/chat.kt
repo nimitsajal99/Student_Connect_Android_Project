@@ -67,7 +67,7 @@ class chat : AppCompatActivity() {
         }
 
         btnBack.setOnClickListener {
-            val intent = Intent(this, mainFeed::class.java)
+            val intent = Intent(this, currentChats::class.java)
             intent.putExtra("username", From)
             startActivity(intent)
             finish()

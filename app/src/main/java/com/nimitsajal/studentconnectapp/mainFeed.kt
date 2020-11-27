@@ -11,11 +11,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
 import com.google.android.gms.maps.GoogleMap
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.auth.User
@@ -24,6 +26,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
+import kotlinx.android.synthetic.main.activity_main_feed.view.*
 import kotlinx.android.synthetic.main.branchnames_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
@@ -305,10 +308,10 @@ class mainFeed : AppCompatActivity() {
                         db.collection("Post").document(document.id)
                             .get()
                             .addOnSuccessListener {
-                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString())
+                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString())
                                 //TODO: temp added
                                 arrayPost.add(temp)
-                                adapter.add(post_class(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString()))
+                                adapter.add(post_class(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString(), username, adapter))
                             }
                     }
                 }
@@ -317,77 +320,179 @@ class mainFeed : AppCompatActivity() {
     }
 }
 
-data class postList(
-    var username: String,
-    var imageUrl: String,
-    var dpUrl: String,
-    var description: String
-){
+data class postList(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String)
+{
+
 }
 
-class post_class(
-    var username: String,
-    var imageUrl: String,
-    var dpUrl: String,
-    var description: String
-): Item<GroupieViewHolder>(){
+class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>): Item<GroupieViewHolder>()
+{
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        if(likeCount == 0){
+            val likes = "No Likes Yet"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
+        else if(likeCount == 1){
+            val likes = "1 Like"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
+        else{
+            val likes = "$likeCount Likes"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
         viewHolder.itemView.tvUsernameCard.text = username
         viewHolder.itemView.tvDescriptionCard.text = description
         Picasso.get().load(dpUrl).into(viewHolder.itemView.circularImageViewCard)
         Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
 
+        val db = FirebaseFirestore.getInstance()
+        db.collection("Users").document(myusername).collection("My Feed").document(uid)
+            .get()
+            .addOnSuccessListener {
+                if(it != null){
+                    if(it["Liked"].toString().toBoolean()){
+                        viewHolder.itemView.btnLike.isVisible = true
+                        viewHolder.itemView.btnUnlike.isVisible = false
+                    }
+                    else{
+                        viewHolder.itemView.btnLike.isVisible = false
+                        viewHolder.itemView.btnUnlike.isVisible = true
+                    }
+                }
+            }
 
+        viewHolder.itemView.btnUnlike.setOnClickListener {
+            viewHolder.itemView.btnLike.isVisible = true
+            viewHolder.itemView.btnUnlike.isVisible = false
+            liked(true)
+        }
+        viewHolder.itemView.btnLike.setOnClickListener {
+            viewHolder.itemView.btnLike.isVisible = false
+            viewHolder.itemView.btnUnlike.isVisible = true
+            liked(false)
+        }
 
-//        Picasso.get().load(imageUrl).into(object : com.squareup.picasso.Target {
-//            @RequiresApi(Build.VERSION_CODES.O)
-//            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-//                // loaded bitmap is here (bitmap)
-//                Log.d("colorset", "bitmap loaded")
-//
-//                if (bitmap != null) {
-//                    Palette.Builder(bitmap).generate { it?.let {  palette ->
-//                        val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
-//                        val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
-//                        val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
-//                        val muted: Int = palette.getMutedColor(0x000000)
-//                        val mutedLight: Int = palette.getLightMutedColor(0x000000)
-//                        val mutedDark: Int = palette.getDarkMutedColor(0x000000)
-//                        val dominant: Int = palette.getDominantColor(0x000000)
-//
-//                        viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
-//                        Log.d("colorset", "color set $muted")
-//
-//                    } }
-//                }
-//
-////                Palette.from(android.R.attr.bitmap).generate { palette ->
-////                    val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
-////                    val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
-////                    val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
-////                    val muted: Int = palette.getMutedColor(0x000000)
-////                    val mutedLight: Int = palette.getLightMutedColor(0x000000)
-////                    val mutedDark: Int = palette.getDarkMutedColor(0x000000)
-////                }
-////
-////                var newBitmap: Bitmap? = bitmap?.let { Bitmap.createScaledBitmap(it, 1, 1, true) };
-////                var color = newBitmap?.getPixel(0, 0);
-////                newBitmap?.recycle();
-////                if (color != null) {
-////                    viewHolder.itemView.cvBehindImage.setCardBackgroundColor(color)
-////                    Log.d("colorset", "color set ${color}")
-////                }
-//            }
-//
-//            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-//
-//            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-//        })
+        viewHolder.itemView.etCommentBox.addTextChangedListener{
+            if(viewHolder.itemView.etCommentBox.text.toString() == ""){
+                viewHolder.itemView.btnCommentDisabled.isVisible = true
+                viewHolder.itemView.btnCommentEnabled.isVisible = false
+                viewHolder.itemView.etCommentBox.isVisible = false
+            }
+            else{
+                viewHolder.itemView.btnCommentDisabled.isVisible = false
+                viewHolder.itemView.btnCommentEnabled.isVisible = true
+            }
+        }
+
+//        viewHolder.itemView.circularImageViewCard.setOnClickListener {
+//            val intent  = Intent(this, others_profile_page::class.java)
+//            intent.
+//        }
+
+        viewHolder.itemView.btnCommentDisabled.setOnClickListener {
+            if(viewHolder.itemView.etCommentBox.isVisible){
+                viewHolder.itemView.etCommentBox.isVisible = false
+            }
+            else{
+                viewHolder.itemView.etCommentBox.isVisible = true
+            }
+        }
+
+        viewHolder.itemView.btnCommentEnabled.setOnClickListener {
+            if(viewHolder.itemView.etCommentBox.text.toString() != ""){
+                val comment = viewHolder.itemView.etCommentBox.text.toString()
+                viewHolder.itemView.etCommentBox.setText("")
+                commented(comment)
+            }
+        }
+
+        Picasso.get().load(imageUrl).into(object : com.squareup.picasso.Target {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                // loaded bitmap is here (bitmap)
+                Log.d("colorset", "bitmap loaded")
+
+                if (bitmap != null) {
+                    Palette.Builder(bitmap).generate { it?.let {  palette ->
+                        val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
+                        val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
+                        val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
+                        val muted: Int = palette.getMutedColor(0x000000)
+                        val mutedLight: Int = palette.getLightMutedColor(0x000000)
+                        val mutedDark: Int = palette.getDarkMutedColor(0x000000)
+                        val dominant: Int = palette.getDominantColor(0x000000)
+
+                        viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
+                        Log.d("colorset", "color set $muted")
+
+                    } }
+                }
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+        })
     }
 
     override fun getLayout(): Int {
         return R.layout.post_adapter_cardiew
+    }
+
+    private fun commented(comment: String){
+        val time = FieldValue.serverTimestamp()
+        val db = FirebaseFirestore.getInstance()
+
+        val commenting = hashMapOf(
+            "Text" to comment,
+            "Timestamp" to time,
+            "From" to myusername
+        )
+
+        db.collection("Post").document(uid).collection("Comments")
+            .add(commenting)
+            .addOnSuccessListener {
+                if(it != null){
+                    Log.d("mainfeed", "Post updated - comment added")
+                }
+            }
+    }
+
+    private fun liked(liking: Boolean){
+        adapter.clear()
+        if(liking){
+            likeCount += 1
+        }
+        else{
+            likeCount -= 1
+        }
+        val db = FirebaseFirestore.getInstance()
+        db.collection("Post").document(uid)
+            .update("Likes", likeCount)
+            .addOnSuccessListener {
+                if(it != null){
+                    Log.d("mainfeed", "Post updated - like updated")
+                }
+            }
+        if(liking){
+            db.collection("Users").document(myusername).collection("My Feed").document(uid)
+                .update("Liked", true)
+                .addOnSuccessListener {
+                    if(it != null){
+                        Log.d("mainfeed", "User updated - like updated")
+                    }
+                }
+        }
+        else{
+            db.collection("Users").document(myusername).collection("My Feed").document(uid)
+                .update("Liked", false)
+                .addOnSuccessListener {
+                    if(it != null){
+                        Log.d("mainfeed", "User updated - like updated")
+                    }
+                }
+        }
     }
 }
 

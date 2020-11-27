@@ -221,71 +221,139 @@ class others_profile_page : AppCompatActivity() {
     }
 
     private fun newChat(username: String, db: FirebaseFirestore, friend: isFriend, usernameOthers: String){
-        val message = hashMapOf(
-            "From" to "System",
-            "To" to usernameOthers,
-            "Text" to "Say Hi",
-            "Time" to FieldValue.serverTimestamp()
-        )
 
-        val messageFrom = hashMapOf(
-            "From" to "System",
-            "To" to usernameOthers,
-            "Text" to "Say Hi",
-            "Name" to usernameOthers,
-            "Time" to FieldValue.serverTimestamp()
-        )
+        if(friend.isFriend){
+            val message = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "Say Hi",
+                "Time" to FieldValue.serverTimestamp()
+            )
 
-        val messageTo = hashMapOf(
-            "From" to "System",
-            "To" to usernameOthers,
-            "Text" to "Say Hi",
-            "Name" to username,
-            "Time" to FieldValue.serverTimestamp()
-        )
+            val messageFrom = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "Say Hi",
+                "Name" to usernameOthers,
+                "Time" to FieldValue.serverTimestamp()
+            )
 
-        val info = hashMapOf(
-            "Info" to "Info"
-        )
+            val messageTo = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "Say Hi",
+                "Name" to username,
+                "Time" to FieldValue.serverTimestamp()
+            )
 
-        db.collection("Users").document(username).collection("Chats").document(usernameOthers)
-            .set(messageFrom)
-            .addOnCompleteListener{
-                if(it.isSuccessful)
-                {
-                    db.collection("Users").document(username).collection("Chats").document(usernameOthers).collection("Next")
-                        .add(message)
-                        .addOnCompleteListener{it1->
-                            if(it1.isSuccessful)
-                            {
-                                Log.d("others", "chat created in user")
+            val info = hashMapOf(
+                "Info" to "Info"
+            )
+
+            db.collection("Users").document(username).collection("Chats").document(usernameOthers)
+                .set(messageFrom)
+                .addOnCompleteListener{
+                    if(it.isSuccessful)
+                    {
+                        db.collection("Users").document(username).collection("Chats").document(usernameOthers).collection("Next")
+                            .add(message)
+                            .addOnCompleteListener{it1->
+                                if(it1.isSuccessful)
+                                {
+                                    Log.d("others", "chat created in user")
+                                }
+
                             }
-
-                        }
+                    }
                 }
-            }
-        db.collection("Users").document(usernameOthers).collection("Chats").document(username)
-            .set(messageTo)
-            .addOnCompleteListener{it2->
-                if(it2.isSuccessful)
-                {
-                    db.collection("Users").document(usernameOthers).collection("Chats").document(username).collection("Next")
-                        .add(message)
-                        .addOnCompleteListener{it3->
-                            if(it3.isSuccessful)
-                            {
-                                val intent = Intent(this, chat::class.java)
-                                intent.putExtra("from", username)
-                                intent.putExtra("to", usernameOthers)
-                                startActivity(intent)
-                                btnMessageOthers.isEnabled = true
-                                finish()
+            db.collection("Users").document(usernameOthers).collection("Chats").document(username)
+                .set(messageTo)
+                .addOnCompleteListener{it2->
+                    if(it2.isSuccessful)
+                    {
+                        db.collection("Users").document(usernameOthers).collection("Chats").document(username).collection("Next")
+                            .add(message)
+                            .addOnCompleteListener{it3->
+                                if(it3.isSuccessful)
+                                {
+                                    val intent = Intent(this, chat::class.java)
+                                    intent.putExtra("from", username)
+                                    intent.putExtra("to", usernameOthers)
+                                    startActivity(intent)
+                                    btnMessageOthers.isEnabled = true
+                                    finish()
+                                }
+
                             }
+                    }
 
-                        }
                 }
+        }
+        else{
+            val message = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "Say Hi",
+                "Time" to FieldValue.serverTimestamp()
+            )
 
-            }
+            val messageFrom = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "Why don't you add $usernameOthers as a Friend",
+                "Name" to usernameOthers,
+                "Time" to FieldValue.serverTimestamp()
+            )
+
+            val messageTo = hashMapOf(
+                "From" to "System",
+                "To" to usernameOthers,
+                "Text" to "$username is not in your Friend List",
+                "Name" to username,
+                "Time" to FieldValue.serverTimestamp()
+            )
+
+            db.collection("Users").document(username).collection("Chats").document(usernameOthers)
+                .set(messageFrom)
+                .addOnCompleteListener{
+                    if(it.isSuccessful)
+                    {
+                        db.collection("Users").document(username).collection("Chats").document(usernameOthers).collection("Next")
+                            .add(message)
+                            .addOnCompleteListener{it1->
+                                if(it1.isSuccessful)
+                                {
+                                    Log.d("others", "chat created in user")
+                                }
+
+                            }
+                    }
+                }
+            db.collection("Users").document(usernameOthers).collection("Chats").document(username)
+                .set(messageTo)
+                .addOnCompleteListener{it2->
+                    if(it2.isSuccessful)
+                    {
+                        db.collection("Users").document(usernameOthers).collection("Chats").document(username).collection("Next")
+                            .add(message)
+                            .addOnCompleteListener{it3->
+                                if(it3.isSuccessful)
+                                {
+                                    val intent = Intent(this, chat::class.java)
+                                    intent.putExtra("from", username)
+                                    intent.putExtra("to", usernameOthers)
+                                    startActivity(intent)
+                                    btnMessageOthers.isEnabled = true
+                                    finish()
+                                }
+
+                            }
+                    }
+
+                }
+        }
+
+
     }
 
     private fun getUser(auth: FirebaseAuth, username: String, db: FirebaseFirestore, friend: isFriend){

@@ -198,6 +198,14 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
                 viewHolder.itemView.tv_text_latestMessage.text = text
                 Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage)
                 Log.d("adapter", "adapter added")
+
+                //TODO: Tap on specific item in recyclerview
+//                viewHolder.itemView.tv_usernames_latestMessage.setOnClickListener {
+//                    Log.d("clicked", "username clicked")
+//                }
+//                viewHolder.itemView.cv_dp_currentMessage.setOnClickListener {
+//                    Log.d("clicked", "dp clicked")
+//                }
             }
     }
 

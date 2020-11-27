@@ -1,14 +1,20 @@
 package com.nimitsajal.studentconnectapp
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.location.Address
+import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,15 +23,31 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_college_profile_page.*
+import kotlinx.android.synthetic.main.activity_college_profile_page.btnChat
+import kotlinx.android.synthetic.main.activity_college_profile_page.btnFeedCollege
+import kotlinx.android.synthetic.main.activity_college_profile_page.btnLogout
+import kotlinx.android.synthetic.main.activity_college_profile_page.btnProfile
+import kotlinx.android.synthetic.main.activity_college_profile_page.ivCollege
+import kotlinx.android.synthetic.main.activity_college_profile_page.rvBranchNames
+import kotlinx.android.synthetic.main.activity_college_profile_page.tvAddress
+import kotlinx.android.synthetic.main.activity_college_profile_page.tvCollegeAbout
+import kotlinx.android.synthetic.main.activity_college_profile_page.tvCollegeName
+import kotlinx.android.synthetic.main.activity_map_college_profile.*
 
 class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    var collegeName = " BMSCE - BMS College of Engineering"
-    var username = ""
-    var universityName = "BMS University"
+//    var collegeName = "RVCA - RV College of Architecture"
+//    var username = ""
+//    var universityName = "RV Educational Institutions\n"
 
+//    var collegeName = intent.getStringExtra("collegeName").toString()
+//    var username = intent.getStringExtra("username").toString()
+//    var universityName = intent.getStringExtra("universityName").toString()
+
+
+    var clginfo = clgInfo("", "", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +58,14 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
 
+
+
+
+        clginfo.collegename = intent.getStringExtra("collegeName").toString()
+        clginfo.username = intent.getStringExtra("username").toString()
+        clginfo.universityName= intent.getStringExtra("universityName").toString()
+
         val adapter = GroupAdapter<GroupieViewHolder>()
-
-        collegeName = intent.getStringExtra("collegeName").toString()
-        username = intent.getStringExtra("username").toString()
-        universityName = intent.getStringExtra("universityName").toString()
-
 
 //        btnEvent.setOnClickListener {
 //            val intent = Intent(this, collegeProfilePage::class.java)
@@ -61,31 +85,34 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
 
         btnChat.setOnClickListener {
             val intent = Intent(this, currentChats::class.java)
-            intent.putExtra("username", username)
+            intent.putExtra("username", clginfo.username)
             startActivity(intent)
         }
 
         btnProfile.setOnClickListener {
             val intent = Intent(this, profilePage::class.java)
-            intent.putExtra("username", username)
+            intent.putExtra("username", clginfo.username)
             startActivity(intent)
         }
 
         btnFeedCollege.setOnClickListener {
             val intent = Intent(this, mainFeed::class.java)
-            intent.putExtra("username", username)
+            intent.putExtra("username", clginfo.username)
             startActivity(intent)
         }
 
-        if(collegeName != "" || universityName != ""){
-            if (collegeName != null) {
-                if (universityName != null) {
-                    loadCollege(collegeName, universityName, adapter)
-                }
-            }
+        tvAddress.setOnClickListener {
+            val textToCopy = tvAddress.text.toString()
+            val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("address", textToCopy)
+            clipboardManager.setPrimaryClip(clipData)
+
+            Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_LONG).show()
         }
 
-
+        if(clginfo.collegename != "" || clginfo.universityName != ""){
+            loadCollege(clginfo.collegename, clginfo.universityName, adapter)
+        }
     }
 
     /**
@@ -99,45 +126,25 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val db = FirebaseFirestore.getInstance()
-        var geoPoint: GeoPoint? = null
-        // Add a marker in Sydney and move the camera
-        db.collection("University").document("Next").collection(" BMSCE - BMS College of Engineering").document("BMS University")
-            .get()
-            .addOnSuccessListener {
-                if(it != null){
-                    geoPoint = it.getGeoPoint("Map Location")
-                }
-            }
+        mMap.uiSettings.isZoomControlsEnabled = true
 
-        if(geoPoint != null){
-            val lat = geoPoint!!.latitude
-            val lng = geoPoint!!.longitude
-            Log.d("map", "lat = $lat")
-            Log.d("map", "lng = $lng")
-        }
-        else{
-            Log.d("map", "geoPoint = NULL")
-        }
+        val geoCoder = Geocoder(this)
+        var locationName: String = clginfo.collegename
+        var addressList: List<Address>? = null
+        addressList = geoCoder.getFromLocationName(locationName, 1)
+        val address = addressList!![0]
+        val latLng = LatLng(address.latitude, address.longitude)
 
-        collegeName = " BMSCE - BMS College of Engineering"
-        val lat = 12.941294511779427
-        val lng = 77.56551506851775
+        mMap.isBuildingsEnabled = true
+        mMap.isTrafficEnabled = true
+        mMap.isIndoorEnabled = true
+        mMap.mapType = (GoogleMap.MAP_TYPE_NORMAL)
 
-        val location = LatLng(lat, lng)
-
-//        Log.d("map", "location = $location")
-
-        mMap.addMarker(MarkerOptions().position(location).title("Marker in $collegeName"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f))
+        mMap.addMarker(MarkerOptions().position(latLng).title(clginfo.collegename))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
     }
 
-    private fun loadCollege(
-        collegeName: String,
-        universityName: String,
-        adapter: GroupAdapter<GroupieViewHolder>
-    ){
+    private fun loadCollege(collegeName: String, universityName: String, adapter: GroupAdapter<GroupieViewHolder>){
         val db = FirebaseFirestore.getInstance()
         db.collection("University").document("Next").collection(universityName).document(collegeName)
             .get()
@@ -165,4 +172,8 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
                 rvBranchNames.adapter = adapter
             }
     }
+}
+
+data class clgInfo(var universityName: String, var collegename: String, var username: String){
+
 }

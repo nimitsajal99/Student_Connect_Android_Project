@@ -96,11 +96,13 @@ class newChat : AppCompatActivity() {
     {
         val db = FirebaseFirestore.getInstance()
 
+        val time = FieldValue.serverTimestamp()
+
         val message = hashMapOf(
             "From" to "System",
             "To" to to,
             "Text" to "Say Hi",
-            "Time" to FieldValue.serverTimestamp()
+            "Time" to time
         )
 
         val messageFrom = hashMapOf(
@@ -108,7 +110,7 @@ class newChat : AppCompatActivity() {
             "To" to to,
             "Text" to "Say Hi",
             "Name" to toName,
-            "Time" to FieldValue.serverTimestamp()
+            "Time" to time
         )
 
         val messageTo = hashMapOf(
@@ -116,7 +118,7 @@ class newChat : AppCompatActivity() {
             "To" to to,
             "Text" to "Say Hi",
             "Name" to fromName,
-            "Time" to FieldValue.serverTimestamp()
+            "Time" to time
         )
 
         val info = hashMapOf(

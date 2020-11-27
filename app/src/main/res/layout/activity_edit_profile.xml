@@ -51,10 +51,27 @@
         android:id="@+id/btnDp"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
         app:layout_constraintLeft_toLeftOf="@id/llDetails"
         app:layout_constraintTop_toTopOf="@id/llDetails" />
+
+    <Button
+        android:id="@+id/btnRemoveDP"
+        android:layout_width="130dp"
+        android:layout_height="25dp"
+        android:layout_weight="1"
+        app:layout_constraintLeft_toLeftOf="@id/btnDp"
+        android:text="Remove Dp"
+        app:layout_constraintTop_toBottomOf="@id/btnDp"
+        app:layout_constraintRight_toRightOf="@id/btnDp"
+        android:background="@drawable/rounded_corners_buttons"
+        android:textColor="@color/base0"
+        android:textStyle="bold"
+        android:textSize="17sp"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="2dp"
+        tools:ignore="MissingConstraints" />
 
     <LinearLayout
         android:id="@+id/llDetails"
@@ -74,7 +91,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="10"
-            android:padding="15dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="35dp"
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -82,8 +102,9 @@
                 android:layout_width="110dp"
                 android:layout_height="110dp"
                 app:civ_border_width="4dp"
-                android:layout_marginTop="10sp"
+                android:layout_marginLeft="5dp"
                 app:civ_border_color="@color/base3" />
+
 
             <LinearLayout
                 android:layout_width="250dp"
@@ -99,7 +120,7 @@
                     android:text="Username"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginBottom="3dp"
                     android:textColor="@color/base2"/>
 
@@ -114,7 +135,7 @@
                     android:textSize="25sp"
                     android:textStyle="bold"
                     android:background="@color/base0"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="3dp"
                     tools:ignore="NotSibling" />
@@ -130,25 +151,11 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:background="@color/base0"
-                    android:layout_marginLeft="15dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="3dp"
                     tools:ignore="NotSibling" />
 
-<!--                <EditText-->
-<!--                    android:id="@+id/tvName"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:maxWidth="230dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:hint="Name"-->
-<!--                    android:textColorHint="@color/base3"-->
-<!--                    android:text="Name"-->
-<!--                    android:textStyle="bold"-->
-<!--                    android:textSize="25sp"-->
-<!--                    android:layout_marginLeft="15dp"-->
-<!--                    android:layout_marginTop="3dp"-->
-<!--                    android:layout_marginBottom="3dp"-->
-<!--                    android:textColor="@color/base3"/>-->
 
 
             </LinearLayout>
@@ -174,17 +181,7 @@
                 android:textStyle="normal"
                 android:textSize="17sp"/>
 
-<!--            <TextView-->
-<!--                android:id="@+id/tvDescription"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Descrption : "-->
-<!--                android:paddingBottom="15dp"-->
-<!--                android:paddingEnd="15dp"-->
-<!--                android:paddingStart="15dp"-->
-<!--                android:textColor="@color/base3"-->
-<!--                android:textStyle="normal"-->
-<!--                android:textSize="17sp"/>-->
+
 
         </LinearLayout>
 
