@@ -111,7 +111,7 @@ class chat : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
-                    val intent = Intent(this, mainFeed::class.java)
+                    val intent = Intent(this, currentChats::class.java)
                     intent.putExtra("usernameOthers", username)
                     startActivity(intent)
                 }

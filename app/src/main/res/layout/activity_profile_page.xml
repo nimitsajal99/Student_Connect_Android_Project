@@ -243,11 +243,11 @@
             android:background="@drawable/home_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/btnEvent"
+            app:layout_constraintRight_toLeftOf="@id/btnEventProfile"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/btnEvent"
+            android:id="@+id/btnEventProfile"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
@@ -260,13 +260,13 @@
 
         <ImageButton
             android:id="@+id/btnProfile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/profile_button"
+            android:background="@drawable/profilebutton_selected"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/btnEvent"
+            app:layout_constraintLeft_toRightOf="@id/btnEventProfile"
             app:layout_constraintRight_toLeftOf="@id/btnChat"
             app:layout_constraintTop_toTopOf="parent" />
 

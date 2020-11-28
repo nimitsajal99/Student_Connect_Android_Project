@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="2dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/base0card"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        tools:ignore="ExtraText">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvBehindImageProfile"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/base1"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/postImageProfile"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="1dp"
+            android:elevation="10dp"
+            android:padding="3dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvDescriptionProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_horizontal"
+            android:text=""
+            android:textColor="@color/base3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/postImageProfile" />
+
+
+        <LinearLayout
+            android:id="@+id/llCount"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:weightSum="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDescriptionProfile">
+
+            <Button
+                android:id="@+id/btnLikeCount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="7dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_buttons"
+                android:gravity="end|center_vertical"
+                android:paddingRight="15dp"
+                android:textColor="@color/base0"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnComCount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="7dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_buttons"
+                android:textColor="@color/base0"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/likeIcon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/like_count_profile"
+            app:layout_constraintBottom_toBottomOf="@id/llCount"
+            app:layout_constraintLeft_toLeftOf="@id/llCount"
+            app:layout_constraintTop_toTopOf="@id/llCount" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8sp"
+            android:text="2345"
+            android:textColor="@color/base3"
+            android:textSize="27sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/llCount"
+            app:layout_constraintLeft_toRightOf="@id/likeIcon"
+            app:layout_constraintTop_toTopOf="@id/llCount" />
+
+        <ImageView
+            android:id="@+id/commentIcon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="23dp"
+            android:background="@drawable/comment_count_profile"
+            app:layout_constraintBottom_toBottomOf="@id/llCount"
+            app:layout_constraintLeft_toLeftOf="@id/guideline2"
+            app:layout_constraintTop_toTopOf="@id/llCount" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8sp"
+            android:text="2345"
+            android:textColor="@color/base3"
+            android:textSize="27sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/llCount"
+            app:layout_constraintLeft_toRightOf="@id/commentIcon"
+            app:layout_constraintTop_toTopOf="@id/llCount" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

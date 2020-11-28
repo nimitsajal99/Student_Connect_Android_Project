@@ -28,6 +28,7 @@ import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
 import kotlinx.android.synthetic.main.activity_main_feed.view.*
 import kotlinx.android.synthetic.main.branchnames_adapter.view.*
+import kotlinx.android.synthetic.main.comment_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
@@ -61,23 +62,11 @@ class mainFeed : AppCompatActivity() {
             }
         }
 
-//        btnEvent.setOnClickListener {
-//            val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_text)
-//            tvToast.text = "This is a Sample Toast"
-//            Toast(this).apply {
-//                duration = Toast.LENGTH_SHORT
-//                setGravity(Gravity.CENTER, 0, 0)
-//                view = layout
-//            }.show()
-//        }
-
-//        btnEvent.setOnClickListener {
-//            val intent = Intent(this, mapCollegeProfile::class.java)
-//            intent.putExtra("username", username)
-//            intent.putExtra("collegeName", " BMSCE - BMS College of Engineering")
-//            intent.putExtra("universityName", "BMS University")
-//            startActivity(intent)
-//        }
+        btnEvent.setOnClickListener {
+            val intent = Intent(this, eventPage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+        }
 
         btnUpload.setOnClickListener{
             val intent = Intent(this, upload_post::class.java)
@@ -291,33 +280,88 @@ class mainFeed : AppCompatActivity() {
 
     }
 
-    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore)
-    {
-
+    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore) {
         adapter.clear()
         val user = db.collection("Users").document(username).collection("My Feed")
-        user
-            .orderBy("Time", Query.Direction.ASCENDING)
-            .addSnapshotListener { value, error ->
-                if(value == null || error != null){
-                    Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-                for(document in value.documents){
-                    if(document.id != "Info"){
-                        db.collection("Post").document(document.id)
-                            .get()
-                            .addOnSuccessListener {
-                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString())
-                                //TODO: temp added
-                                arrayPost.add(temp)
-                                adapter.add(post_class(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString(), username, adapter))
-                            }
+        user.orderBy("Time", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener {
+                if (it != null) {
+                    adapter.clear()
+                    for (document in it) {
+                        if (document.id != "Info") {
+                            db.collection("Post").document(document.id)
+                                .get()
+                                .addOnSuccessListener { it2 ->
+                                    val temp = postList(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString())
+                                    //TODO: temp added
+                                    arrayPost.add(temp)
+                                    val adapterComments = GroupAdapter<GroupieViewHolder>()
+                                    db.collection("Post").document(document.id).collection("Comments")
+                                        .orderBy("Timestamp", Query.Direction.ASCENDING)
+                                        .get()
+                                        .addOnSuccessListener { it3 ->
+                                            if (it3 != null) {
+                                                adapterComments.clear()
+                                                for (doc in it3.documents) {
+                                                    if (doc.id != "Info") {
+                                                        adapterComments.add(Comment_class(doc["From"].toString(), doc["Text"].toString()))
+                                                    }
+                                                }
+                                                adapter.add(post_class(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString(), username, adapter, adapterComments, false))
+                                            }
+                                        }
+                                }
+                        }
                     }
+                    rvFeed.adapter = adapter
                 }
-                rvFeed.adapter = adapter
             }
     }
+
+//    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore)
+//    {
+//
+//        adapter.clear()
+//        val user = db.collection("Users").document(username).collection("My Feed")
+//        user
+//            .orderBy("Time", Query.Direction.DESCENDING)
+//            .addSnapshotListener { value, error ->
+//                if(value == null || error != null){
+//                    Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+//                    return@addSnapshotListener
+//                }
+//                adapter.clear()
+//                for(document in value.documents){
+//                    if(document.id != "Info"){
+//                        db.collection("Post").document(document.id)
+//                            .get()
+//                            .addOnSuccessListener {
+//                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString())
+//                                //TODO: temp added
+//                                arrayPost.add(temp)
+//                                val adapterComments = GroupAdapter<GroupieViewHolder>()
+//                                db.collection("Post").document(document.id).collection("Comments")
+//                                    .orderBy("Timestamp", Query.Direction.ASCENDING)
+//                                    .addSnapshotListener { value, error ->
+//                                        if(value == null || error != null){
+//                                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+//                                            return@addSnapshotListener
+//                                        }
+//                                        adapterComments.clear()
+//                                        for(doc in value.documents){
+//                                            if(doc.id != "Info"){
+//                                                adapterComments.add(Comment_class(doc["From"].toString(), doc["Text"].toString()))
+//                                            }
+//                                        }
+//                                        adapter.add(post_class(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString(), username, adapter, adapterComments, false))
+//                                    }
+//                            }
+//                    }
+//                }
+//                rvFeed.adapter = adapter
+//            }
+//    }
 }
 
 data class postList(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String)
@@ -325,7 +369,7 @@ data class postList(var username: String, var imageUrl: String, var dpUrl: Strin
 
 }
 
-class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>): Item<GroupieViewHolder>()
+class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>, var adapterComment: GroupAdapter<GroupieViewHolder>, var isComBox: Boolean): Item<GroupieViewHolder>()
 {
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
@@ -341,6 +385,9 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             val likes = "$likeCount Likes"
             viewHolder.itemView.tvLikeCount.text = likes
         }
+
+        viewHolder.itemView.rvComments.adapter = adapterComment
+
         viewHolder.itemView.tvUsernameCard.text = username
         viewHolder.itemView.tvDescriptionCard.text = description
         Picasso.get().load(dpUrl).into(viewHolder.itemView.circularImageViewCard)
@@ -366,11 +413,35 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             viewHolder.itemView.btnLike.isVisible = true
             viewHolder.itemView.btnUnlike.isVisible = false
             liked(true)
+            if(likeCount == 0){
+                val likes = "No Likes Yet"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else if(likeCount == 1){
+                val likes = "1 Like"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else{
+                val likes = "$likeCount Likes"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
         }
         viewHolder.itemView.btnLike.setOnClickListener {
             viewHolder.itemView.btnLike.isVisible = false
             viewHolder.itemView.btnUnlike.isVisible = true
             liked(false)
+            if(likeCount == 0){
+                val likes = "No Likes Yet"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else if(likeCount == 1){
+                val likes = "1 Like"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else{
+                val likes = "$likeCount Likes"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
         }
 
         viewHolder.itemView.etCommentBox.addTextChangedListener{
@@ -391,11 +462,17 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
 //        }
 
         viewHolder.itemView.btnCommentDisabled.setOnClickListener {
-            if(viewHolder.itemView.etCommentBox.isVisible){
+            if(isComBox){
+                isComBox = false
+                viewHolder.itemView.rvComments.isVisible = false
+            }
+            else if(viewHolder.itemView.etCommentBox.isVisible && !isComBox){
                 viewHolder.itemView.etCommentBox.isVisible = false
+                viewHolder.itemView.rvComments.isVisible = false
             }
             else{
                 viewHolder.itemView.etCommentBox.isVisible = true
+                viewHolder.itemView.rvComments.isVisible = true
             }
         }
 
@@ -404,6 +481,9 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
                 val comment = viewHolder.itemView.etCommentBox.text.toString()
                 viewHolder.itemView.etCommentBox.setText("")
                 commented(comment)
+                adapterComment.add(Comment_class(myusername, comment))
+
+                isComBox = true
             }
         }
 
@@ -424,6 +504,7 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
                         val dominant: Int = palette.getDominantColor(0x000000)
 
                         viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
+//                        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
                         Log.d("colorset", "color set $muted")
 
                     } }
@@ -455,12 +536,13 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             .addOnSuccessListener {
                 if(it != null){
                     Log.d("mainfeed", "Post updated - comment added")
+
                 }
             }
     }
 
     private fun liked(liking: Boolean){
-        adapter.clear()
+//        adapter.clear()
         if(liking){
             likeCount += 1
         }
@@ -494,6 +576,18 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
                 }
         }
     }
+}
+
+class Comment_class(val username: String, val comment: String): Item<GroupieViewHolder>(){
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.username.text = "$username: "
+        viewHolder.itemView.comment.text = comment
+    }
+
+    override fun getLayout(): Int {
+        return R.layout.comment_adapter
+    }
+
 }
 
 class UserSearch(val username: String,val url: String, val Name: String, val isUser: Boolean): Item<GroupieViewHolder>(){

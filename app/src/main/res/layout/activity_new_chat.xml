@@ -94,7 +94,6 @@
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"

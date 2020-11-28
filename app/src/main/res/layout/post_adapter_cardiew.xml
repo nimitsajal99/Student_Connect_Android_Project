@@ -119,26 +119,27 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="5dp"/>
 
-        <EditText
-            android:id="@+id/etCommentBox"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Comment here"
-            android:textColorHint="@color/base4"
-            android:textSize="18sp"
-            android:paddingLeft="8sp"
-            android:paddingRight="8sp"
-            android:paddingTop="5sp"
-            android:paddingBottom="5sp"
-            android:text=""
-            android:layout_marginRight="40dp"
-            android:background="@color/base0card"
-            app:layout_constraintTop_toBottomOf="@id/tvDescriptionCard"
-            app:layout_constraintBottom_toTopOf="@id/rvComments"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+
+            <EditText
+                android:id="@+id/etCommentBox"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Comment here"
+                android:textColorHint="@color/base4"
+                android:textSize="18sp"
+                android:paddingLeft="8sp"
+                android:paddingRight="8sp"
+                android:paddingTop="5sp"
+                android:paddingBottom="5sp"
+                android:text=""
+                android:layout_marginRight="40dp"
+                android:background="@color/base0"
+                app:layout_constraintTop_toBottomOf="@id/tvDescriptionCard"
+                app:layout_constraintBottom_toTopOf="@id/rvComments"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
 
         <Button
             android:id="@+id/btnCommentDisabled"
@@ -151,7 +152,7 @@
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
             android:layout_marginBottom="15dp"
-            android:background="@drawable/comment_disabled"/>
+            android:background="@drawable/commentbox_disabled"/>
 
         <Button
             android:id="@+id/btnCommentEnabled"
@@ -163,22 +164,28 @@
             android:clickable="true"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
-            android:background="@drawable/comment_enabled"/>
+            android:background="@drawable/commentbox_enabled"/>
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvComments"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/etCommentBox"
-            />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvComments"
+                android:visibility="gone"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/etCommentBox"
+                />
+
+
+
 
 <!--        <ImageView-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="2dp"-->
 <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
 <!--            app:layout_constraintTop_toBottomOf="@id/rvComments"/>-->
-
 
 
         <Button

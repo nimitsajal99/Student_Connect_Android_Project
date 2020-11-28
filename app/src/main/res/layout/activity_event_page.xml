@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/studentConnectCurrentChat"
+            android:id="@+id/logoMainFeed"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:src="@drawable/rutu_logo"
@@ -30,39 +30,39 @@
             android:visibility="visible"
             />
 
-        <EditText
-            android:id="@+id/etSearch"
-            android:visibility="invisible"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:hint="Search Usernames"
-            android:textColorHint="@color/base2"
-            android:textColor="@color/base3"
-            android:textSize="17sp"
-            android:text=""
-            android:paddingLeft="15dp"
-            android:background="@color/base0light"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/btnSearch"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            tools:ignore="NotSibling" />
+<!--        <EditText-->
+<!--            android:id="@+id/etSearchMainFeed"-->
+<!--            android:visibility="invisible"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:hint="Search Usernames"-->
+<!--            android:textColorHint="@color/base2"-->
+<!--            android:textColor="@color/base3"-->
+<!--            android:textSize="17sp"-->
+<!--            android:text=""-->
+<!--            android:paddingLeft="15dp"-->
+<!--            android:background="@color/base0light"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintLeft_toLeftOf="parent"-->
+<!--            app:layout_constraintRight_toLeftOf="@id/btnSearch"-->
+<!--            android:layout_marginLeft="5dp"-->
+<!--            android:layout_marginRight="5dp"-->
+<!--            tools:ignore="NotSibling" />-->
 
-        <ImageButton
-            android:id="@+id/btnSearch_currentChat"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/search_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toLeftOf="@id/btnLogout"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="NotSibling" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/btnSearch"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginRight="20dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:background="@drawable/search_button"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintLeft_toRightOf="@id/guideline"-->
+<!--            app:layout_constraintRight_toLeftOf="@id/btnLogout"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            tools:ignore="NotSibling" />-->
 
         <ImageButton
             android:id="@+id/btnLogout"
@@ -80,19 +80,18 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCurrentChats"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="60dp"
-        android:padding="10dp"
-
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Stay Tuned for Upcoming Events"
+        android:textSize="24sp"
+        android:textStyle="italic"
+        android:textColor="@color/base1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomBar"
@@ -120,11 +119,11 @@
 
         <ImageButton
             android:id="@+id/btnEvent"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/event_button"
+            android:background="@drawable/eventbutton_selected"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/btnFeed"
             app:layout_constraintRight_toLeftOf="@id/btnProfile"
@@ -144,11 +143,11 @@
 
         <ImageButton
             android:id="@+id/btnChat"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/chatbutton_selected"
+            android:background="@drawable/chat_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/btnProfile"
             app:layout_constraintRight_toRightOf="parent"
@@ -156,22 +155,11 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/btnNewChat"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:background="@drawable/new_chat_button"
-        android:contentDescription="Upload"
-        android:layout_margin="16dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"/>
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -23,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.btnChat
 import kotlinx.android.synthetic.main.details_adapter.view.*
+import java.lang.System
 
 
 class profilePage : AppCompatActivity() {
@@ -76,6 +78,7 @@ class profilePage : AppCompatActivity() {
             val intent = Intent(this, currentChats::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            finish()
         }
 
         btnLogout.setOnClickListener {
@@ -93,10 +96,18 @@ class profilePage : AppCompatActivity() {
 //            startActivity(intent)
 //        }
 
+        btnEventProfile.setOnClickListener {
+            val intent = Intent(this, eventPage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            finish()
+        }
+
         btnFeed.setOnClickListener {
             val intent = Intent(this, mainFeed::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            finish()
         }
 
         btnEdit.setOnClickListener {
@@ -105,8 +116,55 @@ class profilePage : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //TODO: Double Click edit
+        tvName.setOnClickListener(object : profilePage.DoubleClickListener(){
+            override fun onDoubleClick(v: View?){
+                Log.d("double", "double press")
+                toEdit(username!!)
+            }
+        })
+
+        circularImageView.setOnClickListener(object : profilePage.DoubleClickListener(){
+            override fun onDoubleClick(v: View?){
+                Log.d("double", "double press")
+                toEdit(username!!)
+            }
+        })
+
+        tvDescription.setOnClickListener(object : profilePage.DoubleClickListener(){
+            override fun onDoubleClick(v: View?){
+                Log.d("double", "double press")
+                toEdit(username!!)
+            }
+        })
+
     }
 
+    private fun toEdit(username: String)
+    {
+        val intent = Intent(this,editProfile::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        finish()
+    }
+
+    abstract class DoubleClickListener: View.OnClickListener {
+        private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+        var lastClickTime: Long = 0
+        override fun onClick(v: View?) {
+            val clickTime = System.currentTimeMillis()
+            if(clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA){
+                onDoubleClick(v)
+            }
+            lastClickTime = clickTime
+        }
+        open fun onDoubleClick(v: View?)
+        {
+            object {
+                private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+            }
+        }
+    }
 
     private fun collapse(textView: TextView) {
         textView.height = 0
@@ -139,7 +197,9 @@ class profilePage : AppCompatActivity() {
             if(it != null){
 
                 var selectedPhotoUrl_string = it.getString("Picture")
+
                 val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
+
 //                val selectedPhotoUrl = selectedPhotoUrl_string.toUri()
 //                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUrl)
 //                circularImageView.setImageBitmap(bitmap)
@@ -149,6 +209,7 @@ class profilePage : AppCompatActivity() {
                     com.squareup.picasso.Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         // loaded bitmap is here (bitmap)
+
                         circularImageView.setImageBitmap(bitmap)
                     }
 
@@ -157,9 +218,7 @@ class profilePage : AppCompatActivity() {
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
                 })
 
-
                 tvName.setText(it.getString("Name").toString()).toString()
-
 
                 if(it.getString("Description").toString() == ""){
                     collapse(tvDescription)

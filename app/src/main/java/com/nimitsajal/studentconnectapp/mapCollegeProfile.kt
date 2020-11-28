@@ -101,13 +101,14 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
-        tvAddress.setOnClickListener {
+        tvAddress.setOnLongClickListener {
             val textToCopy = tvAddress.text.toString()
             val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData = ClipData.newPlainText("address", textToCopy)
             clipboardManager.setPrimaryClip(clipData)
 
             Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_LONG).show()
+            return@setOnLongClickListener true
         }
 
         if(clginfo.collegename != "" || clginfo.universityName != ""){

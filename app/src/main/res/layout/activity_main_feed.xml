@@ -107,11 +107,11 @@
 
         <ImageButton
             android:id="@+id/btnFeed"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/home_button"
+            android:background="@drawable/homebutton_selected"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/btnEvent"

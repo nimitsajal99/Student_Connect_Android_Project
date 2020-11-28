@@ -84,6 +84,12 @@ class editProfile : AppCompatActivity() {
             })
         }
 
+        btnExit.setOnClickListener {
+            val intent = Intent(this, profilePage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            finish()
+        }
         btnBack.setOnClickListener {
             val intent = Intent(this, profilePage::class.java)
             intent.putExtra("username", username)
@@ -279,6 +285,32 @@ class editProfile : AppCompatActivity() {
         {
             Toast.makeText(this, "Phone number is Invalid!", Toast.LENGTH_SHORT).show()
             return
+        }
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
+
+        var username = ""
+        val db = FirebaseFirestore.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if(user != null){
+            val user_table = db.collection("User Table").document(user.uid.toString())
+            user_table.get().addOnSuccessListener { result ->
+                if(result != null){
+                    username = result.getString("Username").toString()
+                    Log.d("profilePage", username.toString())
+                    //TODO: Change to current chats
+                    val intent = Intent(this, profilePage::class.java)
+                    intent.putExtra("usernameOthers", username)
+                    startActivity(intent)
+                }
+                else{
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+            }
         }
     }
 

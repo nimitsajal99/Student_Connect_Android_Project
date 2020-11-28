@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
@@ -15,9 +16,11 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_current_chats.*
+import kotlinx.android.synthetic.main.activity_current_chats.etSearch
 import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
+import kotlinx.android.synthetic.main.activity_new_chat.*
 import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.*
 
@@ -28,6 +31,11 @@ class currentChats : AppCompatActivity() {
 //        var username = ""
 
         val adapter = GroupAdapter<GroupieViewHolder>()
+
+
+        //TODO: GRID VIEW
+//        val mLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+//        rvCurrentChats.layoutManager = mLayoutManager
 
         var arrayUser = mutableListOf<usersList>()
 
@@ -69,12 +77,14 @@ class currentChats : AppCompatActivity() {
             val intent = Intent(this, profilePage::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            finish()
         }
 
         btnFeed.setOnClickListener {
             val intent = Intent(this, mainFeed::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            finish()
         }
 
         btnNewChat.setOnClickListener {
@@ -113,6 +123,13 @@ class currentChats : AppCompatActivity() {
                 etSearch.isVisible=true
                 studentConnectCurrentChat.isVisible = false
             }
+        }
+
+        btnEvent.setOnClickListener {
+            val intent = Intent(this, eventPage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            finish()
         }
     }
 

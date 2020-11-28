@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
