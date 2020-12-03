@@ -1,10 +1,14 @@
 package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -182,6 +186,16 @@ class chat : AppCompatActivity() {
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                 }
+                adapter.setOnItemLongClickListener { item, view ->
+                    val temp: Recieve = item as Recieve
+                    val text = temp.text
+                    val clipboardManager =
+                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clipData = ClipData.newPlainText("address", text)
+                    clipboardManager.setPrimaryClip(clipData)
+                    Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_LONG).show()
+                    return@setOnItemLongClickListener true
+                }
                 recyclerView_chat.adapter = adapter
             }
     }
@@ -195,6 +209,30 @@ class Send(val text: String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.tvSend.text = text
         Log.d("adapter", "adapter added")
+        viewHolder.itemView.tvSend.setOnClickListener(object : Send.DoubleClickListener() {
+            override fun onDoubleClick(v: View?) {
+                Log.d("adapter", "double press")
+                //Toast.makeText(, "double", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@Send, "ERROR", Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+    abstract class DoubleClickListener : View.OnClickListener {
+        private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+        var lastClickTime: Long = 0
+        override fun onClick(v: View?) {
+            val clickTime = java.lang.System.currentTimeMillis()
+            if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                onDoubleClick(v)
+            }
+            lastClickTime = clickTime
+        }
+
+        open fun onDoubleClick(v: View?) {
+            object {
+                private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+            }
+        }
     }
 }
 

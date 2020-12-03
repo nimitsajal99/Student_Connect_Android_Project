@@ -8,10 +8,14 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
@@ -34,6 +38,9 @@ import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
 
 class mainFeed : AppCompatActivity() {
+
+    private lateinit var detector: GestureDetectorCompat
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_feed)
@@ -53,6 +60,7 @@ class mainFeed : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
+                    detector = GestureDetectorCompat(this,DiaryGestureListener(username,adapter,db,arraySearch))
                     loadFeed(arrayPost, adapter, username!!, db)
                 }
                 else{
@@ -62,10 +70,10 @@ class mainFeed : AppCompatActivity() {
             }
         }
 
+        detector = GestureDetectorCompat(this,DiaryGestureListener(username,adapter,db,arraySearch))
+
         btnEvent.setOnClickListener {
-            val intent = Intent(this, eventPage::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
+            goToEvent(username!!)
         }
 
         btnUpload.setOnClickListener{
@@ -103,23 +111,11 @@ class mainFeed : AppCompatActivity() {
 
         btnSearch.setOnClickListener {
             if(etSearchMainFeed.isVisible==true){
-                etSearchMainFeed.isVisible=false
-                etSearchMainFeed.setText("").toString()
-                adapter.clear()
-                loadFeed(arrayPost, adapter, username!!, db)
-                logoMainFeed.isVisible = true
+                closeSearchBar()
             }
             else
             {
-                etSearchMainFeed.isEnabled = true
-                etSearchMainFeed.isVisible=true
-                adapter.clear()
-                if(etSearchMainFeed.text.toString() != "")
-                {
-                    adapter.clear()
-                    loadSearch(username!!, db, adapter, arraySearch)
-                }
-                logoMainFeed.isVisible = false
+               openSearchBar(username!!, adapter, db, arraySearch)
             }
         }
 
@@ -149,6 +145,170 @@ class mainFeed : AppCompatActivity() {
     override fun onBackPressed() {
         //super.onBackPressed()
         moveTaskToBack(true)
+    }
+
+    private fun showToast(message: String)
+    {
+        Log.d("toast", "$message")
+        val toastView = layoutInflater.inflate(
+            R.layout.toast_text_adapter,
+            findViewById(R.id.toastLayout)
+        )
+        // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+        val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+        textMessage.text = message
+        Log.d("toast", "${textMessage.text}")
+        with(Toast(applicationContext))
+        {
+            duration = Toast.LENGTH_SHORT
+            view = toastView
+            show()
+        }
+    }
+
+    inner class DiaryGestureListener(username: String?, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>) : GestureDetector.SimpleOnGestureListener()
+    {
+
+        //TODO: Swipe Link - > https://www.youtube.com/watch?v=j1aydFEOEA0
+        private val db = db
+        private val arraySearch = arraySearch
+        private val adapter = adapter
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try{
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x)?:0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y)?:0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if(Math.abs(diffX) > Math.abs(diffY))
+                {
+                    //Left or Right Swipe
+                    if(Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD)
+                    {
+                        if(diffX>0){
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@mainFeed.onSwipeRight()
+                        }
+                        else{
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@mainFeed.onSwipeLeft(username!!)
+                        }
+                    }
+                    else
+                    {
+                        return false
+                    }
+                }
+                else
+                {
+                    //Up or down Swipe
+                    if(Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD)
+                    {
+                        if(diffY>0)
+                        {
+                            //Up Swipe
+                            return this@mainFeed.onSwipeUp()
+                        }
+                        else
+                        {
+                            //Bottom Swipe
+                            return this@mainFeed.onSwipeBottom(username!!,adapter,db,arraySearch)
+
+                        }
+                    }
+                    else
+                    {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+    }
+
+    private fun onSwipeUp():Boolean {
+        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        closeSearchBar()
+        return true
+    }
+
+    private fun onSwipeBottom(username: String, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>): Boolean {
+        openSearchBar(username,adapter,db,arraySearch)
+        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        return true
+    }
+
+    private fun onSwipeLeft(username: String): Boolean {
+        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        goToEvent(username)
+        return true
+    }
+
+    private fun onSwipeRight(): Boolean {
+        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    fun goToEvent(username: String)
+    {
+        val intent = Intent(this, eventPage::class.java)
+        intent.putExtra("username", username)
+//        intent.flags
+        startActivity(intent)
+//            Log.d("profilePage", "in also")
+//
+////            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_in_left)
+//            CustomIntent.customType(this@mainFeed, "right-to-left")
+//            Log.d("profilePage", "out of also")
+//        showToast("NEW toast")
+
+    }
+
+    fun openSearchBar(username: String, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>)
+    {
+        etSearchMainFeed.isEnabled = true
+        etSearchMainFeed.isVisible=true
+        adapter.clear()
+        if(etSearchMainFeed.text.toString() != "")
+        {
+            adapter.clear()
+            loadSearch(username!!, db, adapter, arraySearch)
+        }
+        logoMainFeed.isVisible = false
+    }
+
+    fun closeSearchBar()
+    {
+        etSearchMainFeed.isVisible=false
+        etSearchMainFeed.setText("").toString()
+        logoMainFeed.isVisible = true
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
     }
 
     private fun loadSearch(username: String, db: FirebaseFirestore, adapter: GroupAdapter<GroupieViewHolder>, arraySearch: MutableList<usersList>){
@@ -338,7 +498,6 @@ class mainFeed : AppCompatActivity() {
 //                            .get()
 //                            .addOnSuccessListener {
 //                                val temp = postList(it["From"].toString(), it["Picture"].toString(), it["Dp"].toString(), it["Description"].toString(), it["Likes"].toString().toInt(), document.id.toString())
-//                                //TODO: temp added
 //                                arrayPost.add(temp)
 //                                val adapterComments = GroupAdapter<GroupieViewHolder>()
 //                                db.collection("Post").document(document.id).collection("Comments")

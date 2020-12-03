@@ -10,8 +10,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GestureDetectorCompat
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -38,6 +41,10 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
+    private lateinit var detector: GestureDetectorCompat
+
+    var clginfo = clgInfo("", "", "")
+
 //    var collegeName = "RVCA - RV College of Architecture"
 //    var username = ""
 //    var universityName = "RV Educational Institutions\n"
@@ -45,9 +52,6 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
 //    var collegeName = intent.getStringExtra("collegeName").toString()
 //    var username = intent.getStringExtra("username").toString()
 //    var universityName = intent.getStringExtra("universityName").toString()
-
-
-    var clginfo = clgInfo("", "", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,15 +68,31 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
         clginfo.collegename = intent.getStringExtra("collegeName").toString()
         clginfo.username = intent.getStringExtra("username").toString()
         clginfo.universityName= intent.getStringExtra("universityName").toString()
+        val db = FirebaseFirestore.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if(user != null){
+            val user_table = db.collection("User Table").document(user.uid.toString())
+            user_table.get().addOnSuccessListener { result ->
+                if(result != null){
+                    clginfo.username = result.getString("Username").toString()
+                    Log.d("profilePage", clginfo.username.toString())
+                    detector = GestureDetectorCompat(this, DiaryGestureListener(clginfo.username))
+                }
+                else{
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+            }
+        }
+
+        detector = GestureDetectorCompat(this, DiaryGestureListener(clginfo.username))
 
         val adapter = GroupAdapter<GroupieViewHolder>()
 
-//        btnEvent.setOnClickListener {
-//            val intent = Intent(this, collegeProfilePage::class.java)
-//            intent.putExtra("username", username)
-//            startActivity(intent)
-//        }
-
+        btnEventMap.setOnClickListener {
+            goToEvent(clginfo.username)
+        }
 
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -96,9 +116,7 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
         }
 
         btnFeedCollege.setOnClickListener {
-            val intent = Intent(this, mainFeed::class.java)
-            intent.putExtra("username", clginfo.username)
-            startActivity(intent)
+           goToFeed(clginfo.username)
         }
 
         tvAddress.setOnLongClickListener {
@@ -172,6 +190,115 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
                 }
                 rvBranchNames.adapter = adapter
             }
+    }
+    //TODO: GO to feed
+    private fun goToFeed(username: String)
+    {
+        val intent = Intent(this, mainFeed::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+    }
+    //TODO: go to event
+    private fun goToEvent(username: String)
+    {
+        val intent = Intent(this, eventPage::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        finish()
+    }
+    //TODO: On touch event
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@mapCollegeProfile.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@mapCollegeProfile.onSwipeLeft(username!!)
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@mapCollegeProfile.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@mapCollegeProfile.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun onSwipeLeft(username: String): Boolean {
+        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        goToEvent(username)
+        return true
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        goToFeed(username)
+        return true
     }
 }
 

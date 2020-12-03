@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toast_text"
+    android:id="@+id/toastLayout"
     android:background="@drawable/toast_text">
 
     <TextView
-        android:id="@+id/tvToast"
+        android:id="@+id/toastText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
+        android:textSize="18sp"
         android:textColor="@color/base0"
         android:textStyle="bold|italic"
         android:text="Test Toast"
-        android:padding="10sp"
+        android:paddingTop="5sp"
+        android:paddingBottom="5sp"
+        android:paddingLeft="16sp"
+        android:paddingRight="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

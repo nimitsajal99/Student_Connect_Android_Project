@@ -9,7 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -24,6 +27,7 @@ class editProfile : AppCompatActivity() {
 
     private var selectedPhotoUrl: Uri? = null
     private var Dpempty: Boolean = false
+    private lateinit var detector: GestureDetectorCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +54,7 @@ class editProfile : AppCompatActivity() {
                             userinfo.name = it.getString("Name").toString()
                             userinfo.phonenumber = it.getString("Phone Number").toString()
                             userinfo.description = it.getString("Description").toString()
+                            detector = GestureDetectorCompat(this,DiaryGestureListener(username))
                             getUser(userinfo)
                         }
                     }
@@ -61,6 +66,8 @@ class editProfile : AppCompatActivity() {
                 }
             }
         }
+
+        detector = GestureDetectorCompat(this,DiaryGestureListener(username))
 
         btnDp.setOnClickListener {
             photoPicker()
@@ -85,16 +92,10 @@ class editProfile : AppCompatActivity() {
         }
 
         btnExit.setOnClickListener {
-            val intent = Intent(this, profilePage::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-            finish()
+            goToProfile(username!!)
         }
         btnBack.setOnClickListener {
-            val intent = Intent(this, profilePage::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-            finish()
+            goToProfile(username!!)
         }
         btnSave.setOnClickListener {
 //            Toast.makeText(this,"Clicked name: ${etNameEdit.text.toString()} , phone number ${etPhoneEdit.text.toString()} ", Toast.LENGTH_SHORT).show()
@@ -104,6 +105,109 @@ class editProfile : AppCompatActivity() {
             Log.d("Editprofile", "name: ${etNameEdit.text.toString()} , phone number ${etPhoneEdit.text.toString()}, description ${etDescriptionEdit.text.toString()}")
             Log.d("Editprofile", "name ${userinfo.name} , phone number ${userinfo.phonenumber} , description ${userinfo.description}")
         }
+    }
+
+    private fun goToProfile(username: String)
+    {
+        val intent = Intent(this, profilePage::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        finish()
+    }
+
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@editProfile.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@editProfile.onSwipeLeft()
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@editProfile.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@editProfile.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun onSwipeLeft(): Boolean {
+        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+
+        return true
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        goToProfile(username)
+        return true
     }
 
     private fun photoPicker() {
@@ -301,7 +405,6 @@ class editProfile : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
-                    //TODO: Change to current chats
                     val intent = Intent(this, profilePage::class.java)
                     intent.putExtra("usernameOthers", username)
                     startActivity(intent)

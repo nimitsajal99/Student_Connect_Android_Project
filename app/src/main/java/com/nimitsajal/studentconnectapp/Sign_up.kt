@@ -108,21 +108,18 @@ class Sign_up : AppCompatActivity() {
 
         if (!isEmailValid(userEmail)) {
             Toast.makeText(this, "Email is Invalid!", Toast.LENGTH_SHORT).show()
-            //TODO: Switching The button Back On
             btnContinueToClgDetails.isEnabled = true
             return
         }
 
         if (!isValidMobile(userPhone)) {
             Toast.makeText(this, "Phone number is Invalid!", Toast.LENGTH_SHORT).show()
-            //TODO: Switching The button Back On
             btnContinueToClgDetails.isEnabled = true
             return
         }
 
         if (!isPasswordValid(userPassword)) {
             Toast.makeText(this, "Weak Password!", Toast.LENGTH_SHORT).show()
-            //TODO: Switching The button Back On
             btnContinueToClgDetails.isEnabled = true
             return
         }

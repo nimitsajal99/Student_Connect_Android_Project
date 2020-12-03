@@ -5,7 +5,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,6 +23,9 @@ import kotlinx.android.synthetic.main.activity_new_chat.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 
 class newChat : AppCompatActivity() {
+
+    private lateinit var detector: GestureDetectorCompat
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_chat)
@@ -39,6 +45,7 @@ class newChat : AppCompatActivity() {
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
                     adapter.clear()
+                    detector = GestureDetectorCompat(this,DiaryGestureListener(username))
                     fetchUsers(username!!, adapter, arrayUser)
                 }
                 else{
@@ -48,21 +55,17 @@ class newChat : AppCompatActivity() {
             }
         }
 
+        detector = GestureDetectorCompat(this,DiaryGestureListener(username))
+
         btnBack.setOnClickListener {
-            val intent = Intent(this, currentChats::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-            finish()
+            goToChats(username!!)
         }
 
         btnSearch.setOnClickListener {
             if (etSearch.isVisible == true) {
-                etSearch.isVisible = false
-                etSearch.setText("").toString()
-                studentConnectNewChat.isVisible = true
+                closeSearchBar()
             } else {
-                etSearch.isVisible = true
-                studentConnectNewChat.isVisible = false
+                openSearchBar()
             }
         }
 
@@ -82,6 +85,119 @@ class newChat : AppCompatActivity() {
                 searching(username!!, adapter, arrayUser)
             }
         }
+    }
+
+    private fun goToChats(username: String)
+    {
+        val intent = Intent(this, currentChats::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        finish()
+    }
+    private fun closeSearchBar()
+    {
+        etSearch.isVisible = false
+        etSearch.setText("").toString()
+        studentConnectNewChat.isVisible = true
+    }
+    private fun openSearchBar()
+    {
+        etSearch.isVisible = true
+        studentConnectNewChat.isVisible = false
+    }
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@newChat.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@newChat.onSwipeLeft()
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@newChat.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@newChat.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        closeSearchBar()
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        openSearchBar()
+        return false
+    }
+
+    private fun onSwipeLeft(): Boolean {
+        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+
+        return true
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        goToChats(username)
+        return true
     }
 
     private  fun already(from: String, to: String)

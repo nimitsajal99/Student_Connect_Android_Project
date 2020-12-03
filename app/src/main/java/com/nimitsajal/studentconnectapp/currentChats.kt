@@ -5,7 +5,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.GridLayoutManager
@@ -25,6 +28,7 @@ import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.*
 
 class currentChats : AppCompatActivity() {
+    private lateinit var detector: GestureDetectorCompat
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_current_chats)
@@ -49,6 +53,8 @@ class currentChats : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
+                    detector = GestureDetectorCompat(this,DiaryGestureListener(username))
+                    adapter.clear()
                     fetchUser(username!!, adapter, arrayUser)
                 }
                 else{
@@ -58,6 +64,7 @@ class currentChats : AppCompatActivity() {
             }
         }
 
+        detector = GestureDetectorCompat(this,DiaryGestureListener(username))
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, MainActivity::class.java)
@@ -74,10 +81,7 @@ class currentChats : AppCompatActivity() {
 //        }
 
         btnProfile.setOnClickListener {
-            val intent = Intent(this, profilePage::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-            finish()
+            goToProfile(username!!)
         }
 
         btnFeed.setOnClickListener {
@@ -88,9 +92,7 @@ class currentChats : AppCompatActivity() {
         }
 
         btnNewChat.setOnClickListener {
-            val intent = Intent(this, newChat::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
+            goToNewChats(username!!)
         }
 
         etSearch.addTextChangedListener(){
@@ -114,14 +116,11 @@ class currentChats : AppCompatActivity() {
 
         btnSearch_currentChat.setOnClickListener {
             if(etSearch.isVisible==true){
-                etSearch.isVisible=false
-                etSearch.setText("").toString()
-                studentConnectCurrentChat.isVisible = true
+               closeSearchBar()
             }
             else
             {
-                etSearch.isVisible=true
-                studentConnectCurrentChat.isVisible = false
+                openSearchBar()
             }
         }
 
@@ -131,6 +130,130 @@ class currentChats : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun goToProfile(username: String)
+    {
+        val intent = Intent(this, profilePage::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun openSearchBar()
+    {
+        etSearch.isVisible=true
+        studentConnectCurrentChat.isVisible = false
+    }
+
+    private fun closeSearchBar()
+    {
+        etSearch.isVisible=false
+        etSearch.setText("").toString()
+        studentConnectCurrentChat.isVisible = true
+    }
+
+    private fun goToNewChats(username: String)
+    {
+        val intent = Intent(this, newChat::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+    }
+
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@currentChats.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@currentChats.onSwipeLeft(username!!)
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@currentChats.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@currentChats.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        closeSearchBar()
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        openSearchBar()
+        return false
+    }
+
+    private fun onSwipeLeft(username: String): Boolean {
+        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        goToNewChats(username)
+        return false
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        goToProfile(username)
+        return false
     }
 
     @SuppressLint("RestrictedApi")
