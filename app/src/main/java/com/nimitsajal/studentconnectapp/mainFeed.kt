@@ -453,25 +453,47 @@ class mainFeed : AppCompatActivity() {
                             db.collection("Post").document(document.id)
                                 .get()
                                 .addOnSuccessListener { it2 ->
-                                    val temp = postList(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString())
-                                    //TODO: temp added
-                                    arrayPost.add(temp)
-                                    val adapterComments = GroupAdapter<GroupieViewHolder>()
-                                    db.collection("Post").document(document.id).collection("Comments")
-                                        .orderBy("Timestamp", Query.Direction.ASCENDING)
-                                        .get()
-                                        .addOnSuccessListener { it3 ->
-                                            if (it3 != null) {
-                                                adapterComments.clear()
-                                                for (doc in it3.documents) {
-                                                    if (doc.id != "Info") {
-                                                        adapterComments.add(Comment_class(doc["From"].toString(), doc["Text"].toString()))
+                                    if(it2 != null){
+                                        try {
+                                            val temp = postList(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString())
+                                            //TODO: temp added
+                                            arrayPost.add(temp)
+                                            val adapterComments = GroupAdapter<GroupieViewHolder>()
+                                            db.collection("Post").document(document.id).collection("Comments")
+                                                .orderBy("Timestamp", Query.Direction.ASCENDING)
+                                                .get()
+                                                .addOnSuccessListener { it3 ->
+                                                    if (it3 != null) {
+                                                        adapterComments.clear()
+                                                        for (doc in it3.documents) {
+                                                            if (doc.id != "Info") {
+                                                                adapterComments.add(Comment_class(doc["From"].toString(), doc["Text"].toString()))
+                                                            }
+                                                        }
+                                                        adapter.add(post_class(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString(), username, adapter, adapterComments, false))
                                                     }
                                                 }
-                                                adapter.add(post_class(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString(), username, adapter, adapterComments, false))
-                                            }
                                         }
+                                        catch (e: Exception){
+                                            Log.d("mainfeed", "$e")
+                                            db.collection("Users").document(username).collection("My Feed").document(document.id)
+                                                .delete()
+                                                .addOnSuccessListener {
+                                                    Log.d("mainfeed", "TRY document ${document.id} deleted from $username ")
+                                                }
+                                                .addOnFailureListener {
+                                                    Log.d("mainfeed", "TRY document ${document.id} not deleted from $username ")
+                                                }
+//                                            db.collection("Post").document(document.id)
+//                                                .delete()
+//                                                .addOnSuccessListener {
+//                                                    Log.d("mainfeed", "TRY document ${document.id} deleted AGAIN")
+//                                                }
+                                        }
+
+                                    }
                                 }
+
                         }
                     }
                     rvFeed.adapter = adapter
@@ -695,7 +717,6 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             .addOnSuccessListener {
                 if(it != null){
                     Log.d("mainfeed", "Post updated - comment added")
-
                 }
             }
     }

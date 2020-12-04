@@ -7,6 +7,10 @@
     android:background="@color/base0"
     tools:context=".mainFeed">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -44,22 +48,20 @@
             android:visibility="visible"
             />
 
+        <ImageView
+            android:id="@+id/btnDeletePost"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="4dp"
+            android:visibility="gone"
+            android:background="@drawable/delete_post"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvNewChats"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
-        android:padding="10dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -67,6 +69,238 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:scrollbars="vertical"
+        android:overScrollMode="ifContentScrolls"
+        android:isScrollContainer="true"
+        android:fadeScrollbars="true">
+
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardCornerRadius="2dp"
+        app:cardUseCompatPadding="true"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/base0card"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="10dp"
+            tools:ignore="ExtraText">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/circularImageViewCard"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                app:civ_border_width="2dp"
+                app:civ_border_color="@color/base2"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="13dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/postImageCard"/>
+
+            <TextView
+                android:id="@+id/tvUsernameCard"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="username"
+                android:textColor="@color/base3"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginLeft="8sp"
+                app:layout_constraintLeft_toRightOf="@id/circularImageViewCard"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/tvLikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Likes"
+                android:textColor="@color/base3"
+                android:textSize="17sp"
+                android:textStyle="normal"
+                android:gravity="center"
+                android:layout_marginBottom="3dp"
+                android:layout_marginRight="3dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/postImageCard"
+                />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvBehindImage"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:cardCornerRadius="2dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/base1"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <ImageView
+                android:id="@+id/postImageCard"
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_marginTop="0dp"
+                android:padding="3dp"
+                android:elevation="2dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+
+
+
+            <!--        <ImageView-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="2dp"-->
+            <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+            <!--            app:layout_constraintBottom_toTopOf="@id/postImageCard"/>-->
+            <!--        <ImageView-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="2dp"-->
+            <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+            <!--            app:layout_constraintTop_toBottomOf="@id/postImageCard"/>-->
+
+            <TextView
+                android:id="@+id/tvDescriptionCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/base3"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text=""
+                android:gravity="center_horizontal"
+                app:layout_constraintTop_toBottomOf="@id/postImageCard"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="5dp"/>
+
+
+            <EditText
+                android:id="@+id/etCommentBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Comment here"
+                android:textColorHint="@color/base4"
+                android:textSize="18sp"
+                android:paddingLeft="8sp"
+                android:paddingRight="8sp"
+                android:paddingTop="5sp"
+                android:paddingBottom="5sp"
+                android:text=""
+                android:background="@color/base0"
+                android:layout_marginTop="3dp"
+                app:layout_constraintTop_toBottomOf="@id/tvDescriptionCard"
+                app:layout_constraintBottom_toTopOf="@id/rvComments"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/btnCommentDisabled"
+                android:visibility="visible"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:clickable="true"
+                android:gravity="center"
+                android:elevation="30dp"
+                android:layout_marginRight="15dp"
+                app:layout_constraintBottom_toBottomOf="@id/postImageCard"
+                app:layout_constraintRight_toRightOf="@id/postImageCard"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/commentbox_disabled"/>
+
+            <Button
+                android:id="@+id/btnCommentEnabled"
+                android:visibility="invisible"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="13dp"
+                android:layout_marginRight="13dp"
+                android:clickable="true"
+                android:elevation="30dp"
+                app:layout_constraintRight_toRightOf="@id/postImageCard"
+                app:layout_constraintBottom_toBottomOf="@id/postImageCard"
+                android:background="@drawable/commentbox_enabled"/>
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvComments"
+                android:clickable="true"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/etCommentBox"
+                />
+
+            <!--        <ImageView-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="2dp"-->
+            <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+            <!--            app:layout_constraintTop_toBottomOf="@id/rvComments"/>-->
+
+
+            <Button
+                android:id="@+id/btnLike"
+                android:visibility="invisible"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="13dp"
+                android:layout_marginBottom="13dp"
+                android:clickable="true"
+                android:elevation="100dp"
+                app:layout_constraintLeft_toLeftOf="@id/postImageCard"
+                app:layout_constraintBottom_toBottomOf="@id/postImageCard"
+                android:background="@drawable/like_filled"/>
+
+            <Button
+                android:id="@+id/btnUnlike"
+                android:visibility="visible"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="15dp"
+                android:clickable="true"
+                android:elevation="100dp"
+                app:layout_constraintLeft_toLeftOf="@id/postImageCard"
+                app:layout_constraintBottom_toBottomOf="@id/postImageCard"
+                android:background="@drawable/unliked_filled"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    </androidx.core.widget.NestedScrollView>
+
+    </FrameLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

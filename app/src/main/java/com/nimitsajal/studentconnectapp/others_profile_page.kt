@@ -10,9 +10,11 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -35,6 +37,8 @@ class others_profile_page : AppCompatActivity() {
         tvUsernameOthers.setText("").toString()
         //tvUsername.setText(username).toString()
 
+        val mLayoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+        rvProfilePageOthers.layoutManager = mLayoutManager
 
         tvDescriptionOthers.setText("").toString()
 
@@ -43,6 +47,8 @@ class others_profile_page : AppCompatActivity() {
         btnFriendsOthers.setText("").toString()
 
         btnMessageOthers.setText("Message").toString()
+
+        val adapterPost = GroupAdapter<GroupieViewHolder>()
 
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -73,7 +79,7 @@ class others_profile_page : AppCompatActivity() {
                                         }
                                     }
                                 }
-                                getUser(auth,usernameOthers, db,friend)
+                                getUser(auth,usernameOthers, db, friend, adapterPost)
                             }
                     }
                 }
@@ -114,7 +120,7 @@ class others_profile_page : AppCompatActivity() {
         btnFriendsOthers.setOnClickListener {
             if (usernameOthers != null && username != null) {
                 btnFriendsOthers.isEnabled = false
-                friend(username, usernameOthers, db, friend)
+                friend(username, usernameOthers, db, friend, adapterPost)
             }
         }
 
@@ -126,7 +132,52 @@ class others_profile_page : AppCompatActivity() {
         }
     }
 
-    private fun friend(username: String, usernameOthers: String, db: FirebaseFirestore, friend: isFriend){
+    private fun loadPost(db: FirebaseFirestore, username: String, adapter: GroupAdapter<GroupieViewHolder>, dp: String){
+        rvProfilePageOthers.adapter = null
+        adapter.clear()
+        db.collection("Users").document(username).collection("My Posts")
+            .orderBy("Time", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener {
+                if(it != null){
+                    for(document in it){
+                        if(document.id != "Info"){
+                            var comCount = 0
+                            db.collection("Post").document(document.id)
+                                .get()
+                                .addOnSuccessListener { it2 ->
+                                    if(it2 != null){
+                                        db.collection("Post").document(document.id).collection("Comments")
+                                            .get()
+                                            .addOnSuccessListener {it3 ->
+                                                if(it3 != null){
+                                                    comCount = it3.size()-1
+                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id))
+                                                }
+                                            }
+                                    }
+                                }
+                        }
+                    }
+                }
+                adapter.setOnItemLongClickListener { item, view ->
+//                    Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
+                    val post: profile_post_class = item as profile_post_class
+                    val intent = Intent(this, myPost::class.java)
+                    intent.putExtra("username", username)
+                    intent.putExtra("picture", post.url)
+                    intent.putExtra("uid", post.uid)
+                    intent.putExtra("description", post.description)
+                    intent.putExtra("dp", dp)
+                    intent.putExtra("others", "true")
+                    startActivity(intent)
+                    return@setOnItemLongClickListener true
+                }
+                rvProfilePageOthers.adapter = adapter
+            }
+    }
+
+    private fun friend(username: String, usernameOthers: String, db: FirebaseFirestore, friend: isFriend, adapterPost: GroupAdapter<GroupieViewHolder>){
         if(friend.isFriend){
             db.collection("Users").document(username).collection("Friends").document(usernameOthers)
                 .delete()
@@ -147,6 +198,7 @@ class others_profile_page : AppCompatActivity() {
                         btnFriendsOthers.isEnabled = true
                     }
                 }
+            rvProfilePageOthers.adapter = null
         }
         else{
             var dpUsername = ""
@@ -191,6 +243,7 @@ class others_profile_page : AppCompatActivity() {
                                         .addOnFailureListener {it5 ->
                                             Log.d("others", "outer user not entered = ${it5.message}")
                                         }
+                        loadPost(db, usernameOthers, adapterPost, friend.url)
                                 }
                 }
         }
@@ -356,7 +409,7 @@ class others_profile_page : AppCompatActivity() {
 
     }
 
-    private fun getUser(auth: FirebaseAuth, username: String, db: FirebaseFirestore, friend: isFriend){
+    private fun getUser(auth: FirebaseAuth, username: String, db: FirebaseFirestore, friend: isFriend, adapterPost: GroupAdapter<GroupieViewHolder>){
 
 
         tvUsernameOthers.setText(username.toString()).toString()
@@ -387,6 +440,9 @@ class others_profile_page : AppCompatActivity() {
 
                 tvNameOthers.setText(it.getString("Name").toString()).toString()
                 friend.name = it.getString("Name").toString()
+                if(friend.isFriend == true){
+                    loadPost(db, username, adapterPost, friend.url)
+                }
 
                 if(it.getString("Description").toString() == ""){
                     collapse(tvDescriptionOthers)
@@ -433,6 +489,7 @@ class others_profile_page : AppCompatActivity() {
                     btnFriendsOthers.setText(friends).toString()
                 }
             }
+
     }
 
     private fun collapse(textView: TextView) {

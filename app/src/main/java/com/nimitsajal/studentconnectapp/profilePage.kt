@@ -71,6 +71,8 @@ class profilePage : AppCompatActivity() {
 
 //        tvDetails.setText("").toString()
 
+        var dp = picture("")
+
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
@@ -81,8 +83,7 @@ class profilePage : AppCompatActivity() {
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
                     detector = GestureDetectorCompat(this,DiaryGestureListener(username))
-                    getUser(auth, username!!)
-                    loadPost(db, username!!, adapter)
+                    getUser(auth, username!!, dp, adapter)
                 }
                 else{
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
@@ -157,7 +158,7 @@ class profilePage : AppCompatActivity() {
 
     }
 
-    private fun loadPost(db: FirebaseFirestore, username: String, adapter: GroupAdapter<GroupieViewHolder>){
+    private fun loadPost(db: FirebaseFirestore, username: String, adapter: GroupAdapter<GroupieViewHolder>, dp: picture){
         db.collection("Users").document(username).collection("My Posts")
             .orderBy("Time", Query.Direction.DESCENDING)
             .get()
@@ -184,7 +185,16 @@ class profilePage : AppCompatActivity() {
                     }
                 }
                 adapter.setOnItemLongClickListener { item, view ->
-                    Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
+                    val post: profile_post_class = item as profile_post_class
+                    val intent = Intent(this, myPost::class.java)
+                    intent.putExtra("username", username)
+                    intent.putExtra("picture", post.url)
+                    intent.putExtra("uid", post.uid)
+                    intent.putExtra("description", post.description)
+                    intent.putExtra("dp", dp.picture)
+                    intent.putExtra("others", "false")
+                    startActivity(intent)
                     return@setOnItemLongClickListener true
                 }
                 rvProfilePage.adapter = adapter
@@ -389,7 +399,7 @@ class profilePage : AppCompatActivity() {
         }
     }
 
-    private fun getUser(auth: FirebaseAuth, username: String){
+    private fun getUser(auth: FirebaseAuth, username: String, dp: picture, adapter: GroupAdapter<GroupieViewHolder>){
         val db = FirebaseFirestore.getInstance()
 
 //        if(username.toString() == ""){
@@ -407,7 +417,8 @@ class profilePage : AppCompatActivity() {
             if(it != null){
 
                 var selectedPhotoUrl_string = it.getString("Picture")
-
+                dp.picture = selectedPhotoUrl_string.toString()
+                loadPost(db, username, adapter, dp)
                 val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
 
 //                val selectedPhotoUrl = selectedPhotoUrl_string.toUri()
@@ -468,6 +479,10 @@ class profilePage : AppCompatActivity() {
                 }
             }
     }
+
+}
+
+data class picture(var picture: String){
 
 }
 

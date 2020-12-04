@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,6 +12,11 @@
     app:cardBackgroundColor="@color/base0card"
     android:clickable="true"
     android:focusable="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -83,9 +89,9 @@
             android:id="@+id/postImageCard"
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="0dp"
             android:padding="3dp"
-            android:elevation="10dp"
+            android:elevation="2dp"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -148,6 +154,7 @@
             android:layout_height="45dp"
             android:clickable="true"
             android:gravity="center"
+            android:elevation="30dp"
             android:layout_marginRight="15dp"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
@@ -162,6 +169,7 @@
             android:layout_marginBottom="13dp"
             android:layout_marginRight="13dp"
             android:clickable="true"
+            android:elevation="30dp"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             android:background="@drawable/commentbox_enabled"/>
@@ -196,6 +204,7 @@
             android:layout_marginStart="13dp"
             android:layout_marginBottom="13dp"
             android:clickable="true"
+            android:elevation="30dp"
             app:layout_constraintLeft_toLeftOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             android:background="@drawable/like_filled"/>
@@ -208,10 +217,13 @@
             android:layout_marginStart="15dp"
             android:layout_marginBottom="15dp"
             android:clickable="true"
+            android:elevation="30dp"
             app:layout_constraintLeft_toLeftOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             android:background="@drawable/unliked_filled"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
 
 </androidx.cardview.widget.CardView>
