@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -82,6 +84,65 @@ class collegeProfilePage : AppCompatActivity(){
                 }
             }
         }
+    }
+
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 
     private fun loadCollege(collegeName: String, universityName: String, adapter: GroupAdapter<GroupieViewHolder>){

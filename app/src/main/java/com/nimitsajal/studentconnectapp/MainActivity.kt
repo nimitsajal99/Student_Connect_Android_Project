@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,11 +44,11 @@ class MainActivity : AppCompatActivity() {
             val userPassword = etPassword_login.text.toString()
             if(userEmail.isBlank())
             {
-                Toast.makeText(this,"Enter Email", Toast.LENGTH_SHORT).show()
+                showToast("Enter Email", 3)
                 return@setOnClickListener
             }
             if(userPassword.isBlank()) {
-                Toast.makeText(this, "Enter Password", Toast.LENGTH_SHORT).show()
+                showToast("Enter Password", 3)
                 return@setOnClickListener
             }
             Log.d("login", "Going to database")
@@ -71,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                             username = result.getString("Username").toString()
                         }
                         else{
-                            Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                            showToast("ERROR", 1)
                             return@addOnSuccessListener
                         }
                     }
@@ -81,9 +82,68 @@ class MainActivity : AppCompatActivity() {
                 }
                 else
                 {
-                    Toast.makeText(this,"${it.exception}", Toast.LENGTH_SHORT).show()
+                    showToast("Email or Password Invalid", 1)
                 }
             }
         }
+    }
+
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 }

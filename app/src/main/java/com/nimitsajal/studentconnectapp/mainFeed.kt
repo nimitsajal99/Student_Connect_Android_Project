@@ -64,7 +64,7 @@ class mainFeed : AppCompatActivity() {
                     loadFeed(arrayPost, adapter, username!!, db)
                 }
                 else{
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    showToast("ERROR", 1)
                     return@addOnSuccessListener
                 }
             }
@@ -147,23 +147,63 @@ class mainFeed : AppCompatActivity() {
         moveTaskToBack(true)
     }
 
-    private fun showToast(message: String)
-    {
-        Log.d("toast", "$message")
-        val toastView = layoutInflater.inflate(
-            R.layout.toast_text_adapter,
-            findViewById(R.id.toastLayout)
-        )
-        // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
-        val textMessage = toastView.findViewById<TextView>(R.id.toastText)
-        textMessage.text = message
-        Log.d("toast", "${textMessage.text}")
-        with(Toast(applicationContext))
-        {
-            duration = Toast.LENGTH_SHORT
-            view = toastView
-            show()
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
         }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 
     inner class DiaryGestureListener(username: String?, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>) : GestureDetector.SimpleOnGestureListener()
@@ -241,25 +281,25 @@ class mainFeed : AppCompatActivity() {
     }
 
     private fun onSwipeUp():Boolean {
-        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
         closeSearchBar()
         return true
     }
 
     private fun onSwipeBottom(username: String, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>): Boolean {
         openSearchBar(username,adapter,db,arraySearch)
-        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
         return true
     }
 
     private fun onSwipeLeft(username: String): Boolean {
-        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
         goToEvent(username)
         return true
     }
 
     private fun onSwipeRight(): Boolean {
-        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
         return false
     }
 
@@ -329,7 +369,7 @@ class mainFeed : AppCompatActivity() {
                 db.collection("Users")
                     .addSnapshotListener { value, error ->
                         if(value == null || error != null){
-                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                            showToast("ERROR", 1)
                             return@addSnapshotListener
                         }
                         for(document in value.documents){
@@ -382,7 +422,7 @@ class mainFeed : AppCompatActivity() {
                 db.collection("University")
                     .addSnapshotListener { value, error ->
                         if(value == null || error != null){
-                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                            showToast("ERROR", 1)
                             return@addSnapshotListener
                         }
                         for(document in value.documents)
@@ -392,7 +432,7 @@ class mainFeed : AppCompatActivity() {
                                 db.collection("University").document("Next").collection(document.id)
                                     .addSnapshotListener { value2, error2 ->
                                         if(value2 == null || error2 != null){
-                                            Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                                            showToast("ERROR", 1)
                                             return@addSnapshotListener
                                         }
                                         for(doc in value2.documents)

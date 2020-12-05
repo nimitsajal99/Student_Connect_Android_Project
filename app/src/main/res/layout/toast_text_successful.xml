@@ -4,14 +4,14 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toastLayout"
-    android:background="@drawable/toast_text">
+    android:id="@+id/toastLayoutSuccessful"
+    android:background="@drawable/toast_text_successful">
 
     <ImageView
         android:id="@+id/warninngIcon"
         android:layout_width="16sp"
         android:layout_height="16sp"
-        android:background="@drawable/warning"
+        android:background="@drawable/checked"
         android:layout_marginLeft="14sp"
         android:layout_marginRight="4sp"
         app:layout_constraintTop_toTopOf="parent"

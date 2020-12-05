@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
@@ -58,7 +59,7 @@ class currentChats : AppCompatActivity() {
                     fetchUser(username!!, adapter, arrayUser)
                 }
                 else{
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    showToast("ERROR", 1)
                     return@addOnSuccessListener
                 }
             }
@@ -130,6 +131,65 @@ class currentChats : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 
     private fun goToProfile(username: String)
@@ -233,25 +293,25 @@ class currentChats : AppCompatActivity() {
     }
 
     private fun onSwipeUp():Boolean {
-        Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
         closeSearchBar()
         return false
     }
 
     private fun onSwipeBottom(): Boolean {
-        Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
         openSearchBar()
         return false
     }
 
     private fun onSwipeLeft(username: String): Boolean {
-        Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
         goToNewChats(username)
         return false
     }
 
     private fun onSwipeRight(username: String): Boolean {
-        Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
         goToProfile(username)
         return false
     }
@@ -266,7 +326,7 @@ class currentChats : AppCompatActivity() {
         val user = db.collection("Users").document(username).collection("Chats")
         user.addSnapshotListener { value, error ->
             if(error != null || value == null){
-                Toast.makeText(this, "ERRRRRRRRROR", Toast.LENGTH_SHORT).show()
+                showToast("ERROR", 1)
                 return@addSnapshotListener
             }
 

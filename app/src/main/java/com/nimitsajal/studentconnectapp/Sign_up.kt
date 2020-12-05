@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Patterns
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -51,6 +52,65 @@ class Sign_up : AppCompatActivity() {
 //        btnContinueToClgDetails.setOnClickListener {
 //            performRegister()
 //        }
+    }
+
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 
     private fun isUserNameValid(userName: String): Boolean {
@@ -101,25 +161,25 @@ class Sign_up : AppCompatActivity() {
         val userPhone = etPhone_signup.text.toString()
 
         if (userName.isEmpty() || userEmail.isEmpty() || userPassword.isEmpty() || userUserName.isEmpty() || userPhone.isEmpty()) {
-            Toast.makeText(this, "Don't leave any fields blank!", Toast.LENGTH_SHORT).show()
+            showToast("Don't leave any fields blank!", 3)
             btnContinueToClgDetails.isEnabled = true
             return
         }
 
         if (!isEmailValid(userEmail)) {
-            Toast.makeText(this, "Email is Invalid!", Toast.LENGTH_SHORT).show()
+            showToast("Email is Invalid!", 1)
             btnContinueToClgDetails.isEnabled = true
             return
         }
 
         if (!isValidMobile(userPhone)) {
-            Toast.makeText(this, "Phone number is Invalid!", Toast.LENGTH_SHORT).show()
+            showToast("Phone number is Invalid!", 1)
             btnContinueToClgDetails.isEnabled = true
             return
         }
 
         if (!isPasswordValid(userPassword)) {
-            Toast.makeText(this, "Weak Password!", Toast.LENGTH_SHORT).show()
+            showToast("Weak Password!", 1)
             btnContinueToClgDetails.isEnabled = true
             return
         }
@@ -135,7 +195,7 @@ class Sign_up : AppCompatActivity() {
                     if (temp != null) {
                         if(temp.exists()) {
                             Log.d("database", "Username present -$userUserName-")
-                            Toast.makeText(this, "Username already exists!", Toast.LENGTH_SHORT).show()
+                            showToast("Username already exists!", 1)
                             btnContinueToClgDetails.isEnabled = true
                         }
                         else

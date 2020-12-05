@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -185,6 +186,65 @@ class collegeDetailsDatabase : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 
     private fun setArrayUniversity(): MutableList<String> {
@@ -383,29 +443,29 @@ class collegeDetailsDatabase : AppCompatActivity() {
         if(university_name == "University")
         {
             btnRegister.isEnabled = true
-            Toast.makeText(this, "Enter The University", Toast.LENGTH_SHORT).show()
+            showToast("Enter The University", 3)
             return
         }
         if(college_name == "College")
         {
             btnRegister.isEnabled = true
-            Toast.makeText(this, "Enter The College", Toast.LENGTH_SHORT).show()
+            showToast("Enter The College", 3)
             return
         }
         if(branch_name == "Branch")
         {
             btnRegister.isEnabled = true
-            Toast.makeText(this, "Enter The Branch", Toast.LENGTH_SHORT).show()
+            showToast("Enter The Branch", 3)
             return
         }
         if(semester_name == "Semester")
         {
             btnRegister.isEnabled = true
-            Toast.makeText(this, "Enter The Semester", Toast.LENGTH_SHORT).show()
+            showToast("Enter The Semester", 3)
             return
         }
 
-        Toast.makeText(this, "Entered Perform Register", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Entered Perform Register", Toast.LENGTH_SHORT).show()
 
         val userName = intent.getStringExtra("userName_signup")
         val userEmail = intent.getStringExtra("userEmail_signup")
@@ -429,11 +489,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         )
                         var user = auth.currentUser
                         if (user != null) {
-                            Toast.makeText(
-                                this,
-                                "Registration Successful $userUserName",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToast("Registration Successful $userUserName", 2)
                             Log.d("database", "String => $selectedPhotoUrl_string")
                             Log.d("database", "URI => $selectedPhotoUrl")
                             val filename = userUserName.toString()
@@ -505,11 +561,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
                     .addOnFailureListener {
                         btnRegister.isEnabled = true
                         Log.d("Registration", "Registration failed! : ${it.message}")
-                        Toast.makeText(
-                            this,
-                            "Registration Failed: ${it.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        showToast("Registration Failed: ${it.message}", 1)
                     }
             }
         }

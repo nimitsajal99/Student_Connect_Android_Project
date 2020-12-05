@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -50,7 +51,7 @@ class chat : AppCompatActivity() {
                         loadDP(url)
                     }
                     else{
-                        Toast.makeText(this, "ERROR", Toast.LENGTH_LONG).show()
+                        showToast("ERROR", 1)
                         return@addOnSuccessListener
                     }
                 }
@@ -120,7 +121,7 @@ class chat : AppCompatActivity() {
                     startActivity(intent)
                 }
                 else{
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    showToast("ERROR", 1)
                     return@addOnSuccessListener
                 }
             }
@@ -139,21 +140,21 @@ class chat : AppCompatActivity() {
         val recieve = db.collection("Users").document(To).collection("Chats").document(From)
         send.update(message)
             .addOnFailureListener {
-                Toast.makeText(this, "Message not Updated", Toast.LENGTH_LONG).show()
+                showToast("Message not Updated", 1)
             }
         recieve.update(message)
             .addOnFailureListener {
-                Toast.makeText(this, "Message not Updated", Toast.LENGTH_LONG).show()
+                showToast("Message not Updated", 1)
             }
         send.collection("Next")
             .add(message)
             .addOnFailureListener {
-                Toast.makeText(this, "Message not Sent", Toast.LENGTH_LONG).show()
+                showToast("Message not Sent", 1)
             }
         recieve.collection("Next")
             .add(message)
             .addOnFailureListener {
-                Toast.makeText(this, "Message not Sent", Toast.LENGTH_LONG).show()
+                showToast("Message not Sent", 1)
             }
     }
 
@@ -168,7 +169,7 @@ class chat : AppCompatActivity() {
             .orderBy("Time", Query.Direction.ASCENDING)
             .addSnapshotListener { value, error ->
                 if(value == null || error != null){
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_LONG).show()
+                    showToast("ERROR", 1)
                     return@addSnapshotListener
                 }
                 adapter.clear()
@@ -193,11 +194,69 @@ class chat : AppCompatActivity() {
                         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clipData = ClipData.newPlainText("address", text)
                     clipboardManager.setPrimaryClip(clipData)
-                    Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_LONG).show()
+                    showToast("Text copied to clipboard", 3)
                     return@setOnItemLongClickListener true
                 }
                 recyclerView_chat.adapter = adapter
             }
+    }
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
     }
 }
 

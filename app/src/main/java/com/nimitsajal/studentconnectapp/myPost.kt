@@ -6,6 +6,9 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
@@ -23,6 +26,9 @@ import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.*
 
 class myPost : AppCompatActivity() {
+
+    private lateinit var detector: GestureDetectorCompat
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_post)
@@ -46,14 +52,17 @@ class myPost : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
+                    detector = GestureDetectorCompat(this,DiaryGestureListener(username))
                     loadPost(db, username!!, url!!, uid!!, description!!, dp!!, myUsername!!, isOther!!)
                 }
                 else{
-                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                    showToast("ERROR", 1)
                     return@addOnSuccessListener
                 }
             }
         }
+
+        detector = GestureDetectorCompat(this,DiaryGestureListener(username))
 
         btnUnlike.setOnClickListener {
             btnLike.isVisible = true
@@ -95,6 +104,159 @@ class myPost : AppCompatActivity() {
 
     }
 
+    private fun showToast(message: String, type: Int)
+    {   //1 -> error
+        //2 -> success
+        //3 -> information
+
+        if(type == 1){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_adapter,
+                findViewById(R.id.toastLayout)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else if(type == 2){
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_successful,
+                findViewById(R.id.toastLayoutSuccessful)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+        else{
+            Log.d("toast", "$message")
+            val toastView = layoutInflater.inflate(
+                R.layout.toast_text_information,
+                findViewById(R.id.toastLayoutInformation)
+            )
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(applicationContext))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+        }
+
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@myPost.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@myPost.onSwipeLeft()
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@myPost.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@myPost.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        //Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun onSwipeLeft(): Boolean {
+        //Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+
+        return true
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        goToProfile(username, "true")
+        return true
+    }
+
     private fun deletePost(username: String, uid: String, db: FirebaseFirestore){
         db.collection("Users").document(username).collection("My Posts").document(uid)
             .delete()
@@ -106,7 +268,7 @@ class myPost : AppCompatActivity() {
             .addOnSuccessListener {
                 Log.d("mainfeed", "post deleted from Posts")
             }
-        Toast.makeText(this, "Post DELETED", Toast.LENGTH_SHORT).show()
+        showToast("Post DELETED", 2)
         goToProfile(username, "false")
     }
 
@@ -143,7 +305,6 @@ class myPost : AppCompatActivity() {
     }
 
     private fun goToProfile(username: String, isOther: String){
-        Toast.makeText(this, "$isOther", Toast.LENGTH_SHORT).show()
         if(isOther == "true"){
             onBackPressed()
         }
@@ -215,21 +376,38 @@ class myPost : AppCompatActivity() {
                     rvComments.adapter = adapterComments
                 }
             }
-
-        db.collection("Users").document(username).collection("My Posts").document(uid)
-            .get()
-            .addOnSuccessListener {
-                if(it != null){
-                    if(it["Liked"].toString().toBoolean()){
-                        btnLike.isVisible = true
-                        btnUnlike.isVisible = false
-                    }
-                    else{
-                        btnLike.isVisible = false
-                        btnUnlike.isVisible = true
+        if(isOther == "true"){
+            db.collection("Users").document(username).collection("My Feed").document(uid)
+                .get()
+                .addOnSuccessListener {
+                    if(it != null){
+                        if(it["Liked"].toString().toBoolean()){
+                            btnLike.isVisible = true
+                            btnUnlike.isVisible = false
+                        }
+                        else{
+                            btnLike.isVisible = false
+                            btnUnlike.isVisible = true
+                        }
                     }
                 }
-            }
+        }
+        else{
+            db.collection("Users").document(username).collection("My Posts").document(uid)
+                .get()
+                .addOnSuccessListener {
+                    if(it != null){
+                        if(it["Liked"].toString().toBoolean()){
+                            btnLike.isVisible = true
+                            btnUnlike.isVisible = false
+                        }
+                        else{
+                            btnLike.isVisible = false
+                            btnUnlike.isVisible = true
+                        }
+                    }
+                }
+        }
     }
 
     private fun liked(liking: Boolean, username: String, uid: String, db: FirebaseFirestore){
