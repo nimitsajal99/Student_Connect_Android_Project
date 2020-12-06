@@ -152,6 +152,7 @@ class newChat : AppCompatActivity() {
         val intent = Intent(this, currentChats::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         finish()
     }
     private fun closeSearchBar()

@@ -8,7 +8,6 @@
     tools:context=".mainFeed">
 
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -24,12 +23,11 @@
         <ImageView
             android:layout_width="200dp"
             android:layout_height="30dp"
-            android:src="@drawable/rutu_logo"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="18dp"
-            />
+            android:src="@drawable/rutu_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <ImageButton
@@ -51,97 +49,94 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        android:gravity="center">
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="10"
             android:padding="15dp"
-            >
+            android:weightSum="10">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/circularImageView"
                 android:layout_width="110dp"
                 android:layout_height="110dp"
-                app:civ_border_width="4dp"
-                app:civ_border_color="@color/base2" />
+                app:civ_border_color="@color/base2"
+                app:civ_border_width="4dp" />
 
             <LinearLayout
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="7"
-                android:orientation="vertical"
-                android:gravity="start">
+                android:gravity="start"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tvUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Username"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
                     android:layout_marginLeft="15dp"
                     android:layout_marginBottom="3dp"
-                    android:textColor="@color/base3"/>
+                    android:text="Username"
+                    android:textColor="@color/base3"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
-                    android:maxWidth="230dp"
                     android:layout_height="wrap_content"
-                    android:text="Name"
-                    android:textStyle="bold"
-                    android:textSize="25sp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="3dp"
-                    android:textColor="@color/base3"/>
+                    android:maxWidth="230dp"
+                    android:text="Name"
+                    android:textColor="@color/base3"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
 
 
                 <!--                <com.kassisdion.library.ViewPagerWithIndicator-->
-<!--                    app:arrow.enable="true"-->
-<!--                    app:arrow.width="50dp"-->
-<!--                    app:arrow.height="50dp"-->
-<!--                    app:round.enable="true"-->
-<!--                    app:round.size="15dip"-->
-<!--                    app:round.color.default="@color/base3"-->
-<!--                    app:round.color.selected="@android:color/holo_blue_light"-->
-<!--                    android:id="@+id/viewPagerWithIndicator"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"/>-->
+                <!--                    app:arrow.enable="true"-->
+                <!--                    app:arrow.width="50dp"-->
+                <!--                    app:arrow.height="50dp"-->
+                <!--                    app:round.enable="true"-->
+                <!--                    app:round.size="15dip"-->
+                <!--                    app:round.color.default="@color/base3"-->
+                <!--                    app:round.color.selected="@android:color/holo_blue_light"-->
+                <!--                    android:id="@+id/viewPagerWithIndicator"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"/>-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/tvDetails"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Details"-->
-<!--                    android:textStyle="italic"-->
-<!--                    android:textSize="17sp"-->
-<!--                    android:layout_marginLeft="15dp"-->
-<!--                    android:layout_marginTop="3dp"-->
-<!--                    android:textColor="@color/base3"-->
-<!--                    android:ellipsize="marquee"-->
-<!--                    android:marqueeRepeatLimit="marquee_forever"-->
-<!--                    android:scrollHorizontally="true"-->
-<!--                    android:singleLine="true"/>-->
+                <!--                <TextView-->
+                <!--                    android:id="@+id/tvDetails"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:text="Details"-->
+                <!--                    android:textStyle="italic"-->
+                <!--                    android:textSize="17sp"-->
+                <!--                    android:layout_marginLeft="15dp"-->
+                <!--                    android:layout_marginTop="3dp"-->
+                <!--                    android:textColor="@color/base3"-->
+                <!--                    android:ellipsize="marquee"-->
+                <!--                    android:marqueeRepeatLimit="marquee_forever"-->
+                <!--                    android:scrollHorizontally="true"-->
+                <!--                    android:singleLine="true"/>-->
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    android:orientation="horizontal"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="3dp"
-                    />
-
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 
             </LinearLayout>
@@ -157,13 +152,13 @@
                 android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Descrption : "
-                android:paddingBottom="15dp"
-                android:paddingEnd="15dp"
                 android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="15dp"
+                android:text="Descrption : "
                 android:textColor="@color/base3"
-                android:textStyle="normal"
-                android:textSize="17sp"/>
+                android:textSize="17sp"
+                android:textStyle="normal" />
 
         </LinearLayout>
 
@@ -171,34 +166,33 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
-            android:weightSum="2"
             android:paddingLeft="15dp"
-            android:paddingRight="15dp">
-            
+            android:paddingRight="15dp"
+            android:weightSum="2">
+
             <Button
                 android:id="@+id/btnFriends"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Friends (2345)"
-                android:background="@drawable/rounded_corners_buttons"
-                android:textColor="@color/base0"
-                android:textStyle="bold"
-                android:textSize="17sp"
                 android:layout_marginRight="7dp"
-                />
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_buttons"
+                android:text="Friends (2345)"
+                android:textColor="@color/base0"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
             <Button
                 android:id="@+id/btnEdit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Edit"
-                android:background="@drawable/rounded_corners_buttons"
-                android:textColor="@color/base0"
-                android:textStyle="bold"
-                android:textSize="17sp"
                 android:layout_marginLeft="7dp"
-                />
+                android:layout_weight="1"
+                android:background="@drawable/rounded_corners_buttons"
+                android:text="Edit"
+                android:textColor="@color/base0"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
 
         </LinearLayout>
@@ -208,8 +202,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:paddingTop="10dp">
+            android:paddingTop="10dp"
+            android:paddingRight="15dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProfilePage"
@@ -281,6 +275,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.74"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -124,6 +124,10 @@ class others_profile_page : AppCompatActivity() {
             goToFeed(username)
         }
 
+        btnEventOthers.setOnClickListener {
+            goToEvent(username)
+        }
+
         btnFriendsOthers.setOnClickListener {
             if (usernameOthers != null && username != null) {
                 btnFriendsOthers.isEnabled = false
@@ -137,6 +141,14 @@ class others_profile_page : AppCompatActivity() {
                 chat(username, db, friend, usernameOthers)
             }
         }
+    }
+
+    private fun goToEvent(username: String){
+        val intent = Intent(this, eventPage::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+        finish()
     }
 
     private fun showToast(message: String, type: Int)
@@ -202,6 +214,7 @@ class others_profile_page : AppCompatActivity() {
         val intent = Intent(this, mainFeed::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         finish()
     }
 
@@ -245,7 +258,7 @@ class others_profile_page : AppCompatActivity() {
                         } else {
                             //Left Swipe
                             //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
-                            return this@others_profile_page.onSwipeLeft()
+                            return this@others_profile_page.onSwipeLeft(username!!)
                         }
                     } else {
                         return false
@@ -287,9 +300,9 @@ class others_profile_page : AppCompatActivity() {
         return false
     }
 
-    private fun onSwipeLeft(): Boolean {
+    private fun onSwipeLeft(username: String): Boolean {
         //Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
-
+        goToEvent(username)
         return true
     }
 
@@ -338,6 +351,7 @@ class others_profile_page : AppCompatActivity() {
                     intent.putExtra("dp", dp)
                     intent.putExtra("others", "true")
                     startActivity(intent)
+                    overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
                     return@setOnItemLongClickListener true
                 }
                 rvProfilePageOthers.adapter = adapter

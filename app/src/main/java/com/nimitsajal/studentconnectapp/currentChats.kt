@@ -197,6 +197,7 @@ class currentChats : AppCompatActivity() {
         val intent = Intent(this, profilePage::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         finish()
     }
 
@@ -218,6 +219,7 @@ class currentChats : AppCompatActivity() {
         val intent = Intent(this, newChat::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
     }
 
 

@@ -256,6 +256,7 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
     {
         val intent = Intent(this, mainFeed::class.java)
         intent.putExtra("username", username)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         startActivity(intent)
     }
     //TODO: go to event
@@ -264,6 +265,7 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
         val intent = Intent(this, eventPage::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         finish()
     }
     //TODO: On touch event

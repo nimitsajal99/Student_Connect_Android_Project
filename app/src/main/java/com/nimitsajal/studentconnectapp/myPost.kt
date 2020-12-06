@@ -75,7 +75,7 @@ class myPost : AppCompatActivity() {
             liked(false, username!!, uid!!, db)
         }
         btnBack.setOnClickListener {
-            goToProfile(username!!, isOther!!)
+            goToProfile(username!!, isOther!!, 1)
         }
 
         etCommentBox.addTextChangedListener{
@@ -253,7 +253,7 @@ class myPost : AppCompatActivity() {
 
     private fun onSwipeRight(username: String): Boolean {
         //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
-        goToProfile(username, "true")
+        goToProfile(username, "true", 1)
         return true
     }
 
@@ -269,7 +269,7 @@ class myPost : AppCompatActivity() {
                 Log.d("mainfeed", "post deleted from Posts")
             }
         showToast("Post DELETED", 2)
-        goToProfile(username, "false")
+        goToProfile(username, "false", 2)
     }
 
     private fun commented(comment: String, username: String, uid: String, db: FirebaseFirestore){
@@ -304,20 +304,30 @@ class myPost : AppCompatActivity() {
             }
     }
 
-    private fun goToProfile(username: String, isOther: String){
+    private fun goToProfile(username: String, isOther: String, type: Int){
         if(isOther == "true"){
             onBackPressed()
+        }
+        else if(isOther != "true" && type == 1){
+            val intent = Intent(this, profilePage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+            finish()
         }
         else{
             val intent = Intent(this, profilePage::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_top, R.anim.slide_to_bottom)
             finish()
         }
+
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         finish()
     }
 

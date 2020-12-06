@@ -8,9 +8,12 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.GestureDetectorCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,6 +35,9 @@ import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.tv_usernames_newMessage
 
 class chat : AppCompatActivity() {
+
+    private lateinit var detector: GestureDetectorCompat
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -48,6 +54,7 @@ class chat : AppCompatActivity() {
                     if(it != null){
                         url = it.getString("Picture").toString()
                         Log.d("profilePage", "URL recieved = $url")
+                        detector = GestureDetectorCompat(this,DiaryGestureListener(From))
                         loadDP(url)
                     }
                     else{
@@ -71,11 +78,10 @@ class chat : AppCompatActivity() {
 
         }
 
+        detector = GestureDetectorCompat(this,DiaryGestureListener(From))
+
         btnBack.setOnClickListener {
-            val intent = Intent(this, currentChats::class.java)
-            intent.putExtra("username", From)
-            startActivity(intent)
-            finish()
+            toCurrentChats(From!!)
         }
 
         username.setOnClickListener {
@@ -84,6 +90,7 @@ class chat : AppCompatActivity() {
                 val intent = Intent(this, others_profile_page::class.java)
                 intent.putExtra("usernameOthers", To)
                 startActivity(intent)
+                overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
             }
         }
 
@@ -93,6 +100,7 @@ class chat : AppCompatActivity() {
                 val intent = Intent(this, others_profile_page::class.java)
                 intent.putExtra("usernameOthers", To)
                 startActivity(intent)
+                overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
             }
         }
 
@@ -101,6 +109,107 @@ class chat : AppCompatActivity() {
                 loadChat(To, From)
             }
         }
+    }
+
+    private fun toCurrentChats(username: String){
+        val intent = Intent(this, currentChats::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+        finish()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        //Toast.makeText(this, "Swipe", Toast.LENGTH_SHORT).show()
+        if(detector.onTouchEvent(event))
+        {
+            return true
+        }
+        else
+        {
+            return super.onTouchEvent(event)
+        }
+
+    }
+
+    inner class DiaryGestureListener(username: String?) : GestureDetector.SimpleOnGestureListener()
+    {
+        private val username = username
+        private val SWIPE_THREASHOLD = 100
+        private val SWIPE_VELOCITY_THREASHOLD = 100
+
+
+        override fun onFling(
+            yAxisEvent: MotionEvent?,
+            xAxisEvent: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            try {
+                var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x) ?: 0.0F
+                var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y) ?: 0.0F
+                //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    //Left or Right Swipe
+                    if (Math.abs(diffX) > SWIPE_THREASHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffX > 0) {
+                            //Right Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Right", Toast.LENGTH_SHORT).show()
+                            return this@chat.onSwipeRight(username!!)
+                        } else {
+                            //Left Swipe
+                            //Toast.makeText(this@mainFeed, "Swipe Left", Toast.LENGTH_SHORT).show()
+                            return this@chat.onSwipeLeft()
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    //Up or down Swipe
+                    if (Math.abs(diffY) > SWIPE_THREASHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THREASHOLD) {
+                        if (diffY > 0) {
+                            //Up Swipe
+                            return this@chat.onSwipeUp()
+                        } else {
+                            //Bottom Swipe
+                            return this@chat.onSwipeBottom()
+
+                        }
+                    } else {
+                        return false
+                    }
+                }
+
+                return super.onFling(yAxisEvent, xAxisEvent, velocityX, velocityY)
+            }
+            catch (e: java.lang.Exception)
+            {
+                return false
+            }
+        }
+
+    }
+
+    private fun onSwipeUp():Boolean {
+        //Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+
+        return false
+    }
+
+    private fun onSwipeBottom(): Boolean {
+        //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun onSwipeLeft(): Boolean {
+        //Toast.makeText(this, "Swipe Left", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun onSwipeRight(username: String): Boolean {
+        //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
+        toCurrentChats(username)
+        return true
     }
 
     override fun onBackPressed() {

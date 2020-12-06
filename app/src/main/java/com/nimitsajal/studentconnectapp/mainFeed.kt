@@ -80,6 +80,7 @@ class mainFeed : AppCompatActivity() {
             val intent = Intent(this, upload_post::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.zoom_in_upload, R.anim.static_transition)
         }
 
         btnLogout.setOnClickListener {
@@ -309,6 +310,9 @@ class mainFeed : AppCompatActivity() {
         intent.putExtra("username", username)
 //        intent.flags
         startActivity(intent)
+
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+
 //            Log.d("profilePage", "in also")
 //
 ////            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_in_left)

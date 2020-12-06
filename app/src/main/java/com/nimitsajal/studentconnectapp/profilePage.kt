@@ -129,9 +129,7 @@ class profilePage : AppCompatActivity() {
         }
 
         btnEdit.setOnClickListener {
-            val intent = Intent(this, editProfile::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
+            toEdit(username!!)
         }
 
         //TODO: Double Click edit
@@ -254,6 +252,7 @@ class profilePage : AppCompatActivity() {
                     intent.putExtra("dp", dp.picture)
                     intent.putExtra("others", "false")
                     startActivity(intent)
+                    overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
                     return@setOnItemLongClickListener true
                 }
                 rvProfilePage.adapter = adapter
@@ -314,6 +313,7 @@ class profilePage : AppCompatActivity() {
         val intent = Intent(this, currentChats::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         finish()
     }
 
@@ -322,6 +322,7 @@ class profilePage : AppCompatActivity() {
         val intent = Intent(this, eventPage::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
         finish()
     }
 
@@ -424,6 +425,7 @@ class profilePage : AppCompatActivity() {
         val intent = Intent(this,editProfile::class.java)
         intent.putExtra("username", username)
         startActivity(intent)
+        overridePendingTransition(R.anim.zoom_in_edit, R.anim.static_transition)
         finish()
     }
 

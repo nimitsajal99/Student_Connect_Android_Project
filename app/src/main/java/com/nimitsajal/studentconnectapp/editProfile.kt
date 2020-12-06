@@ -93,10 +93,10 @@ class editProfile : AppCompatActivity() {
         }
 
         btnExit.setOnClickListener {
-            goToProfile(username!!)
+            goToProfile(username!!, 2)
         }
         btnBack.setOnClickListener {
-            goToProfile(username!!)
+            goToProfile(username!!, 1)
         }
         btnSave.setOnClickListener {
 //            Toast.makeText(this,"Clicked name: ${etNameEdit.text.toString()} , phone number ${etPhoneEdit.text.toString()} ", Toast.LENGTH_SHORT).show()
@@ -108,12 +108,33 @@ class editProfile : AppCompatActivity() {
         }
     }
 
-    private fun goToProfile(username: String)
+    private fun goToProfile(username: String, type: Int)
     {
-        val intent = Intent(this, profilePage::class.java)
-        intent.putExtra("username", username)
-        startActivity(intent)
-        finish()
+        //1 -> back
+        //2 -> exit
+        //3 -> save
+
+        if(type == 1){
+            val intent = Intent(this, profilePage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+            finish()
+        }
+        else if(type == 2){
+            val intent = Intent(this, profilePage::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(R.anim.zoom_out_exit, R.anim.static_transition)
+            finish()
+        }
+        else{
+            val intent = Intent(this, mainFeed::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(R.anim.zoom_out_upload, R.anim.static_transition)
+            finish()
+        }
     }
 
 
@@ -266,7 +287,7 @@ class editProfile : AppCompatActivity() {
 
     private fun onSwipeRight(username: String): Boolean {
         //Toast.makeText(this, "Swipe Right", Toast.LENGTH_SHORT).show()
-        goToProfile(username)
+        goToProfile(username, 1)
         return true
     }
 
@@ -440,10 +461,7 @@ class editProfile : AppCompatActivity() {
                         Log.d("Editprofile", "Phone Number updated $phonenumber")
                     }
             }
-            val intent = Intent(this, mainFeed::class.java)
-            intent.putExtra("username", userinfo.username)
-            startActivity(intent)
-            finish()
+            goToProfile(userinfo.username, 3)
         }
         else
         {
