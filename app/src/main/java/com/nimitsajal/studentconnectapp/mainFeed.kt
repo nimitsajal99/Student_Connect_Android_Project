@@ -1,10 +1,10 @@
 package com.nimitsajal.studentconnectapp
 
-import android.R.attr.bitmap
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.icu.number.NumberFormatter.with
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,23 +14,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
-import com.google.android.gms.maps.GoogleMap
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.auth.User
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
-import kotlinx.android.synthetic.main.activity_main_feed.view.*
 import kotlinx.android.synthetic.main.branchnames_adapter.view.*
 import kotlinx.android.synthetic.main.comment_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
@@ -60,7 +57,14 @@ class mainFeed : AppCompatActivity() {
                 if(result != null){
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
-                    detector = GestureDetectorCompat(this,DiaryGestureListener(username,adapter,db,arraySearch))
+                    detector = GestureDetectorCompat(
+                        this, DiaryGestureListener(
+                            username,
+                            adapter,
+                            db,
+                            arraySearch
+                        )
+                    )
                     loadFeed(arrayPost, adapter, username!!, db)
                 }
                 else{
@@ -70,7 +74,14 @@ class mainFeed : AppCompatActivity() {
             }
         }
 
-        detector = GestureDetectorCompat(this,DiaryGestureListener(username,adapter,db,arraySearch))
+        detector = GestureDetectorCompat(
+            this, DiaryGestureListener(
+                username,
+                adapter,
+                db,
+                arraySearch
+            )
+        )
 
         btnEvent.setOnClickListener {
             goToEvent(username!!)
@@ -93,15 +104,19 @@ class mainFeed : AppCompatActivity() {
         }
 
         btnChat.setOnClickListener {
-            val intent = Intent(this, currentChats::class.java)
+            val intent = Intent(this, blank::class.java)
             intent.putExtra("username", username)
+            intent.putExtra("type", "2")
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_right_fast, R.anim.slide_to_left_fast)
         }
 
         btnProfile.setOnClickListener {
-            val intent = Intent(this, profilePage::class.java)
+            val intent = Intent(this, blank::class.java)
             intent.putExtra("username", username)
+            intent.putExtra("type", "1")
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_right_fast, R.anim.slide_to_left_fast)
         }
 
 //        btnFeed.setOnClickListener {
@@ -137,7 +152,7 @@ class mainFeed : AppCompatActivity() {
                 adapter.clear()
                 if(username != null){
                     adapter.clear()
-                    loadSearch(username!!,db,adapter,arraySearch)
+                    loadSearch(username!!, db, adapter, arraySearch)
                 }
             }
         }
@@ -207,7 +222,12 @@ class mainFeed : AppCompatActivity() {
 
     }
 
-    inner class DiaryGestureListener(username: String?, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>) : GestureDetector.SimpleOnGestureListener()
+    inner class DiaryGestureListener(
+        username: String?,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        db: FirebaseFirestore,
+        arraySearch: MutableList<usersList>
+    ) : GestureDetector.SimpleOnGestureListener()
     {
 
         //TODO: Swipe Link - > https://www.youtube.com/watch?v=j1aydFEOEA0
@@ -262,7 +282,7 @@ class mainFeed : AppCompatActivity() {
                         else
                         {
                             //Bottom Swipe
-                            return this@mainFeed.onSwipeBottom(username!!,adapter,db,arraySearch)
+                            return this@mainFeed.onSwipeBottom(username!!, adapter, db, arraySearch)
 
                         }
                     }
@@ -287,8 +307,13 @@ class mainFeed : AppCompatActivity() {
         return true
     }
 
-    private fun onSwipeBottom(username: String, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>): Boolean {
-        openSearchBar(username,adapter,db,arraySearch)
+    private fun onSwipeBottom(
+        username: String,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        db: FirebaseFirestore,
+        arraySearch: MutableList<usersList>
+    ): Boolean {
+        openSearchBar(username, adapter, db, arraySearch)
         //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
         return true
     }
@@ -322,7 +347,12 @@ class mainFeed : AppCompatActivity() {
 
     }
 
-    fun openSearchBar(username: String, adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore, arraySearch: MutableList<usersList>)
+    fun openSearchBar(
+        username: String,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        db: FirebaseFirestore,
+        arraySearch: MutableList<usersList>
+    )
     {
         etSearchMainFeed.isEnabled = true
         etSearchMainFeed.isVisible=true
@@ -355,7 +385,12 @@ class mainFeed : AppCompatActivity() {
 
     }
 
-    private fun loadSearch(username: String, db: FirebaseFirestore, adapter: GroupAdapter<GroupieViewHolder>, arraySearch: MutableList<usersList>){
+    private fun loadSearch(
+        username: String,
+        db: FirebaseFirestore,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        arraySearch: MutableList<usersList>
+    ){
         val search = etSearchMainFeed.text.toString()
         val str = search[0]
         val remString = search.drop(1)
@@ -381,7 +416,11 @@ class mainFeed : AppCompatActivity() {
                                 var contains = true
                                 for(word in words){
                                     val pattern = word.toRegex(RegexOption.IGNORE_CASE)
-                                    if(pattern.containsMatchIn(document["Name"].toString()) || pattern.containsMatchIn(document.id) || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(document["Branch"].toString()))
+                                    if(pattern.containsMatchIn(document["Name"].toString()) || pattern.containsMatchIn(
+                                            document.id
+                                        ) || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(
+                                            document["Branch"].toString()
+                                        ))
                                     {
 
                                     }
@@ -393,9 +432,21 @@ class mainFeed : AppCompatActivity() {
                                 }
                                 if(contains)
                                 {
-                                    val temp = usersList(document.id, "", document["Name"].toString(), document["Picture"].toString())
+                                    val temp = usersList(
+                                        document.id,
+                                        "",
+                                        document["Name"].toString(),
+                                        document["Picture"].toString()
+                                    )
                                     arraySearch.add(temp)
-                                    adapter.add(UserSearch(document.id, document["Picture"].toString(), document["Name"].toString(),true))
+                                    adapter.add(
+                                        UserSearch(
+                                            document.id,
+                                            document["Picture"].toString(),
+                                            document["Name"].toString(),
+                                            true
+                                        )
+                                    )
                                 }
 
                             }
@@ -458,7 +509,14 @@ class mainFeed : AppCompatActivity() {
                                                 }
                                                 if(contains)
                                                 {
-                                                    adapter.add(UserSearch(doc.id, "", document.id,false))
+                                                    adapter.add(
+                                                        UserSearch(
+                                                            doc.id,
+                                                            "",
+                                                            document.id,
+                                                            false
+                                                        )
+                                                    )
                                                     rvFeed.adapter = adapter
                                                 }
                                             }
@@ -484,22 +542,39 @@ class mainFeed : AppCompatActivity() {
 
     }
 
-    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore) {
+    private fun loadFeed(
+        arrayPost: MutableList<postList>,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        username: String,
+        db: FirebaseFirestore
+    ) {
         adapter.clear()
+        var flag = 0
+        pbFeed.isVisible = true
         val user = db.collection("Users").document(username).collection("My Feed")
         user.orderBy("Time", Query.Direction.DESCENDING)
+            .limit(20)
             .get()
             .addOnSuccessListener {
                 if (it != null) {
                     adapter.clear()
                     for (document in it) {
                         if (document.id != "Info") {
+                            flag += 1
                             db.collection("Post").document(document.id)
                                 .get()
                                 .addOnSuccessListener { it2 ->
                                     if(it2 != null){
                                         try {
-                                            val temp = postList(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString())
+                                            val temp = postList(
+                                                it2["From"].toString(),
+                                                it2["Picture"].toString(),
+                                                it2["Dp"].toString(),
+                                                it2["Description"].toString(),
+                                                it2["Likes"].toString().toInt(),
+                                                document.id.toString()
+                                            )
+
                                             //TODO: temp added
                                             arrayPost.add(temp)
                                             val adapterComments = GroupAdapter<GroupieViewHolder>()
@@ -511,22 +586,48 @@ class mainFeed : AppCompatActivity() {
                                                         adapterComments.clear()
                                                         for (doc in it3.documents) {
                                                             if (doc.id != "Info") {
-                                                                adapterComments.add(Comment_class(doc["From"].toString(), doc["Text"].toString()))
+                                                                adapterComments.add(
+                                                                    Comment_class(
+                                                                        doc["From"].toString(),
+                                                                        doc["Text"].toString()
+                                                                    )
+                                                                )
                                                             }
                                                         }
-                                                        adapter.add(post_class(it2["From"].toString(), it2["Picture"].toString(), it2["Dp"].toString(), it2["Description"].toString(), it2["Likes"].toString().toInt(), document.id.toString(), username, adapter, adapterComments, false))
+                                                        adapter.add(
+                                                            post_class(
+                                                                it2["From"].toString(),
+                                                                it2["Picture"].toString(),
+                                                                it2["Dp"].toString(),
+                                                                it2["Description"].toString(),
+                                                                it2["Likes"].toString().toInt(),
+                                                                document.id.toString(),
+                                                                username,
+                                                                adapter,
+                                                                adapterComments,
+                                                                false
+                                                            )
+                                                        )
                                                     }
                                                 }
                                         }
                                         catch (e: Exception){
                                             Log.d("mainfeed", "$e")
-                                            db.collection("Users").document(username).collection("My Feed").document(document.id)
+                                            db.collection("Users").document(username).collection("My Feed").document(
+                                                document.id
+                                            )
                                                 .delete()
                                                 .addOnSuccessListener {
-                                                    Log.d("mainfeed", "TRY document ${document.id} deleted from $username ")
+                                                    Log.d(
+                                                        "mainfeed",
+                                                        "TRY document ${document.id} deleted from $username "
+                                                    )
                                                 }
                                                 .addOnFailureListener {
-                                                    Log.d("mainfeed", "TRY document ${document.id} not deleted from $username ")
+                                                    Log.d(
+                                                        "mainfeed",
+                                                        "TRY document ${document.id} not deleted from $username "
+                                                    )
                                                 }
 //                                            db.collection("Post").document(document.id)
 //                                                .delete()
@@ -540,7 +641,14 @@ class mainFeed : AppCompatActivity() {
 
                         }
                     }
-                    rvFeed.adapter = adapter
+                    if(flag == 0){
+                        tvNoNewPost.isVisible = true
+                        pbFeed.isVisible = false
+                    }
+                    else{
+                        rvFeed.adapter = adapter
+                        pbFeed.isVisible = false
+                    }
                 }
             }
     }
@@ -589,15 +697,34 @@ class mainFeed : AppCompatActivity() {
 //    }
 }
 
-data class postList(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String)
+data class postList(
+    var username: String,
+    var imageUrl: String,
+    var dpUrl: String,
+    var description: String,
+    var likeCount: Int,
+    var uid: String
+)
 {
 
 }
 
-class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>, var adapterComment: GroupAdapter<GroupieViewHolder>, var isComBox: Boolean): Item<GroupieViewHolder>()
+class post_class(
+    var username: String,
+    var imageUrl: String,
+    var dpUrl: String,
+    var description: String,
+    var likeCount: Int,
+    var uid: String,
+    var myusername: String,
+    var adapter: GroupAdapter<GroupieViewHolder>,
+    var adapterComment: GroupAdapter<GroupieViewHolder>,
+    var isComBox: Boolean
+): Item<GroupieViewHolder>()
 {
-    @SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi", "ResourceType")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.pbFeed.isVisible = true
         if(likeCount == 0){
             val likes = "No Likes Yet"
             viewHolder.itemView.tvLikeCount.text = likes
@@ -615,8 +742,28 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
 
         viewHolder.itemView.tvUsernameCard.text = username
         viewHolder.itemView.tvDescriptionCard.text = description
-        Picasso.get().load(dpUrl).into(viewHolder.itemView.circularImageViewCard)
-        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
+        Picasso.get().load(dpUrl).into(viewHolder.itemView.circularImageViewCard, object : Callback {
+            override fun onSuccess() {
+                viewHolder.itemView.pbDpFeed.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
+        //Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
+
+
+        Picasso.get().load(imageUrl)
+            .into(viewHolder.itemView.postImageCard, object : Callback {
+                override fun onSuccess() {
+                    viewHolder.itemView.pbFeed.isVisible = false
+                }
+
+                override fun onError(e: java.lang.Exception?) {
+                    Log.d("loading", "ERROR - $e")
+                }
+            })
+
 
         val db = FirebaseFirestore.getInstance()
         db.collection("Users").document(myusername).collection("My Feed").document(uid)
@@ -719,20 +866,23 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
                 Log.d("colorset", "bitmap loaded")
 
                 if (bitmap != null) {
-                    Palette.Builder(bitmap).generate { it?.let {  palette ->
-                        val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
-                        val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
-                        val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
-                        val muted: Int = palette.getMutedColor(0x000000)
-                        val mutedLight: Int = palette.getLightMutedColor(0x000000)
-                        val mutedDark: Int = palette.getDarkMutedColor(0x000000)
-                        val dominant: Int = palette.getDominantColor(0x000000)
+                    Palette.Builder(bitmap).generate {
+                        it?.let { palette ->
+                            val vibrant: Int =
+                                palette.getVibrantColor(0x000000) // <=== color you want
+                            val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
+                            val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
+                            val muted: Int = palette.getMutedColor(0x000000)
+                            val mutedLight: Int = palette.getLightMutedColor(0x000000)
+                            val mutedDark: Int = palette.getDarkMutedColor(0x000000)
+                            val dominant: Int = palette.getDominantColor(0x000000)
 
-                        viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
+                            viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
 //                        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
-                        Log.d("colorset", "color set $muted")
+                            Log.d("colorset", "color set $muted")
 
-                    } }
+                        }
+                    }
                 }
             }
 
@@ -814,7 +964,7 @@ class Comment_class(val username: String, val comment: String): Item<GroupieView
 
 }
 
-class UserSearch(val username: String,val url: String, val Name: String, val isUser: Boolean): Item<GroupieViewHolder>(){
+class UserSearch(val username: String, val url: String, val Name: String, val isUser: Boolean): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
         if (isUser) {
             return R.layout.new_chat_adapter
@@ -829,15 +979,23 @@ class UserSearch(val username: String,val url: String, val Name: String, val isU
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         if(isUser)
         {
+            viewHolder.itemView.pbNewChat.isVisible = true
             viewHolder.itemView.tv_usernames_newMessage.text = username
-            Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage)
+            Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage, object : Callback {
+                override fun onSuccess() {
+                    viewHolder.itemView.pbNewChat.isVisible = false
+                }
+                override fun onError(e: java.lang.Exception?) {
+                    Log.d("loading", "ERROR - $e")
+                    TODO("PROGRESS BAR")
+                }
+            })
             Log.d("adapter", "adapter added")
         }
         else
         {
             viewHolder.itemView.tvBranchNames.text = username
         }
-
     }
 }
 

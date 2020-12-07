@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_profile_page.tvUsername
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import kotlinx.android.synthetic.main.activity_sign_up.btnDP
 import kotlinx.android.synthetic.main.activity_upload_post.*
+import java.lang.System.currentTimeMillis
 import java.util.*
 
 class upload_post : AppCompatActivity() {
@@ -140,6 +142,7 @@ class upload_post : AppCompatActivity() {
     }
 
     private fun uploadPost(username: String, description: String, imageUri: Uri, userDpUrl: String, db: FirebaseFirestore){
+        pbUpload.isVisible = true
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("images/uploads/$username/$filename")
         ref.putFile(imageUri)
@@ -150,6 +153,8 @@ class upload_post : AppCompatActivity() {
                 )
                 ref.downloadUrl
                     .addOnSuccessListener { img_link ->
+//                        val calendar = Calendar.getInstance()
+//                        val time = calendar.timeInMillis
                         val time = FieldValue.serverTimestamp()
                         val post = hashMapOf(
                             "From" to username,
@@ -209,6 +214,7 @@ class upload_post : AppCompatActivity() {
                                         }
                                         val intent = Intent(this, mainFeed::class.java)
                                         intent.putExtra("username", username)
+                                        pbUpload.isVisible = false
                                         startActivity(intent)
                                         overridePendingTransition(R.anim.zoom_out_upload, R.anim.static_transition)
                                         finish()

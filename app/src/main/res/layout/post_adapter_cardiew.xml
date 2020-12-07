@@ -27,6 +27,19 @@
         android:paddingRight="10dp"
         tools:ignore="ExtraText">
 
+        <ProgressBar
+            android:id="@+id/pbDpFeed"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:indeterminate="true"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="@color/base3"
+            app:layout_constraintBottom_toBottomOf="@id/circularImageViewCard"
+            app:layout_constraintTop_toTopOf="@id/circularImageViewCard"
+            app:layout_constraintRight_toRightOf="@id/circularImageViewCard"
+            app:layout_constraintLeft_toLeftOf="@id/circularImageViewCard"
+            />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circularImageViewCard"
             android:layout_width="45dp"
@@ -83,7 +96,18 @@
             app:cardElevation="2dp"
             app:cardBackgroundColor="@color/base1"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true">
+
+            <ProgressBar
+                android:id="@+id/pbFeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:layout_gravity="center"
+                android:indeterminateTintMode="src_atop"
+                android:indeterminateTint="@color/base3" />
+
+        </androidx.cardview.widget.CardView>
 
         <ImageView
             android:id="@+id/postImageCard"
@@ -95,10 +119,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
             app:layout_constraintLeft_toLeftOf="parent"
-
             />
-
-
 
 
 <!--        <ImageView-->

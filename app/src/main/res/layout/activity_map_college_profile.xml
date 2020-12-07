@@ -91,6 +91,17 @@
                 android:clickable="true"
                 android:focusable="true">
 
+                <ProgressBar
+                    android:id="@+id/pbCollegeProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:layout_gravity="center"
+                    android:elevation="10dp"
+                    android:indeterminateTintMode="src_atop"
+                    android:indeterminateTint="@color/base3"
+                    />
+
                 <ImageView
                     android:id="@+id/ivCollege"
                     android:layout_width="match_parent"

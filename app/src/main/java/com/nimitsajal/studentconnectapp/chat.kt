@@ -14,10 +14,12 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -33,6 +35,7 @@ import kotlinx.android.synthetic.main.chat_system.view.*
 import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.tv_usernames_newMessage
+import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
 class chat : AppCompatActivity() {
 
@@ -41,6 +44,8 @@ class chat : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
+
+        pbChat.isVisible = true
 
         var url = ""
         var To = intent.getStringExtra("to")
@@ -268,7 +273,14 @@ class chat : AppCompatActivity() {
     }
 
     private fun loadDP(url: String){
-        Picasso.get().load(url).into(circularImageView)
+        Picasso.get().load(url).into(circularImageView, object : Callback {
+            override fun onSuccess() {
+                pbChat.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
     }
 
     private fun loadChat(To: String, From: String){

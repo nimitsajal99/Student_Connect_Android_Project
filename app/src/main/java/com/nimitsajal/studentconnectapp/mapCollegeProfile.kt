@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.isVisible
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -37,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_college_profile_page.tvAddress
 import kotlinx.android.synthetic.main.activity_college_profile_page.tvCollegeAbout
 import kotlinx.android.synthetic.main.activity_college_profile_page.tvCollegeName
 import kotlinx.android.synthetic.main.activity_map_college_profile.*
+import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 
 class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
 
@@ -229,7 +232,15 @@ class mapCollegeProfile : AppCompatActivity(), OnMapReadyCallback {
             .get()
             .addOnSuccessListener {
                 if(it != null){
-                    Picasso.get().load(it.getString("Picture").toString()).into(ivCollege)
+                    Picasso.get().load(it.getString("Picture").toString()).into(ivCollege, object :
+                        Callback {
+                        override fun onSuccess() {
+                            pbCollegeProfile.isVisible = false
+                        }
+                        override fun onError(e: java.lang.Exception?) {
+                            Log.d("loading", "ERROR - $e")
+                        }
+                    })
                     tvCollegeName.text = collegeName
                     tvCollegeAbout.text = it.getString("About").toString()
                     tvAddress.text = it.getString("Address").toString()

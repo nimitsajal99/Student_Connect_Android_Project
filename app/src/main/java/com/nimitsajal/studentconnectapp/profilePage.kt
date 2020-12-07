@@ -15,10 +15,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -30,7 +33,9 @@ import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.btnChat
 import kotlinx.android.synthetic.main.details_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
+import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.*
+import kotlinx.android.synthetic.main.profile_post_adapter.view.tvLikeCount
 import java.lang.System
 
 
@@ -125,6 +130,7 @@ class profilePage : AppCompatActivity() {
             val intent = Intent(this, mainFeed::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
             finish()
         }
 
@@ -474,6 +480,7 @@ class profilePage : AppCompatActivity() {
         tvUsername.setText(username.toString()).toString()
 
         val user_info = db.collection("Users").document(username)
+//        pbProfile.isVisible = true
         user_info.get().addOnSuccessListener {
             if(it != null){
 
@@ -486,19 +493,25 @@ class profilePage : AppCompatActivity() {
 //                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUrl)
 //                circularImageView.setImageBitmap(bitmap)
 
+                Glide.with(this).load(selectedPhotoUrl_string)
+                    .circleCrop()
+                    .into(circularImageView)
 
-                Picasso.get().load(selectedPhotoUrl_string).into(object :
-                    com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        // loaded bitmap is here (bitmap)
-
-                        circularImageView.setImageBitmap(bitmap)
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-                })
+//                Picasso.get().load(selectedPhotoUrl_string).into(object :
+//                    com.squareup.picasso.Target {
+//                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                        // loaded bitmap is here (bitmap)
+//                        circularImageView.setImageBitmap(bitmap)
+//                        pbProfile.isVisible = false
+//                    }
+//                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+//                        Log.d("profilepage", "DP preparing")
+//                    }
+//
+//                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+//                        Log.d("profilepage", "DP Failed $e")
+//                    }
+//                })
 
                 tvName.setText(it.getString("Name").toString()).toString()
 
@@ -560,7 +573,16 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
 
 class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        Picasso.get().load(url).into(viewHolder.itemView.postImageProfile)
+
+        Picasso.get().load(url).into(viewHolder.itemView.postImageProfile, object : Callback {
+            override fun onSuccess() {
+                viewHolder.itemView.pbProfile.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
+
         var count = description.length
         if(count > 19){
             var remString = description.dropLast(count-17)

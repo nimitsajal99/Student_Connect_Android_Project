@@ -55,6 +55,7 @@ class eventPage : AppCompatActivity() {
             val intent = Intent(this, currentChats::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
             finish()
         }
 

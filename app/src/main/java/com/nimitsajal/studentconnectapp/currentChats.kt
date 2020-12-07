@@ -15,6 +15,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -27,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import kotlinx.android.synthetic.main.activity_new_chat.*
 import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.*
+import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
 class currentChats : AppCompatActivity() {
     private lateinit var detector: GestureDetectorCompat
@@ -89,6 +91,7 @@ class currentChats : AppCompatActivity() {
             val intent = Intent(this, mainFeed::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
             finish()
         }
 
@@ -129,6 +132,7 @@ class currentChats : AppCompatActivity() {
             val intent = Intent(this, eventPage::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
             finish()
         }
     }
@@ -388,6 +392,7 @@ data class usersList(var username: String, var text: String, var name: String, v
 class CurrentChat_class(val username: String, val text: String, val Name: String, val arrayUser: MutableList<usersList>): Item<GroupieViewHolder>(){
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.pbCurrentChat.isVisible = true
         val db = FirebaseFirestore.getInstance()
         var url = ""
         db.collection("Users").document(username)
@@ -398,7 +403,15 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
                 arrayUser.add(temp)
                 viewHolder.itemView.tv_usernames_latestMessage.text = username
                 viewHolder.itemView.tv_text_latestMessage.text = text
-                Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage)
+                Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object :
+                    Callback {
+                    override fun onSuccess() {
+                        viewHolder.itemView.pbCurrentChat.isVisible = false
+                    }
+                    override fun onError(e: java.lang.Exception?) {
+                        Log.d("loading", "ERROR - $e")
+                    }
+                })
                 Log.d("adapter", "adapter added")
 
                 //TODO: Tap on specific item in recyclerview
@@ -418,9 +431,17 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
 
 class CurrentChatSearch_class(val username: String, val text: String, val Name: String, val url: String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.pbCurrentChat.isVisible = true
         viewHolder.itemView.tv_usernames_latestMessage.text = username
         viewHolder.itemView.tv_text_latestMessage.text = text
-        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage)
+        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object : Callback {
+            override fun onSuccess() {
+                viewHolder.itemView.pbCurrentChat.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
         Log.d("adapter", "adapter added")
     }
 

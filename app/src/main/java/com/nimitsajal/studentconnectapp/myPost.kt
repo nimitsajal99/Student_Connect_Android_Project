@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -332,7 +333,15 @@ class myPost : AppCompatActivity() {
     }
 
     private fun loadPost(db: FirebaseFirestore, username: String, url: String, uid: String, description: String, dp: String, myUsername: String, isOther: String){
-        Picasso.get().load(url).into(postImageCard)
+        Picasso.get().load(url).into(postImageCard, object : Callback {
+            override fun onSuccess() {
+                pbMyPost.isVisible = false
+            }
+
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
         tvUsernameCard.text = myUsername
         tvDescriptionCard.text = description
 
@@ -346,6 +355,7 @@ class myPost : AppCompatActivity() {
                 // loaded bitmap is here (bitmap)
 
                 circularImageViewCard.setImageBitmap(bitmap)
+                pbDpMyPost.isVisible = false
             }
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}

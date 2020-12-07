@@ -16,12 +16,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_new_chat.*
+import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
+import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 
 class newChat : AppCompatActivity() {
 
@@ -478,10 +481,18 @@ class UserItem(val username: String,val url: String, val Name: String, val array
 
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.pbNewChat.isVisible = true
         val temp = usersList(username, "", Name, url)
         arrayUser.add(temp)
         viewHolder.itemView.tv_usernames_newMessage.text = username
-        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage)
+        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage, object : Callback {
+            override fun onSuccess() {
+                viewHolder.itemView.pbNewChat.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
         Log.d("adapter", "adapter added")
     }
 }
@@ -493,8 +504,16 @@ class UserItemSearch(val username: String,val url: String, val Name: String): It
 
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.pbNewChat.isVisible = true
         viewHolder.itemView.tv_usernames_newMessage.text = username
-        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage)
+        Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage, object : Callback {
+            override fun onSuccess() {
+                viewHolder.itemView.pbNewChat.isVisible = false
+            }
+            override fun onError(e: java.lang.Exception?) {
+                Log.d("loading", "ERROR - $e")
+            }
+        })
         Log.d("adapter", "adapter added")
     }
 }

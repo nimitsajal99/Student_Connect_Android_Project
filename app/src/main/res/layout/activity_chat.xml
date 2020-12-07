@@ -34,6 +34,22 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="NotSibling" />
 
+        <ProgressBar
+            android:id="@+id/pbChat"
+            android:visibility="gone"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:indeterminate="true"
+            android:layout_gravity="start|center_vertical"
+            android:elevation="10dp"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="@color/base3"
+            app:layout_constraintLeft_toLeftOf="@id/circularImageView"
+            app:layout_constraintRight_toRightOf="@id/circularImageView"
+            app:layout_constraintTop_toTopOf="@id/circularImageView"
+            app:layout_constraintBottom_toBottomOf="@id/circularImageView"
+            />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circularImageView"
             android:layout_width="40dp"
