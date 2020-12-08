@@ -104,19 +104,19 @@ class mainFeed : AppCompatActivity() {
         }
 
         btnChat.setOnClickListener {
-            val intent = Intent(this, blank::class.java)
+            val intent = Intent(this, currentChats::class.java)
             intent.putExtra("username", username)
-            intent.putExtra("type", "2")
+//            intent.putExtra("type", "2")
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_from_right_fast, R.anim.slide_to_left_fast)
+            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }
 
         btnProfile.setOnClickListener {
-            val intent = Intent(this, blank::class.java)
+            val intent = Intent(this, profilePage::class.java)
             intent.putExtra("username", username)
-            intent.putExtra("type", "1")
+//            intent.putExtra("type", "1")
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_from_right_fast, R.anim.slide_to_left_fast)
+            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }
 
 //        btnFeed.setOnClickListener {
@@ -734,8 +734,21 @@ class post_class(
             viewHolder.itemView.tvLikeCount.text = likes
         }
         else{
-            val likes = "$likeCount Likes"
-            viewHolder.itemView.tvLikeCount.text = likes
+            var count: Double = likeCount.toDouble()
+            if(likeCount >= 1000000){
+                var ans: Double = ((count - count%10000)/1000000).toDouble()
+                val likes = "$ans" + "M Likes"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else if(likeCount >= 1000){
+                var ans: Double = ((count - count%10)/1000).toDouble()
+                val likes = "$ans" + "K Likes"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
+            else{
+                val likes = "$likeCount Likes"
+                viewHolder.itemView.tvLikeCount.text = likes
+            }
         }
 
         viewHolder.itemView.rvComments.adapter = adapterComment
@@ -794,8 +807,21 @@ class post_class(
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else{
-                val likes = "$likeCount Likes"
-                viewHolder.itemView.tvLikeCount.text = likes
+                var count: Double = likeCount.toDouble()
+                if(likeCount >= 1000000){
+                    var ans: Double = ((count - count%10000)/1000000).toDouble()
+                    val likes = "$ans" + "M Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
+                else if(likeCount >= 1000){
+                    var ans: Double = ((count - count%10)/1000).toDouble()
+                    val likes = "$ans" + "K Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
+                else{
+                    val likes = "$likeCount Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
             }
         }
         viewHolder.itemView.btnLike.setOnClickListener {
@@ -811,8 +837,21 @@ class post_class(
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else{
-                val likes = "$likeCount Likes"
-                viewHolder.itemView.tvLikeCount.text = likes
+                var count: Double = likeCount.toDouble()
+                if(likeCount >= 1000000){
+                    var ans: Double = ((count - count%10000)/1000000).toDouble()
+                    val likes = "$ans" + "M Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
+                else if(likeCount >= 1000){
+                    var ans: Double = ((count - count%10)/1000).toDouble()
+                    val likes = "$ans" + "K Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
+                else{
+                    val likes = "$likeCount Likes"
+                    viewHolder.itemView.tvLikeCount.text = likes
+                }
             }
         }
 

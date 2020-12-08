@@ -374,8 +374,23 @@ class others_profile_page : AppCompatActivity() {
                         showToast("$usernameOthers is no longer a Friend", 2)
                         friend.isFriend = false
                         friend.count = friend.count-1
-                        val str = "Add Friend (" + friend.count + ")"
-                        btnFriendsOthers.text = str
+
+                        var double: Double = friend.count.toDouble()
+                        if(friend.count >= 1000000){
+                            double = (double - double%100000)/1000000
+                            val str = "Add Friend (" + double + "M)"
+                            btnFriendsOthers.text = str
+                        }
+                        else if(friend.count >= 1000){
+                            double = (double - double%100)/1000
+                            val str = "Add Friend (" + double + "K)"
+                            btnFriendsOthers.text = str
+                        }
+                        else{
+                            val str = "Add Friend (" + friend.count + ")"
+                            btnFriendsOthers.text = str
+                        }
+
                         btnFriendsOthers.isEnabled = true
                     }
                 }
@@ -416,8 +431,23 @@ class others_profile_page : AppCompatActivity() {
                                                 showToast("${friend.name} added as a Friend", 2)
                                                 friend.isFriend = true
                                                 friend.count = friend.count+1
-                                                val str = "Unfriend (" + friend.count + ")"
-                                                btnFriendsOthers.text = str
+
+                                                var double: Double = friend.count.toDouble()
+                                                if(friend.count >= 1000000){
+                                                    double = (double - double%100000)/1000000
+                                                    val str = "Unfriend (" + double + "M)"
+                                                    btnFriendsOthers.text = str
+                                                }
+                                                else if(friend.count >= 1000){
+                                                    double = (double - double%100)/1000
+                                                    val str = "Unfriend (" + double + "K)"
+                                                    btnFriendsOthers.text = str
+                                                }
+                                                else{
+                                                    val str = "Unfriend (" + friend.count + ")"
+                                                    btnFriendsOthers.text = str
+                                                }
+
                                                 btnFriendsOthers.isEnabled = true
                                             }
                                         }
@@ -443,6 +473,7 @@ class others_profile_page : AppCompatActivity() {
                             intent.putExtra("from", username)
                             intent.putExtra("to", usernameOthers)
                             startActivity(intent)
+                            overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
                             finish()
                         }
                         else{
@@ -666,7 +697,18 @@ class others_profile_page : AppCompatActivity() {
             .addOnSuccessListener {
                 if(it != null){
                     friend.count = it.size() - 1
-                    friends = friends + friend.count + ")"
+                    var double: Double = friend.count.toDouble()
+                    if(friend.count >= 1000000){
+                        double = (double - double%100000)/1000000
+                        friends = friends + double + "M)"
+                    }
+                    else if(friend.count >= 1000){
+                        double = (double - double%100)/1000
+                        friends = friends + double + "K)"
+                    }
+                    else{
+                        friends = friends + friend.count + ")"
+                    }
                     btnFriendsOthers.setText(friends).toString()
                 }
             }

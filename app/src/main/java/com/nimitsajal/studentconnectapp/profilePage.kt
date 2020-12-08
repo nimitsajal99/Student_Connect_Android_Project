@@ -270,7 +270,7 @@ class profilePage : AppCompatActivity() {
 
         //TODO: PopUp Dialog Link -> https://www.youtube.com/watch?v=Em7LJddHAbQ&t=588s
 
-
+//        var list = findViewById<ListView>(R.id.list_view)
         var list: ListView = ListView(this)
 //        val adapter = GroupAdapter<GroupieViewHolder>()
 //        var data  = ArrayList<UserItemSearch>()
@@ -292,7 +292,7 @@ class profilePage : AppCompatActivity() {
                     }
                 }
                 //var adda = ArrayAdapter<UserItemSearch>(this,R.layout.new_chat_adapter, data)
-                var adda =  ArrayAdapter<String>(this,R.layout.new_chat_adapter, R.id.tv_usernames_newMessage, ddata)
+                var adda =  ArrayAdapter<String>(this,R.layout.friends_adapter, R.id.tvFriends, ddata)
 
 //                var addaa = GroupAdapter<GroupieViewHolder>()
 //                addaa.add()
@@ -303,14 +303,19 @@ class profilePage : AppCompatActivity() {
                 var dialog = builder.create()
                 dialog.show()
                 //TODO: make it work
-//                list.setOnItemClickListener { parent, view, position, id ->
-//
+                list.setOnItemClickListener { parent, view, position, id ->
 //                    Toast.makeText(this@profilePage,"in",Toast.LENGTH_SHORT).show()
 //                    Toast.makeText(this@profilePage,"parent -> $parent , view -> $view , position -> $position , id -> $id", Toast.LENGTH_SHORT).show()
-//                    dialog.dismiss()
-//                }
+//                    Log.d("profilepage", position.toString())
+                    dialog.dismiss()
+                    var str = ddata[position]
+                    val intent = Intent(this, others_profile_page::class.java)
+                    intent.putExtra("usernameOthers", str)
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
+                    finish()
+                }
             }
-
     }
 
 
@@ -548,7 +553,18 @@ class profilePage : AppCompatActivity() {
             .addOnSuccessListener {
                 if(it != null){
                     val count = it.size() - 1
-                    friends = friends + count + ")"
+                    var double: Double = count.toDouble()
+                    if(count >= 1000000){
+                        double = (double - double%100000)/1000000
+                        friends = friends + double + "M)"
+                    }
+                    else if(count >= 1000){
+                        double = (double - double%100)/1000
+                        friends = friends + double + "K)"
+                    }
+                    else{
+                        friends = friends + count + ")"
+                    }
                     btnFriends.setText(friends).toString()
                 }
             }
@@ -592,8 +608,38 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
         else{
             viewHolder.itemView.tvDescriptionProfile.text = description
         }
-        viewHolder.itemView.tvLikeCount.text = likeCount.toString()
-        viewHolder.itemView.tvComCount.text = commentCount.toString()
+        var countDouble: Int = likeCount
+        if(likeCount >= 1000000){
+            var ans: Int = ((countDouble - countDouble%10000)/1000000)
+            val likes = "$ans" + "M"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
+        else if(likeCount >= 1000){
+            var ans: Int = ((countDouble - countDouble%10)/1000)
+            val likes = "$ans" + "K"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
+        else{
+            val likes = "$likeCount"
+            viewHolder.itemView.tvLikeCount.text = likes
+        }
+        //viewHolder.itemView.tvLikeCount.text = likeCount.toString()
+        //viewHolder.itemView.tvComCount.text = commentCount.toString()
+        countDouble = commentCount
+        if(commentCount >= 1000000){
+            var ans: Int = ((countDouble - countDouble%10000)/1000000)
+            val likes = "$ans" + "M"
+            viewHolder.itemView.tvComCount.text = likes
+        }
+        else if(commentCount >= 1000){
+            var ans: Int = ((countDouble - countDouble%10)/1000)
+            val likes = "$ans" + "K"
+            viewHolder.itemView.tvComCount.text = likes
+        }
+        else{
+            val likes = "$commentCount"
+            viewHolder.itemView.tvComCount.text = likes
+        }
         viewHolder.itemView.btnLikeCount.setOnClickListener {
             Log.d("profilepage", "clicked like button")
             viewHolder.itemView.btnLikeCount.isEnabled = false
@@ -632,7 +678,24 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                             if(it4 != null){
                                                 Log.d("profilepage", "post updated")
                                             }
-                                            viewHolder.itemView.tvLikeCount.text = (count).toString()
+                                            //viewHolder.itemView.tvLikeCount.text = (count).toString()
+
+                                            var countDouble: Int = count
+                                            if(count >= 1000000){
+                                                var ans: Int = ((countDouble - countDouble%10000)/1000000)
+                                                val likes = "$ans" + "M"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+                                            else if(count >= 1000){
+                                                var ans: Int = ((countDouble - countDouble%10)/1000)
+                                                val likes = "$ans" + "K"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+                                            else{
+                                                val likes = "$count"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+
                                             viewHolder.itemView.btnLikeCount.isEnabled = true
                                         }
                                 }
@@ -659,7 +722,24 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                             if(it4 != null){
                                                 Log.d("profilepage", "post updated")
                                             }
-                                            viewHolder.itemView.tvLikeCount.text = (count).toString()
+                                            //viewHolder.itemView.tvLikeCount.text = (count).toString()
+
+                                            var countDouble: Int = count
+                                            if(count >= 1000000){
+                                                var ans: Int = ((countDouble - countDouble%10000)/1000000)
+                                                val likes = "$ans" + "M"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+                                            else if(count >= 1000){
+                                                var ans: Int = ((countDouble - countDouble%10)/1000)
+                                                val likes = "$ans" + "K"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+                                            else{
+                                                val likes = "$count"
+                                                viewHolder.itemView.tvLikeCount.text = likes
+                                            }
+
                                             viewHolder.itemView.btnLikeCount.isEnabled = true
                                         }
                                 }
