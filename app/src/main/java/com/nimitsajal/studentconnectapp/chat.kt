@@ -8,11 +8,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import com.google.firebase.auth.FirebaseAuth
@@ -36,6 +34,9 @@ import kotlinx.android.synthetic.main.current_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.tv_usernames_newMessage
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
+import kotlinx.android.synthetic.main.chat_options.view.*
+import kotlinx.android.synthetic.main.chat_recieve_replied.view.*
+import kotlinx.android.synthetic.main.chat_send_replied.view.*
 
 class chat : AppCompatActivity() {
 
@@ -61,6 +62,11 @@ class chat : AppCompatActivity() {
                         Log.d("profilePage", "URL recieved = $url")
                         detector = GestureDetectorCompat(this,DiaryGestureListener(From))
                         loadDP(url)
+                        if (To != null) {
+                            if (From != null) {
+                                loadChat(To, From, From)
+                            }
+                        }
                     }
                     else{
                         showToast("ERROR", 1)
@@ -109,11 +115,7 @@ class chat : AppCompatActivity() {
             }
         }
 
-        if (To != null) {
-            if (From != null) {
-                loadChat(To, From)
-            }
-        }
+
     }
 
     private fun toCurrentChats(username: String){
@@ -244,29 +246,44 @@ class chat : AppCompatActivity() {
 
     private  fun sendMessage(text: String, To: String, From: String){
         val db = FirebaseFirestore.getInstance()
-        val message = hashMapOf(
+        val time = FieldValue.serverTimestamp()
+
+        val messageCreate = hashMapOf(
             "From" to From,
             "To" to To,
             "Text" to text,
-            "Time" to FieldValue.serverTimestamp()
+            "Time" to time,
+            "Liked" to false,
+            "IsReply" to false,
+            "ReplyTo" to ""
         )
         val send = db.collection("Users").document(From).collection("Chats").document(To)
         val recieve = db.collection("Users").document(To).collection("Chats").document(From)
-        send.update(message)
-            .addOnFailureListener {
-                showToast("Message not Updated", 1)
-            }
-        recieve.update(message)
-            .addOnFailureListener {
-                showToast("Message not Updated", 1)
-            }
+
         send.collection("Next")
-            .add(message)
-            .addOnFailureListener {
-                showToast("Message not Sent", 1)
+            .add(messageCreate)
+            .addOnSuccessListener {
+                recieve.collection("Next").document(it.id)
+                    .set(messageCreate)
+                    .addOnFailureListener {
+                        showToast("Message not Sent", 1)
+                    }
+                val message = hashMapOf(
+                    "From" to From,
+                    "To" to To,
+                    "Text" to text,
+                    "Time" to time,
+                    "ID" to it.id.toString()
+                )
+                send.update(message)
+                    .addOnFailureListener {
+                        showToast("Message not Updated", 1)
+                    }
+                recieve.update(message)
+                    .addOnFailureListener {
+                        showToast("Message not Updated", 1)
+                    }
             }
-        recieve.collection("Next")
-            .add(message)
             .addOnFailureListener {
                 showToast("Message not Sent", 1)
             }
@@ -283,7 +300,7 @@ class chat : AppCompatActivity() {
         })
     }
 
-    private fun loadChat(To: String, From: String){
+    private fun loadChat(To: String, From: String, username: String){
         val adapter = GroupAdapter<GroupieViewHolder>()
         val db = FirebaseFirestore.getInstance()
         db.collection("Users").document(From).collection("Chats").document(To).collection("Next")
@@ -300,24 +317,24 @@ class chat : AppCompatActivity() {
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                     else if(document["From"] == From){
-                        adapter.add(Send(document["Text"].toString()))
+                        adapter.add(Send(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString()))
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                     else{
-                        adapter.add(Recieve(document["Text"].toString()))
+                        adapter.add(Recieve(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString()))
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                 }
-                adapter.setOnItemLongClickListener { item, view ->
-                    val temp: Recieve = item as Recieve
-                    val text = temp.text
-                    val clipboardManager =
-                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clipData = ClipData.newPlainText("address", text)
-                    clipboardManager.setPrimaryClip(clipData)
-                    showToast("Text copied to clipboard", 3)
-                    return@setOnItemLongClickListener true
-                }
+//                adapter.setOnItemLongClickListener { item, view ->
+//                    val temp: Recieve = item as Recieve
+//                    val text = temp.text
+//                    val clipboardManager =
+//                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//                    val clipData = ClipData.newPlainText("address", text)
+//                    clipboardManager.setPrimaryClip(clipData)
+//                    showToast("Text copied to clipboard", 3)
+//                    return@setOnItemLongClickListener true
+//                }
                 recyclerView_chat.adapter = adapter
             }
     }
@@ -381,19 +398,50 @@ class chat : AppCompatActivity() {
     }
 }
 
-class Send(val text: String): Item<GroupieViewHolder>(){
+class Send(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String, val isReply: String, val replyText: String): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
-        return R.layout.chat_send
+        if(isReply=="true" && liked=="true")
+        {
+            return R.layout.chat_send_replied_like
+        }
+        else if(isReply!="true" && liked=="true")
+        {
+            return R.layout.chat_send_like
+        }
+        else if(isReply=="true" && liked!="true")
+        {
+            return R.layout.chat_send_replied
+        }
+        else
+        {
+            return R.layout.chat_send
+        }
     }
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.tvSend.text = text
         Log.d("adapter", "adapter added")
+        if(isReply=="true")
+        {
+            viewHolder.itemView.tvSendReply.text = replyText
+        }
+
+        viewHolder.itemView.tvSend.setOnLongClickListener {
+            inflate(viewHolder)
+            return@setOnLongClickListener true
+        }
+
+        if(isReply == "true"){
+            viewHolder.itemView.tvSendReply.setOnLongClickListener {
+                inflate(viewHolder)
+                return@setOnLongClickListener true
+            }
+        }
+
         viewHolder.itemView.tvSend.setOnClickListener(object : Send.DoubleClickListener() {
             override fun onDoubleClick(v: View?) {
                 Log.d("adapter", "double press")
-                //Toast.makeText(, "double", Toast.LENGTH_SHORT).show()
-                //Toast.makeText(this@Send, "ERROR", Toast.LENGTH_LONG).show()
+                Reply(viewHolder)
             }
         })
     }
@@ -414,17 +462,432 @@ class Send(val text: String): Item<GroupieViewHolder>(){
             }
         }
     }
+
+    private fun inflate(viewHolder: GroupieViewHolder)
+    {
+        val context = viewHolder.itemView.context
+        val dialog = AlertDialog.Builder(context)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.chat_options,null,false)
+        val btnOne = dialogView.findViewById<ImageView>(R.id.forward)
+        val btnTwo = dialogView.findViewById<ImageView>(R.id.delete)
+        val btnThree = dialogView.findViewById<ImageView>(R.id.copy)
+        btnTwo.isVisible = true
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        val customDialogue = dialog.create()
+        customDialogue.show()
+        btnOne.setOnClickListener {
+            customDialogue.dismiss()
+            btnTwo.isVisible = false
+            forward(viewHolder)
+        }
+        btnTwo.setOnClickListener {
+            customDialogue.dismiss()
+            btnTwo.isVisible = false
+            delete()
+        }
+        btnThree.setOnClickListener {
+            customDialogue.dismiss()
+            btnTwo.isVisible = false
+            val clipboardManager = viewHolder.itemView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("address", text)
+            clipboardManager.setPrimaryClip(clipData)
+            Log.d("chat", "Lower adapter listner over")
+            Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    private fun Reply(viewHolder: GroupieViewHolder)
+    {
+        val context = viewHolder.itemView.context
+        val dialog = AlertDialog.Builder(context)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.reply_dialog,null,false)
+        val etReply = dialogView.findViewById<EditText>(R.id.etReply)
+        val tvReply = dialogView.findViewById<TextView>(R.id.tvReply)
+        var replyText = text
+        var length = replyText.length
+        Log.d("chatReply", length.toString())
+        if(length > 160){
+            replyText = replyText.dropLast(length - 157)
+            replyText = replyText + "..."
+            Log.d("chatReply", replyText.length.toString())
+        }
+        tvReply.setText(replyText)
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        //dialog.setPositiveButton("Reply",{dialogInterface: DialogInterface, i: Int ->})
+        val customDialogue = dialog.create()
+        val btn = dialogView.findViewById<Button>(R.id.btnReply)
+        customDialogue.show()
+        btn.setOnClickListener {
+            if(etReply.text.toString() != ""){
+                Log.d("chat", etReply.text.toString())
+                customDialogue.dismiss()
+                sendMessage(etReply.text.toString(),To,From,replyText)
+                etReply.setText("")
+            }
+            else{
+                Log.d("chat", "No reply sent")
+                customDialogue.dismiss()
+                etReply.setText("")
+            }
+        }
+    }
+
+    private  fun sendMessage(text: String, To: String, From: String, replyTo: String){
+        val db = FirebaseFirestore.getInstance()
+        //TODO: changes
+        val time = FieldValue.serverTimestamp()
+        var string = replyTo
+
+
+        val messageCreate = hashMapOf(
+            "From" to From,
+            "To" to To,
+            "Text" to text,
+            "Time" to time,
+            "Liked" to false,
+            "IsReply" to true,
+            "ReplyTo" to string
+        )
+        val send = db.collection("Users").document(From).collection("Chats").document(To)
+        val recieve = db.collection("Users").document(To).collection("Chats").document(From)
+
+
+        send.collection("Next")
+            .add(messageCreate)
+            .addOnSuccessListener {
+                recieve.collection("Next").document(it.id)
+                    .set(messageCreate)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Sent")
+
+                    }
+                val message = hashMapOf(
+                    "From" to From,
+                    "To" to To,
+                    "Text" to text,
+                    "Time" to time,
+                    "ID" to it.id.toString()
+                )
+                send.update(message)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Updated")
+                    }
+                recieve.update(message)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Updated")
+                    }
+            }
+            .addOnFailureListener {
+                Log.d("chat", "Message not Sent")
+            }
+    }
+
+    private fun forward(viewHolder: GroupieViewHolder)
+    {
+        val context = viewHolder.itemView.context
+        val intent = Intent(viewHolder.itemView.context, newChat::class.java)
+        intent.putExtra("username", username)
+        intent.putExtra("fromCurrentChat", text)
+        context.startActivity(intent)
+//        startActivity(intent)
+//        startActivity(intent)
+        //overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+    }
+
+    private fun delete()
+    {
+        val db = FirebaseFirestore.getInstance()
+
+
+        db.collection("Users").document(From).collection("Chats").document(To).collection("Next")
+            .document(id)
+            .update("From", "System")
+            .addOnSuccessListener {
+                Log.d("chat", "System type made in $From")
+            }
+        db.collection("Users").document(From).collection("Chats").document(To).collection("Next")
+            .document(id)
+            .update("Text", "This message was deleted")
+            .addOnSuccessListener {
+                Log.d("chat", "Message updated in $From")
+            }
+        db.collection("Users").document(To).collection("Chats").document(From).collection("Next")
+            .document(id)
+            .update("From", "System")
+            .addOnSuccessListener {
+                Log.d("chat", "System type made in $To")
+            }
+        db.collection("Users").document(To).collection("Chats").document(From).collection("Next")
+            .document(id)
+            .update("Text", "This message was deleted")
+            .addOnSuccessListener {
+                Log.d("chat", "Message updated in $To")
+            }
+        db.collection("Users").document(From).collection("Chats").document(To)
+            .get()
+            .addOnSuccessListener {
+                if(it!=null)
+                {
+                    if(it["ID"] == id.toString())
+                    {
+                        db.collection("Users").document(From).collection("Chats").document(To)
+                            .update("Text","This message was deleted")
+                            .addOnSuccessListener {
+                                Log.d("chat", "Lates message updated $From")
+                            }
+                        db.collection("Users").document(To).collection("Chats").document(From)
+                            .update("Text","This message was deleted")
+                            .addOnSuccessListener {
+                                Log.d("chat", "Lates message updated $From")
+                            }
+                    }
+                }
+            }
+    }
+
 }
 
-class Recieve(val text: String): Item<GroupieViewHolder>(){
+class Recieve(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String,val isReply: String, val replyText: String): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
-        return R.layout.chat_recieve
+        if(isReply=="true" && liked=="true")
+        {
+            return R.layout.chat_recieve_replied_like
+        }
+        else if(isReply!="true" && liked=="true")
+        {
+            return R.layout.chat_recieve_like
+        }
+        else if(isReply=="true" && liked!="true")
+        {
+            return R.layout.chat_recieve_replied
+        }
+        else
+        {
+            return R.layout.chat_recieve
+        }
     }
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.tvRecieve.text = text
         Log.d("adapter", "adapter added")
+        if(isReply == "true"){
+            viewHolder.itemView.tvRecieveReply.text = replyText
+        }
+
+        viewHolder.itemView.tvRecieve.setOnLongClickListener {
+            inflate(viewHolder)
+            return@setOnLongClickListener true
+        }
+
+        if(isReply == "true"){
+            viewHolder.itemView.tvRecieveReply.setOnLongClickListener {
+                inflate(viewHolder)
+                return@setOnLongClickListener true
+            }
+        }
+
+        viewHolder.itemView.tvRecieve.setOnClickListener(object : Recieve.DoubleClickListener() {
+            override fun onDoubleClick(v: View?) {
+                Reply(viewHolder)
+            }
+        })
     }
+
+    abstract class DoubleClickListener : View.OnClickListener {
+        private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+        var lastClickTime: Long = 0
+        override fun onClick(v: View?) {
+            val clickTime = java.lang.System.currentTimeMillis()
+            if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                onDoubleClick(v)
+            }
+            lastClickTime = clickTime
+        }
+
+        open fun onDoubleClick(v: View?) {
+            object {
+                private val DOUBLE_CLICK_TIME_DELTA: Long = 300
+            }
+        }
+    }
+
+    private fun inflate(viewHolder: GroupieViewHolder) {
+        val context = viewHolder.itemView.context
+        val dialog = AlertDialog.Builder(context)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.chat_options, null, false)
+        val btnOne = dialogView.findViewById<ImageView>(R.id.forward)
+        var btnTwo: ImageView? = null
+        val btnThree = dialogView.findViewById<ImageView>(R.id.copy)
+
+        if (liked == "true") {
+            btnTwo = dialogView.findViewById<ImageView>(R.id.like)
+            btnTwo.isVisible = true
+        } else {
+            btnTwo = dialogView.findViewById<ImageView>(R.id.dislike)
+            btnTwo.isVisible = true
+        }
+
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        val customDialogue = dialog.create()
+        customDialogue.show()
+        btnOne.setOnClickListener {
+            btnTwo.isVisible = false
+            customDialogue.dismiss()
+            forward(viewHolder)
+        }
+        btnTwo.setOnClickListener {
+            btnTwo.isVisible = false
+            customDialogue.dismiss()
+            liking()
+        }
+        btnThree.setOnClickListener {
+            btnTwo.isVisible = false
+            customDialogue.dismiss()
+
+            val clipboardManager = viewHolder.itemView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("address", text)
+            clipboardManager.setPrimaryClip(clipData)
+            Log.d("chat", "Lower adapter listner over")
+            Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun liking()
+    {
+        val db = FirebaseFirestore.getInstance()
+        if(liked=="true")
+        {
+            db.collection("Users").document(From).collection("Chats").document(To).collection("Next")
+                .document(id)
+                .update("Liked", false)
+                .addOnSuccessListener {
+                    Log.d("chat", "Unliked in $From")
+                }
+            db.collection("Users").document(To).collection("Chats").document(From).collection("Next")
+                .document(id)
+                .update("Liked", false)
+                .addOnSuccessListener {
+                    Log.d("chat", "Unliked in $To")
+                }
+        }
+        else
+        {
+            db.collection("Users").document(From).collection("Chats").document(To).collection("Next")
+                .document(id)
+                .update("Liked", true)
+                .addOnSuccessListener {
+                    Log.d("chat", "Liked in $From")
+                }
+            db.collection("Users").document(To).collection("Chats").document(From).collection("Next")
+                .document(id)
+                .update("Liked", true)
+                .addOnSuccessListener {
+                    Log.d("chat", "Liked in $To")
+                }
+        }
+    }
+
+    private fun forward(viewHolder: GroupieViewHolder)
+    {
+        val context = viewHolder.itemView.context
+        val intent = Intent(viewHolder.itemView.context, newChat::class.java)
+        intent.putExtra("username", username)
+
+        intent.putExtra("fromCurrentChat", text)
+        context.startActivity(intent)
+//        startActivity(intent)
+//        startActivity(intent)
+        //overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+    }
+
+    private fun Reply(viewHolder: GroupieViewHolder)
+    {
+        val context = viewHolder.itemView.context
+        val dialog = AlertDialog.Builder(context)
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.reply_dialog,null,false)
+        val etReply = dialogView.findViewById<EditText>(R.id.etReply)
+        val tvReply = dialogView.findViewById<TextView>(R.id.tvReply)
+        var replyText = text
+        var length = replyText.length
+        if(length > 160){
+            replyText = replyText.dropLast(length - 157)
+            replyText = replyText + "..."
+        }
+        tvReply.setText(replyText)
+        dialog.setView(dialogView)
+        dialog.setCancelable(true)
+        //dialog.setPositiveButton("Reply",{dialogInterface: DialogInterface, i: Int ->})
+        val customDialogue = dialog.create()
+        val btn = dialogView.findViewById<Button>(R.id.btnReply)
+        customDialogue.show()
+        btn.setOnClickListener {
+            if(etReply.text.toString() != ""){
+                Log.d("chatReply", etReply.text.toString())
+                customDialogue.dismiss()
+                sendMessage(etReply.text.toString(),To,From,replyText)
+                etReply.setText("")
+            }
+            else{
+                Log.d("chatReply", "No reply sent")
+                customDialogue.dismiss()
+                etReply.setText("")
+            }
+        }
+    }
+
+    private  fun sendMessage(text: String, To: String, From: String, replyTo: String){
+        val db = FirebaseFirestore.getInstance()
+        //TODO: changes
+        val time = FieldValue.serverTimestamp()
+        var string = replyTo
+
+        val messageCreate = hashMapOf(
+            "From" to From,
+            "To" to To,
+            "Text" to text,
+            "Time" to time,
+            "Liked" to false,
+            "IsReply" to true,
+            "ReplyTo" to string
+        )
+        val send = db.collection("Users").document(From).collection("Chats").document(To)
+        val recieve = db.collection("Users").document(To).collection("Chats").document(From)
+
+
+        send.collection("Next")
+            .add(messageCreate)
+            .addOnSuccessListener {
+                recieve.collection("Next").document(it.id)
+                    .set(messageCreate)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Sent")
+
+                    }
+                val message = hashMapOf(
+                    "From" to From,
+                    "To" to To,
+                    "Text" to text,
+                    "Time" to time,
+                    "ID" to it.id.toString()
+                )
+                send.update(message)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Updated")
+                    }
+                recieve.update(message)
+                    .addOnFailureListener {
+                        Log.d("chat", "Message not Updated")
+                    }
+            }
+            .addOnFailureListener {
+                Log.d("chat", "Message not Sent")
+            }
+    }
+
 }
 
 class System(val text: String): Item<GroupieViewHolder>(){
@@ -434,6 +897,15 @@ class System(val text: String): Item<GroupieViewHolder>(){
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.tvSystem.text = text
+        if(text=="This message was deleted")
+        {
+            viewHolder.itemView.tvSystem.setTextSize(15.0F)
+            viewHolder.itemView.tvSystem.setPadding(19,6,19,6)
+            val param = viewHolder.itemView.tvSystem.layoutParams as ViewGroup.MarginLayoutParams
+            param.setMargins(0,0,0,0)
+            viewHolder.itemView.tvSystem.layoutParams = param
+            //viewHolder.itemView.tvSystem.setTypeface(null, Typeface.BOLD_ITALIC)
+        }
         Log.d("adapter", "adapter added")
     }
 }

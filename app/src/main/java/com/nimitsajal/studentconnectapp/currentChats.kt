@@ -2,6 +2,7 @@ package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -222,6 +223,7 @@ class currentChats : AppCompatActivity() {
     {
         val intent = Intent(this, newChat::class.java)
         intent.putExtra("username", username)
+        intent.putExtra("fromCurrentChat", "true")
         startActivity(intent)
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
     }
@@ -403,6 +405,12 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
                 arrayUser.add(temp)
                 viewHolder.itemView.tv_usernames_latestMessage.text = username
                 viewHolder.itemView.tv_text_latestMessage.text = text
+                if(text == "This message was deleted")
+                {
+                    Log.d("currentchats", "in")
+                    viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
+                    viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
+                }
                 Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object :
                     Callback {
                     override fun onSuccess() {
@@ -434,6 +442,12 @@ class CurrentChatSearch_class(val username: String, val text: String, val Name: 
         viewHolder.itemView.pbCurrentChat.isVisible = true
         viewHolder.itemView.tv_usernames_latestMessage.text = username
         viewHolder.itemView.tv_text_latestMessage.text = text
+        if(text == "This message was deleted")
+        {
+            Log.d("currentchats", "in")
+            viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
+            viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
+        }
         Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object : Callback {
             override fun onSuccess() {
                 viewHolder.itemView.pbCurrentChat.isVisible = false

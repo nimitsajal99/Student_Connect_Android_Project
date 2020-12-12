@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/base0"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/forward"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/forward"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/guideline9"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="45dp"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        android:background="@drawable/delete_post_cropped"
+        app:layout_constraintLeft_toLeftOf="@id/guideline9"
+        app:layout_constraintRight_toRightOf="@id/guideline9"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/like"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        android:background="@drawable/love"
+        app:layout_constraintLeft_toLeftOf="@id/guideline9"
+        app:layout_constraintRight_toRightOf="@id/guideline9"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/dislike"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        android:background="@drawable/love_empty"
+        app:layout_constraintLeft_toLeftOf="@id/guideline9"
+        app:layout_constraintRight_toRightOf="@id/guideline9"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/copy"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/copy"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/guideline9"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

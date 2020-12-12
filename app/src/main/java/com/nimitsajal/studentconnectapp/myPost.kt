@@ -13,6 +13,9 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.palette.graphics.Palette
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -349,17 +352,52 @@ class myPost : AppCompatActivity() {
             btnDeletePost.isVisible = true
         }
 
-        Picasso.get().load(dp).into(object :
-            com.squareup.picasso.Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                // loaded bitmap is here (bitmap)
+        Glide.with(this).load(dp)
+            .circleCrop()
+            .into(circularImageViewCard)
 
-                circularImageViewCard.setImageBitmap(bitmap)
-                pbDpMyPost.isVisible = false
-            }
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-        })
+//        Picasso.get().load(dp).into(object :
+//            com.squareup.picasso.Target {
+//            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                // loaded bitmap is here (bitmap)
+//
+//                circularImageViewCard.setImageBitmap(bitmap)
+//                pbDpMyPost.isVisible = false
+//            }
+//            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+//            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+//        })
+
+        Glide.with(this)
+            .asBitmap()
+            .load(url)
+            .into(object : CustomTarget<Bitmap>(){
+                override fun onResourceReady(
+                    bitmap: Bitmap,
+                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                ) {
+                    // loaded bitmap is here (bitmap)
+                    Log.d("colorset", "bitmap loaded")
+                    if (bitmap != null) {
+                        Palette.Builder(bitmap).generate {
+                            it?.let { palette ->
+                                val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
+                                val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
+                                val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
+                                val muted: Int = palette.getMutedColor(0x000000)
+                                val mutedLight: Int = palette.getLightMutedColor(0x000000)
+                                val mutedDark: Int = palette.getDarkMutedColor(0x000000)
+                                val dominant: Int = palette.getDominantColor(0x000000)
+                                cvBehindImage.setCardBackgroundColor(muted)
+//                        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
+                                Log.d("colorset", "color set $muted")
+                            }
+                        }
+                    }
+                }
+                override fun onLoadCleared(placeholder: Drawable?) {
+                }
+            })
 
         db.collection("Post").document(uid)
             .get()

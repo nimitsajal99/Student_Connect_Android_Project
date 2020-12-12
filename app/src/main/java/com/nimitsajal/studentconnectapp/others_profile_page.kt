@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +24,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_main_feed.*
+import kotlinx.android.synthetic.main.activity_my_post.*
 import kotlinx.android.synthetic.main.activity_others_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.details_adapter.view.*
@@ -638,17 +640,21 @@ class others_profile_page : AppCompatActivity() {
 
                 friend.url = selectedPhotoUrl_string
 
-                Picasso.get().load(selectedPhotoUrl_string).into(object :
-                    com.squareup.picasso.Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        // loaded bitmap is here (bitmap)
-                        circularImageViewOthers.setImageBitmap(bitmap)
-                    }
+                Glide.with(this).load(selectedPhotoUrl_string)
+                    .circleCrop()
+                    .into(circularImageViewOthers)
 
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-                })
+//                Picasso.get().load(selectedPhotoUrl_string).into(object :
+//                    com.squareup.picasso.Target {
+//                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                        // loaded bitmap is here (bitmap)
+//                        circularImageViewOthers.setImageBitmap(bitmap)
+//                    }
+//
+//                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+//
+//                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+//                })
 
                 tvNameOthers.setText(it.getString("Name").toString()).toString()
                 friend.name = it.getString("Name").toString()

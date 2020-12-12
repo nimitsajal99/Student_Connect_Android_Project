@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.icu.number.NumberFormatter.with
 import android.os.Build
 import android.os.Bundle
+import android.transition.Transition
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -18,6 +19,8 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -898,37 +901,74 @@ class post_class(
             }
         }
 
-        Picasso.get().load(imageUrl).into(object : com.squareup.picasso.Target {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                // loaded bitmap is here (bitmap)
-                Log.d("colorset", "bitmap loaded")
+        Glide.with(viewHolder.itemView.context)
+            .asBitmap()
+            .load(imageUrl)
+            .into(object : CustomTarget<Bitmap>(){
+                override fun onResourceReady(
+                    bitmap: Bitmap,
+                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
+                ) {
+                    // loaded bitmap is here (bitmap)
+                    Log.d("colorset", "bitmap loaded")
 
-                if (bitmap != null) {
-                    Palette.Builder(bitmap).generate {
-                        it?.let { palette ->
-                            val vibrant: Int =
-                                palette.getVibrantColor(0x000000) // <=== color you want
-                            val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
-                            val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
-                            val muted: Int = palette.getMutedColor(0x000000)
-                            val mutedLight: Int = palette.getLightMutedColor(0x000000)
-                            val mutedDark: Int = palette.getDarkMutedColor(0x000000)
-                            val dominant: Int = palette.getDominantColor(0x000000)
+                    if (bitmap != null) {
+                        Palette.Builder(bitmap).generate {
+                            it?.let { palette ->
+                                val vibrant: Int = palette.getVibrantColor(0x000000) // <=== color you want
+                                val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
+                                val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
+                                val muted: Int = palette.getMutedColor(0x000000)
+                                val mutedLight: Int = palette.getLightMutedColor(0x000000)
+                                val mutedDark: Int = palette.getDarkMutedColor(0x000000)
+                                val dominant: Int = palette.getDominantColor(0x000000)
 
-                            viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
+                                viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
 //                        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
-                            Log.d("colorset", "color set $muted")
+                                Log.d("colorset", "color set $muted")
 
+                            }
                         }
                     }
                 }
-            }
 
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+                override fun onLoadCleared(placeholder: Drawable?) {
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-        })
+                }
+
+            })
+
+//        Picasso.get().load(imageUrl).into(object : com.squareup.picasso.Target {
+//            @RequiresApi(Build.VERSION_CODES.O)
+//            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                // loaded bitmap is here (bitmap)
+//                Log.d("colorset", "bitmap loaded")
+//
+//                if (bitmap != null) {
+//                    Palette.Builder(bitmap).generate {
+//                        it?.let { palette ->
+//                            val vibrant: Int =
+//                                palette.getVibrantColor(0x000000) // <=== color you want
+//                            val vibrantLight: Int = palette.getLightVibrantColor(0x000000)
+//                            val vibrantDark: Int = palette.getDarkVibrantColor(0x000000)
+//                            val muted: Int = palette.getMutedColor(0x000000)
+//                            val mutedLight: Int = palette.getLightMutedColor(0x000000)
+//                            val mutedDark: Int = palette.getDarkMutedColor(0x000000)
+//                            val dominant: Int = palette.getDominantColor(0x000000)
+//
+//                            viewHolder.itemView.cvBehindImage.setCardBackgroundColor(muted)
+////                        Picasso.get().load(imageUrl).into(viewHolder.itemView.postImageCard)
+//                            Log.d("colorset", "color set $muted")
+//
+//                        }
+//                    }
+//                }
+//            }
+//
+//            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+//
+//            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+//        })
     }
 
     override fun getLayout(): Int {
