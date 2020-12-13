@@ -41,6 +41,8 @@
             android:autofillHints="Empty_email"
             android:background="@drawable/spiner_layout"
             android:gravity="center"
+            android:paddingLeft="9dp"
+            android:paddingRight="35dp"
             android:textColor="@color/base0"
             android:inputType="textEmailAddress" />
 
@@ -55,6 +57,8 @@
             android:autofillHints="Empty_email"
             android:background="@drawable/spiner_layout"
             android:gravity="center"
+            android:paddingLeft="9dp"
+            android:paddingRight="35dp"
             android:textColor="@color/base0"
             android:inputType="textEmailAddress" />
 
@@ -69,6 +73,8 @@
             android:autofillHints="Empty_email"
             android:background="@drawable/spiner_layout"
             android:gravity="center"
+            android:paddingLeft="9dp"
+            android:paddingRight="35dp"
             android:textColor="@color/base0"
             android:inputType="textEmailAddress" />
 
@@ -83,6 +89,8 @@
             android:autofillHints="Empty_email"
             android:background="@drawable/spiner_layout"
             android:gravity="center"
+            android:paddingLeft="9dp"
+            android:paddingRight="35dp"
             android:textColor="@color/base0"
             android:inputType="textEmailAddress" />
 

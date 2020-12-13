@@ -621,6 +621,15 @@ class collegeDetailsDatabase : AppCompatActivity() {
                             }
                         }
 
+                    db.collection("Users").document(userUserName).collection("Medals").document("Year - $semester_name")
+                        .set(inner)
+                        .addOnCompleteListener { it3 ->
+                            if (it3.isSuccessful)
+                            {
+                                Log.d("database","Medals created with college name")
+                            }
+                        }
+
                     db.collection("Users").document(userUserName).collection("Medals").document(branch_name)
                         .set(inner)
                         .addOnCompleteListener { it4 ->
