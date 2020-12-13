@@ -127,7 +127,16 @@
                 android:layout_width="17dp"
                 android:layout_height="17dp"
                 android:layout_gravity="center"
+                android:visibility="gone"
                 android:background="@drawable/like_count_profile" />
+
+            <ImageView
+                android:id="@+id/likeIconUnfilled"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="center"
+                android:visibility="visible"
+                android:background="@drawable/unfilled_profile_post_liked" />
 
             <TextView
                 android:id="@+id/tvLikeCount"

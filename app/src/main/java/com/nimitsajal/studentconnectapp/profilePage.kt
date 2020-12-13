@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
@@ -640,6 +641,18 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
             val likes = "$commentCount"
             viewHolder.itemView.tvComCount.text = likes
         }
+
+        db.collection("Users").document(username).collection("My Posts").document(uid)
+            .get()
+            .addOnSuccessListener {
+                if (it != null) {
+                    if (it["Liked"].toString().toBoolean()) {
+                        viewHolder.itemView.likeIconUnfilled.visibility = View.GONE
+                        viewHolder.itemView.likeIcon.visibility = View.VISIBLE
+                    }
+                }
+            }
+
         viewHolder.itemView.btnLikeCount.setOnClickListener {
             Log.d("profilepage", "clicked like button")
             viewHolder.itemView.btnLikeCount.isEnabled = false
@@ -697,6 +710,8 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                             }
 
                                             viewHolder.itemView.btnLikeCount.isEnabled = true
+                                            viewHolder.itemView.likeIconUnfilled.visibility = View.VISIBLE
+                                            viewHolder.itemView.likeIcon.visibility = View.GONE
                                         }
                                 }
                             }
@@ -741,6 +756,8 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                             }
 
                                             viewHolder.itemView.btnLikeCount.isEnabled = true
+                                            viewHolder.itemView.likeIconUnfilled.visibility = View.GONE
+                                            viewHolder.itemView.likeIcon.visibility = View.VISIBLE
                                         }
                                 }
                             }

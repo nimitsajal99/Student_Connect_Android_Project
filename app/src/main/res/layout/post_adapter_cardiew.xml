@@ -180,7 +180,7 @@
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
             android:layout_marginBottom="15dp"
-            android:background="@drawable/commentbox_disabled"/>
+            android:background="@drawable/commentbox_disabled_shadow"/>
 
         <Button
             android:id="@+id/btnCommentEnabled"
@@ -193,7 +193,7 @@
             android:elevation="30dp"
             app:layout_constraintRight_toRightOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
-            android:background="@drawable/commentbox_enabled"/>
+            android:background="@drawable/commentbox_enabled_shadow"/>
 
 
 
@@ -228,7 +228,7 @@
             android:elevation="30dp"
             app:layout_constraintLeft_toLeftOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
-            android:background="@drawable/like_filled"/>
+            android:background="@drawable/like_filled_shadow"/>
 
         <Button
             android:id="@+id/btnUnlike"
@@ -241,7 +241,7 @@
             android:elevation="30dp"
             app:layout_constraintLeft_toLeftOf="@id/postImageCard"
             app:layout_constraintBottom_toBottomOf="@id/postImageCard"
-            android:background="@drawable/unliked_filled"/>
+            android:background="@drawable/unliked_filled_shadow"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

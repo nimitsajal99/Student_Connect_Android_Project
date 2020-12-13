@@ -355,6 +355,7 @@ class myPost : AppCompatActivity() {
         Glide.with(this).load(dp)
             .circleCrop()
             .into(circularImageViewCard)
+        pbDpMyPost.isVisible = false
 
 //        Picasso.get().load(dp).into(object :
 //            com.squareup.picasso.Target {

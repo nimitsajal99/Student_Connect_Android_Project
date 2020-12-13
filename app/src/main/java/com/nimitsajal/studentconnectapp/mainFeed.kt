@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -712,18 +713,7 @@ data class postList(
 
 }
 
-class post_class(
-    var username: String,
-    var imageUrl: String,
-    var dpUrl: String,
-    var description: String,
-    var likeCount: Int,
-    var uid: String,
-    var myusername: String,
-    var adapter: GroupAdapter<GroupieViewHolder>,
-    var adapterComment: GroupAdapter<GroupieViewHolder>,
-    var isComBox: Boolean
-): Item<GroupieViewHolder>()
+class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>, var adapterComment: GroupAdapter<GroupieViewHolder>, var isComBox: Boolean): Item<GroupieViewHolder>()
 {
     @SuppressLint("RestrictedApi", "ResourceType")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
@@ -796,6 +786,18 @@ class post_class(
                     }
                 }
             }
+
+        viewHolder.itemView.tvUsernameCard.setOnClickListener {
+            val intent = Intent(viewHolder.itemView.context, others_profile_page::class.java)
+            intent.putExtra("usernameOthers", username)
+            viewHolder.itemView.context.startActivity(intent)
+        }
+
+        viewHolder.itemView.circularImageViewCard.setOnClickListener {
+            val intent = Intent(viewHolder.itemView.context, others_profile_page::class.java)
+            intent.putExtra("usernameOthers", username)
+            viewHolder.itemView.context.startActivity(intent)
+        }
 
         viewHolder.itemView.btnUnlike.setOnClickListener {
             viewHolder.itemView.btnLike.isVisible = true
@@ -1035,6 +1037,12 @@ class Comment_class(val username: String, val comment: String): Item<GroupieView
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.username.text = "$username: "
         viewHolder.itemView.comment.text = comment
+
+        viewHolder.itemView.username.setOnClickListener {
+            val intent = Intent(viewHolder.itemView.context, others_profile_page::class.java)
+            intent.putExtra("usernameOthers", username)
+            viewHolder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getLayout(): Int {

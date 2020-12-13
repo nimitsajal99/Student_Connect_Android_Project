@@ -317,11 +317,11 @@ class chat : AppCompatActivity() {
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                     else if(document["From"] == From){
-                        adapter.add(Send(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString()))
+                        adapter.add(Send(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString(), false))
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                     else{
-                        adapter.add(Recieve(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString()))
+                        adapter.add(Recieve(document["Text"].toString(),document.id, From,To,document["Liked"].toString(),username,document["IsReply"].toString(), document["ReplyTo"].toString(), false))
                         recyclerView_chat.scrollToPosition(adapter.itemCount-1)
                     }
                 }
@@ -398,7 +398,7 @@ class chat : AppCompatActivity() {
     }
 }
 
-class Send(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String, val isReply: String, val replyText: String): Item<GroupieViewHolder>(){
+class Send(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String, val isReply: String, val replyText: String, var isMinimised: Boolean): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
         if(isReply=="true" && liked=="true")
         {
@@ -419,7 +419,39 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
     }
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.tvSend.text = text
+//        if(text.length > 240){
+//            Log.d("chatReply", "Initially Minimised -> Send Class")
+//            var previewText = text.dropLast(text.length - 237)
+//            previewText = previewText + "..."
+//            viewHolder.itemView.tvSend.text = previewText
+//            isMinimised = true
+//        }
+        //else{
+            //Log.d("chatReply", "Initially Not Minimised -> Send Class")
+            viewHolder.itemView.tvSend.text = text
+        //}
+
+//        viewHolder.itemView.tvSend.setOnClickListener {
+//        if(text.length > 240){
+//            Log.d("chatReply", "Now in IF -> Send Class")
+//
+//                Log.d("chatReply", "Action Registered -> Send Class")
+//                if(isMinimised){
+//                    Log.d("chatReply", "Now Not Minimised -> Send Class")
+//                    viewHolder.itemView.tvSend.text = text
+//                    isMinimised = false
+//                }
+//                else{
+//                    Log.d("chatReply", "Now Minimised -> Send Class")
+//                    var previewText = text.dropLast(text.length - 237)
+//                    previewText = previewText + "..."
+//                    viewHolder.itemView.tvSend.text = previewText
+//                    isMinimised = true
+//                }
+//            }
+//
+//        }
+
         Log.d("adapter", "adapter added")
         if(isReply=="true")
         {
@@ -432,18 +464,45 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
         }
 
         if(isReply == "true"){
-            viewHolder.itemView.tvSendReply.setOnLongClickListener {
+            viewHolder.itemView.cardSend.setOnLongClickListener {
                 inflate(viewHolder)
                 return@setOnLongClickListener true
             }
+            viewHolder.itemView.cardSend.setOnClickListener(object : Send.DoubleClickListener() {
+                override fun onDoubleClick(v: View?) {
+                    Log.d("adapter", "double press")
+                    Reply(viewHolder)
+                }
+            })
         }
 
-        viewHolder.itemView.tvSend.setOnClickListener(object : Send.DoubleClickListener() {
-            override fun onDoubleClick(v: View?) {
-                Log.d("adapter", "double press")
-                Reply(viewHolder)
-            }
-        })
+//        if(text.length > 240){
+//            if(isMinimised){
+//                viewHolder.itemView.tvSend.setOnClickListener {
+//                    Log.d("chatReply", "Now Not Minimised -> Send Class")
+//                    viewHolder.itemView.tvSend.text = text
+//                    isMinimised = false
+//                }
+//
+//            }
+//            else {
+//                viewHolder.itemView.tvSend.setOnClickListener(object : Send.DoubleClickListener() {
+//                    override fun onDoubleClick(v: View?) {
+//                        Log.d("adapter", "double press")
+//                        Reply(viewHolder)
+//                    }
+//                })
+//            }
+//        }
+//        else{
+            viewHolder.itemView.tvSend.setOnClickListener(object : Send.DoubleClickListener() {
+                override fun onDoubleClick(v: View?) {
+                    Log.d("adapter", "double press")
+                    Reply(viewHolder)
+                }
+            })
+        //}
+
     }
     abstract class DoubleClickListener : View.OnClickListener {
         private val DOUBLE_CLICK_TIME_DELTA: Long = 300
@@ -461,6 +520,31 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
                 private val DOUBLE_CLICK_TIME_DELTA: Long = 300
             }
         }
+    }
+
+    private fun showToast(message: String, viewHolder: GroupieViewHolder)
+    {
+
+        var context = viewHolder.itemView.context
+
+
+            Log.d("toast", "$message")
+            val toastView = LayoutInflater.from(context).inflate(
+                R.layout.toast_text_information,
+                null
+            )
+
+            // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+            val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+            textMessage.text = message
+            Log.d("toast", "${textMessage.text}")
+            with(Toast(context))
+            {
+                duration = Toast.LENGTH_SHORT
+                view = toastView
+                show()
+            }
+
     }
 
     private fun inflate(viewHolder: GroupieViewHolder)
@@ -493,7 +577,8 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
             val clipData = ClipData.newPlainText("address", text)
             clipboardManager.setPrimaryClip(clipData)
             Log.d("chat", "Lower adapter listner over")
-            Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
+            showToast("Copied", viewHolder)
+            //Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -650,7 +735,7 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
 
 }
 
-class Recieve(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String,val isReply: String, val replyText: String): Item<GroupieViewHolder>(){
+class Recieve(val text: String, val id: String, val From: String, val To: String, val liked: String,val username: String,val isReply: String, val replyText: String, var isMinimised: Boolean): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
         if(isReply=="true" && liked=="true")
         {
@@ -671,7 +756,36 @@ class Recieve(val text: String, val id: String, val From: String, val To: String
     }
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.tvRecieve.text = text
+//        if(text.length > 240){
+//            Log.d("chatReply", "Initially Minimised -> Recieve Class")
+//            var previewText = text.dropLast(text.length - 237)
+//            previewText = previewText + "..."
+//            viewHolder.itemView.tvRecieve.text = previewText
+//            isMinimised = true
+//        }
+//        else{
+//            Log.d("chatReply", "Initially Not Minimised -> Recieve Class")
+            viewHolder.itemView.tvRecieve.text = text
+        //}
+//        viewHolder.itemView.tvRecieve.setOnClickListener {
+//        if(text.length > 240){
+//            Log.d("chatReply", "Now in IF -> Recieve Class")
+//
+//                Log.d("chatReply", "Action Registered -> Recieve Class")
+//                if(isMinimised){
+//                    Log.d("chatReply", "Now Not Minimised -> Recieve Class")
+//                    viewHolder.itemView.tvRecieve.text = text
+//                    isMinimised = false
+//                }
+//                else{
+//                    Log.d("chatReply", "Now Minimised -> Recieve Class")
+//                    var previewText = text.dropLast(text.length - 237)
+//                    previewText = previewText + "..."
+//                    viewHolder.itemView.tvRecieve.text = previewText
+//                    isMinimised = true
+//                }
+//            }
+//        }
         Log.d("adapter", "adapter added")
         if(isReply == "true"){
             viewHolder.itemView.tvRecieveReply.text = replyText
@@ -683,10 +797,15 @@ class Recieve(val text: String, val id: String, val From: String, val To: String
         }
 
         if(isReply == "true"){
-            viewHolder.itemView.tvRecieveReply.setOnLongClickListener {
+            viewHolder.itemView.cardRecieve.setOnLongClickListener {
                 inflate(viewHolder)
                 return@setOnLongClickListener true
             }
+            viewHolder.itemView.cardRecieve.setOnClickListener(object : Recieve.DoubleClickListener() {
+                override fun onDoubleClick(v: View?) {
+                    Reply(viewHolder)
+                }
+            })
         }
 
         viewHolder.itemView.tvRecieve.setOnClickListener(object : Recieve.DoubleClickListener() {
@@ -712,6 +831,31 @@ class Recieve(val text: String, val id: String, val From: String, val To: String
                 private val DOUBLE_CLICK_TIME_DELTA: Long = 300
             }
         }
+    }
+
+    private fun showToast(message: String, viewHolder: GroupieViewHolder)
+    {
+
+        var context = viewHolder.itemView.context
+
+
+        Log.d("toast", "$message")
+        val toastView = LayoutInflater.from(context).inflate(
+            R.layout.toast_text_information,
+            null
+        )
+
+        // Link Youtube -> https://www.youtube.com/watch?v=__GRhyvf6oE
+        val textMessage = toastView.findViewById<TextView>(R.id.toastText)
+        textMessage.text = message
+        Log.d("toast", "${textMessage.text}")
+        with(Toast(context))
+        {
+            duration = Toast.LENGTH_SHORT
+            view = toastView
+            show()
+        }
+
     }
 
     private fun inflate(viewHolder: GroupieViewHolder) {
@@ -752,7 +896,8 @@ class Recieve(val text: String, val id: String, val From: String, val To: String
             val clipData = ClipData.newPlainText("address", text)
             clipboardManager.setPrimaryClip(clipData)
             Log.d("chat", "Lower adapter listner over")
-            Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
+            showToast("Copied", viewHolder)
+            //Toast.makeText(viewHolder.itemView.context, "Copied", Toast.LENGTH_SHORT).show()
         }
     }
 
