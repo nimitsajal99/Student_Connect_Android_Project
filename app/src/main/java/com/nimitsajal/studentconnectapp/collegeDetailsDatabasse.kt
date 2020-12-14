@@ -556,7 +556,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         intent.putExtra("username", userUserName)
                         startActivity(intent)
                         finish()
-                        finish()
                     }
                     .addOnFailureListener {
                         btnRegister.isEnabled = true

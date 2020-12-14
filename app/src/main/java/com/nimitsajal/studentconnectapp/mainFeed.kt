@@ -242,12 +242,7 @@ class mainFeed : AppCompatActivity() {
         private val SWIPE_THREASHOLD = 100
         private val SWIPE_VELOCITY_THREASHOLD = 100
 
-        override fun onFling(
-            yAxisEvent: MotionEvent?,
-            xAxisEvent: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
+        override fun onFling(yAxisEvent: MotionEvent?, xAxisEvent: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
             try{
                 var diffX = xAxisEvent?.x?.minus(yAxisEvent!!.x)?:0.0F
                 var diffY = yAxisEvent?.y?.minus(xAxisEvent!!.y)?:0.0F

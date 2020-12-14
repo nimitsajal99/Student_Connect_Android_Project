@@ -77,7 +77,7 @@ class chat : AppCompatActivity() {
 
         btnSendMessage_chat.setOnClickListener {
             val text = etTypeMEssage_chat.text.toString()
-            if(text != null || text != ""){
+            if(text != null && text != ""){
                 if (To != null) {
                     if (From != null) {
                         sendMessage(text, To, From)

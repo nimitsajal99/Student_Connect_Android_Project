@@ -138,7 +138,6 @@ class Sign_up : AppCompatActivity() {
         return false
     }
 
-
     private fun isPasswordValid(password: String): Boolean {
         if (Pattern.matches(
                 "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{4,}$",

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.view.Gravity
 import android.widget.TextView
 import android.widget.Toast
@@ -12,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toast_login_adapter.*
+import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,10 +47,22 @@ class MainActivity : AppCompatActivity() {
             if(userEmail.isBlank())
             {
                 showToast("Enter Email", 3)
+                btnLogin_login.isEnabled = true
                 return@setOnClickListener
             }
             if(userPassword.isBlank()) {
                 showToast("Enter Password", 3)
+                btnLogin_login.isEnabled = true
+                return@setOnClickListener
+            }
+            if(!isEmailValid(userEmail)){
+                showToast("Enter a Valid Email", 1)
+                btnLogin_login.isEnabled = true
+                return@setOnClickListener
+            }
+            if(!isPasswordValid(userPassword)){
+                showToast("Enter a Valid Password", 1)
+                btnLogin_login.isEnabled = true
                 return@setOnClickListener
             }
             Log.d("login", "Going to database")
@@ -73,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         else{
                             showToast("ERROR", 1)
+                            btnLogin_login.isEnabled = true
                             return@addOnSuccessListener
                         }
                     }
@@ -83,9 +98,25 @@ class MainActivity : AppCompatActivity() {
                 else
                 {
                     showToast("Email or Password Invalid", 1)
+                    btnLogin_login.isEnabled = true
                 }
             }
         }
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        if (Pattern.matches(
+                "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{4,}$",
+                password
+            ) && password.length >= 6
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun isEmailValid(email: CharSequence): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     private fun showToast(message: String, type: Int)
