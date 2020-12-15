@@ -135,6 +135,7 @@ class mainFeed : AppCompatActivity() {
             }
             else
             {
+                tvNoNewPost.isVisible = false
                openSearchBar(username!!, adapter, db, arraySearch)
             }
         }
@@ -431,12 +432,7 @@ class mainFeed : AppCompatActivity() {
                                 }
                                 if(contains)
                                 {
-                                    val temp = usersList(
-                                        document.id,
-                                        "",
-                                        document["Name"].toString(),
-                                        document["Picture"].toString()
-                                    )
+                                    val temp = usersList(document.id, "", document["Name"].toString(), document["Picture"].toString(), "")
                                     arraySearch.add(temp)
                                     adapter.add(
                                         UserSearch(

@@ -342,7 +342,7 @@ class currentChats : AppCompatActivity() {
                 if(document.id != "Info"){
                         Log.d("adapter", "Document id = ${document.id}")
                         //Toast.makeText(this, "Document id = ${document.id}", Toast.LENGTH_SHORT).show()
-                        adapter.add(CurrentChat_class(document.id, document["Text"].toString(), document["Name"].toString(), arrayUser))
+                        adapter.add(CurrentChat_class(document.id, document["Text"].toString(), document["Name"].toString(), arrayUser, document["From"].toString()))
                         Log.d("adapter", "Done")
                         //Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
                 }
@@ -365,13 +365,13 @@ class currentChats : AppCompatActivity() {
         val pattern = search.toRegex(RegexOption.IGNORE_CASE)
         if(search == "" || search == null){
             for(document in arrayUser){
-                adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url))
+                adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url, document.type))
             }
         }
         else{
             for(document in arrayUser){
                 if(pattern.containsMatchIn(document.name) || pattern.containsMatchIn(document.username)){
-                    adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url))
+                    adapter.add(CurrentChatSearch_class(document.username, document.text, document.name, document.url, document.type))
                 }
             }
         }
@@ -388,10 +388,10 @@ class currentChats : AppCompatActivity() {
     }
 }
 
-data class usersList(var username: String, var text: String, var name: String, var url: String){
+data class usersList(var username: String, var text: String, var name: String, var url: String, var type: String){
 }
 
-class CurrentChat_class(val username: String, val text: String, val Name: String, val arrayUser: MutableList<usersList>): Item<GroupieViewHolder>(){
+class CurrentChat_class(val username: String, val text: String, val Name: String, val arrayUser: MutableList<usersList>, var from: String): Item<GroupieViewHolder>(){
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.pbCurrentChat.isVisible = true
@@ -401,15 +401,29 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
             .get()
             .addOnSuccessListener {
                 url = it.getString("Picture").toString()
-                val temp = usersList(username, text, Name, url)
+                val temp = usersList(username, text, Name, url, from)
                 arrayUser.add(temp)
                 viewHolder.itemView.tv_usernames_latestMessage.text = username
                 viewHolder.itemView.tv_text_latestMessage.text = text
-                if(text == "This message was deleted")
+                if((text == "This message was deleted") || (text == "Say Hi" && from == "System"))
                 {
                     Log.d("currentchats", "in")
                     viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
                     viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
+                }
+
+                val words = text.split("\\s+".toRegex()).map { word ->
+                    word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+                }
+                var index = words.size - 1
+                if(index >= 6 && from == "System"){
+                    if((words[index] == "Friend" && words[index-1] == "a" && words[index-2] == "as" && words[0] == "Why" && words[1] == "don't" && words[2] == "you" && words[3] == "add") || (
+                                words[1] == "is" && words[2] == "not" && words[3] == "in" && words[4] == "your" && words[5] == "Friend" && words[6] == "List"
+                                )){
+                        Log.d("currentchats", "in")
+                        viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
+                        viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
+                    }
                 }
                 Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object :
                     Callback {
@@ -437,17 +451,34 @@ class CurrentChat_class(val username: String, val text: String, val Name: String
     }
 }
 
-class CurrentChatSearch_class(val username: String, val text: String, val Name: String, val url: String): Item<GroupieViewHolder>(){
+class CurrentChatSearch_class(val username: String, val text: String, val Name: String, val url: String, val type: String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.pbCurrentChat.isVisible = true
         viewHolder.itemView.tv_usernames_latestMessage.text = username
         viewHolder.itemView.tv_text_latestMessage.text = text
-        if(text == "This message was deleted")
+
+        if((text == "This message was deleted") || (text == "Say Hi" && type == "System"))
         {
             Log.d("currentchats", "in")
             viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
             viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
         }
+
+        val words = text.split("\\s+".toRegex()).map { word ->
+            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+        }
+        var index = words.size - 1
+        if(index >= 6 && type == "System"){
+            if((words[index] == "Friend" && words[index-1] == "a" && words[index-2] == "as" && words[0] == "Why" && words[1] == "don't" && words[2] == "you" && words[3] == "add") || (
+                        words[1] == "is" && words[2] == "not" && words[3] == "in" && words[4] == "your" && words[5] == "Friend" && words[6] == "List"
+                        )){
+                Log.d("currentchats", "in")
+                viewHolder.itemView.tv_text_latestMessage.setTypeface(null, Typeface.BOLD_ITALIC)
+                viewHolder.itemView.tv_text_latestMessage.setTextSize(14.0F)
+            }
+        }
+
+
         Picasso.get().load(url).into(viewHolder.itemView.cv_dp_currentMessage, object : Callback {
             override fun onSuccess() {
                 viewHolder.itemView.pbCurrentChat.isVisible = false

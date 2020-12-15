@@ -635,7 +635,7 @@ class UserItem(val username: String,val url: String, val Name: String, val array
     @SuppressLint("RestrictedApi")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.pbNewChat.isVisible = true
-        val temp = usersList(username, "", Name, url)
+        val temp = usersList(username, "", Name, url, "")
         arrayUser.add(temp)
         viewHolder.itemView.tv_usernames_newMessage.text = username
         Picasso.get().load(url).into(viewHolder.itemView.cv_dp_newMessage, object : Callback {

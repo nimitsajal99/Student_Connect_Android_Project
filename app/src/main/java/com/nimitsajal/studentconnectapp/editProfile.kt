@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -21,7 +22,9 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_edit_profile.*
 import kotlinx.android.synthetic.main.activity_edit_profile.tvUsername
 import kotlinx.android.synthetic.main.activity_new_chat.btnBack
+import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import kotlinx.android.synthetic.main.activity_sign_up.circularImageView
 import java.util.regex.Pattern
 
 class editProfile : AppCompatActivity() {
@@ -519,17 +522,21 @@ class editProfile : AppCompatActivity() {
 //                circularImageView.setImageBitmap(bitmap)
 
 
-        Picasso.get().load(userinfo.url).into(object :
-            com.squareup.picasso.Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                // loaded bitmap is here (bitmap)
-                circularImageViewEdit.setImageBitmap(bitmap)
-            }
+        Glide.with(this).load(userinfo.url)
+            .circleCrop()
+            .into(circularImageViewEdit)
 
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-        })
+//        Picasso.get().load(userinfo.url).into(object :
+//            com.squareup.picasso.Target {
+//            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+//                // loaded bitmap is here (bitmap)
+//                circularImageViewEdit.setImageBitmap(bitmap)
+//            }
+//
+//            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+//
+//            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+//        })
 
 
         etNameEdit.setText(userinfo.name).toString()

@@ -601,8 +601,8 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
         })
 
         var count = description.length
-        if(count > 19){
-            var remString = description.dropLast(count-17)
+        if(count > 17){
+            var remString = description.dropLast(count-15)
             remString = "$remString..."
             viewHolder.itemView.tvDescriptionProfile.text = remString
         }

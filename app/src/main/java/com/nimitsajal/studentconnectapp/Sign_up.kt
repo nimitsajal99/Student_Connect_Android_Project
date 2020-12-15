@@ -199,6 +199,7 @@ class Sign_up : AppCompatActivity() {
                         }
                         else
                         {
+                            btnContinueToClgDetails.isEnabled = true
                             val intent = Intent(this, collegeDetailsDatabase::class.java)
                             intent.putExtra("userName_signup", userName)
                             intent.putExtra("userEmail_signup", userEmail)
