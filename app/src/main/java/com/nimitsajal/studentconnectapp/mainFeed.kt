@@ -12,6 +12,7 @@ import android.transition.Transition
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -135,10 +136,18 @@ class mainFeed : AppCompatActivity() {
         btnSearch.setOnClickListener {
             if(etSearchMainFeed.isVisible==true){
                 closeSearchBar()
+                if(adapter.itemCount==0)
+                {
+                    tvNoNewPost.visibility = View.VISIBLE
+                }
             }
             else
             {
                 tvNoNewPost.isVisible = false
+                if(adapter.itemCount==0)
+                {
+                    tvNoNewPost.visibility = View.GONE
+                }
                openSearchBar(username!!, adapter, db, arraySearch)
             }
         }
@@ -280,7 +289,7 @@ class mainFeed : AppCompatActivity() {
                         if(diffY>0)
                         {
                             //Up Swipe
-                            return this@mainFeed.onSwipeUp()
+                            return this@mainFeed.onSwipeUp(adapter)
                         }
                         else
                         {
@@ -304,8 +313,12 @@ class mainFeed : AppCompatActivity() {
         }
     }
 
-    private fun onSwipeUp():Boolean {
+    private fun onSwipeUp(adapter: GroupAdapter<GroupieViewHolder>):Boolean {
         //Toast.makeText(this, "Swipe Up", Toast.LENGTH_SHORT).show()
+        if(adapter.itemCount==0)
+        {
+            tvNoNewPost.visibility = View.VISIBLE
+        }
         closeSearchBar()
         return true
     }
@@ -317,6 +330,10 @@ class mainFeed : AppCompatActivity() {
         arraySearch: MutableList<usersList>
     ): Boolean {
         openSearchBar(username, adapter, db, arraySearch)
+        if(adapter.itemCount==0)
+        {
+            tvNoNewPost.visibility = View.GONE
+        }
         //Toast.makeText(this, "Swipe Down", Toast.LENGTH_SHORT).show()
         return true
     }
@@ -357,6 +374,7 @@ class mainFeed : AppCompatActivity() {
         arraySearch: MutableList<usersList>
     )
     {
+
         etSearchMainFeed.isEnabled = true
         etSearchMainFeed.isVisible=true
         adapter.clear()
@@ -366,6 +384,7 @@ class mainFeed : AppCompatActivity() {
             loadSearch(username!!, db, adapter, arraySearch)
         }
         logoMainFeed.isVisible = false
+
     }
 
     fun closeSearchBar()
