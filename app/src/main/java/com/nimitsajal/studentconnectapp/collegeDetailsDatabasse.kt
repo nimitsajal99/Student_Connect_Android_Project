@@ -574,11 +574,11 @@ class collegeDetailsDatabase : AppCompatActivity() {
         selectedPhotoUrl: String
     )
     {
-        var university: HashMap<String, Any> = hashMapOf<String, Any>()
-        university.put("University", university_name)
-        university.put("College", college_name)
-        university.put("Branch", branch_name)
-        university.put("Semester", semester_name)
+//        var university: HashMap<String, Any> = hashMapOf<String, Any>()
+//        university.put("University", university_name)
+//        university.put("College", college_name)
+//        university.put("Branch", branch_name)
+//        university.put("Semester", semester_name)
 
         var user: HashMap<String, Any> = hashMapOf<String, Any>()
         user.put("Name", userName)
@@ -586,7 +586,11 @@ class collegeDetailsDatabase : AppCompatActivity() {
         user.put("Phone Number", userPhone)
         user.put("Picture", selectedPhotoUrl)
         user.put("Description", "")
-        user.put("College", university)
+        user.put("University", university_name)
+        user.put("College", college_name)
+        user.put("Branch", branch_name)
+        user.put("Semester", semester_name)
+//        user.put("College", university)
 
         var inner: HashMap<String, Any> = hashMapOf<String, Any>()
         inner.put("Info", "Info")
@@ -596,6 +600,22 @@ class collegeDetailsDatabase : AppCompatActivity() {
 //        val inner = Inner_class("info")
 
         val db = FirebaseFirestore.getInstance()
+        db.collection("University").document("Next").collection(university_name).document(college_name)
+            .get()
+            .addOnSuccessListener {
+                if(it!=null)
+                {
+                    val course = it["Course"].toString()
+                    db.collection("Tags").document(course).collection("Student").document(userUserName)
+                        .set(inner)
+                        .addOnCompleteListener {
+                            if (it.isSuccessful)
+                            {
+                                Log.d("database","User added in Tags")
+                            }
+                        }
+                }
+            }
 
         db.collection("Users").document(userUserName)
             .set(user)
@@ -698,6 +718,22 @@ class collegeDetailsDatabase : AppCompatActivity() {
                             if (it11.isSuccessful)
                             {
                                 Log.d("database","Updated Semester")
+                            }
+                        }
+                    db.collection("University").document("Next").collection(university_name).document(college_name)
+                        .get()
+                        .addOnSuccessListener {it13->
+                            if(it13!=null)
+                            {
+                                val course = it13["Course"].toString()
+                                db.collection("Users").document(userUserName).collection("Tags").document(course)
+                                    .set(inner)
+                                    .addOnCompleteListener { it14->
+                                        if (it14.isSuccessful)
+                                        {
+                                            Log.d("database","Updated User with course")
+                                        }
+                                    }
                             }
                         }
                     db.collection("Users").document(userUserName)

@@ -1,6 +1,7 @@
 package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
+import android.companion.AssociationRequest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -70,6 +71,8 @@ class mainFeed : AppCompatActivity() {
                         )
                     )
                     loadFeed(arrayPost, adapter, username!!, db)
+                    //TODO: friendsuggestion called
+//                    friendSuggestion(db,username!!,adapter)
                 }
                 else{
                     showToast("ERROR", 1)
@@ -420,7 +423,7 @@ class mainFeed : AppCompatActivity() {
                                             document.id
                                         ) || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(
                                             document["Branch"].toString()
-                                        ))
+                                        ) || pattern.containsMatchIn(document["Semester"].toString()))
                                     {
 
                                     }
@@ -648,6 +651,547 @@ class mainFeed : AppCompatActivity() {
             }
     }
 
+    //TODO: Friend reccomendation fuction
+    /*
+    private fun friendSuggestion(db: FirebaseFirestore, username: String, adapter: GroupAdapter<GroupieViewHolder>)
+    {
+        //Log.d("friendsuggestion", "in")
+        var arr = ArrayList<recommendation>()
+        var alreadyAFriend = hashSetOf<String>()
+        var alreadyInArr = hashSetOf<String>()
+        db.collection("Users").document(username).collection("Friends")
+            .get()
+            .addOnSuccessListener {
+                if(it!=null)
+                {
+                    for(document in it) {
+                        if (document.id != "Info") {
+
+                            alreadyAFriend.add(document.id)
+
+                        }
+                    }
+                    db.collection("Users").document(username)
+                        .get()
+                        .addOnSuccessListener { it2->
+                            if(it2!=null)
+                            {
+                                db.collection("University").document("Next").collection(it2["University"].toString())
+                                    .document("Next").collection(it2["College"].toString()).document("Next")
+                                    .collection(it2["Branch"].toString()).document(it2["Semester"].toString()).collection("Student")
+                                    .get()
+                                    .addOnSuccessListener { it3->
+                                        if(it3!=null)
+                                        {
+                                            var length = it3.documents.size
+                                            if (length > 2)
+                                            {
+                                                var times = 0
+                                                var added = 0
+                                                var num = 0
+                                                while (true)
+                                                {
+                                                    //Log.d("friendsuggestion", "in while 1")
+                                                    num = (0 until length).random()
+//                                                    if(num>=length)
+//                                                    {
+//                                                        num = num % length
+//                                                    }
+                                                    Log.d("friendsuggestion", "$num")
+
+                                                    if (it3.documents[num].id != "Info" && !alreadyInArr.contains(it3.documents[num].id) && !alreadyAFriend.contains(it3.documents[num].id) && it3.documents[num].id != username)
+                                                    {
+                                                        //.d("friendsuggestion", "True")
+                                                        arr.add(recommendation(it3.documents[num].id, it2["Semester"].toString()))
+                                                        alreadyInArr.add(it3.documents[num].id)
+                                                        added += 1
+                                                        if (added > 8)
+                                                            break
+                                                    }
+                                                    if (it3.documents[num].id != "Info")
+                                                    {
+                                                        times += 1
+                                                    }
+                                                    if (times >= length || times >= 30)
+                                                    {
+                                                        break
+                                                    }
+                                                }
+                                                //Log.d("friendsuggestion", "out while 1")
+                                            }
+//                                            for(doccument in it3.documents)
+//                                            {
+//                                                if(doccument.id!="Info" && !alreadyAFriend.contains(doccument.id) && doccument.id != username)
+//                                                {
+//                                                    //Log.d("friendsuggestion", "adding")
+//                                                    arr.add(recommendation(doccument.id, it2["University"].toString()))
+//                                                }
+//                                            }
+                                            db.collection("University").document("Next").collection(it2["University"].toString()).document("Next").collection(it2["College"].toString()).document(it2["Branch"].toString()).collection("Student")
+                                                .get()
+                                                .addOnSuccessListener { it3 ->
+                                                    if (it3 != null) {
+                                                        var length = it3.documents.size
+                                                        //Log.d("friendsuggestion", "$length")
+                                                        if (length > 2)
+                                                        {
+                                                            var times = 0
+                                                            var added = 0
+                                                            while (true)
+                                                            {
+                                                                //Log.d("friendsuggestion", "in while 2")
+                                                                var num = (0 until length).random()
+                                                                times += 1
+                                                                if (it3.documents[num].id != "Info" && !alreadyInArr.contains(it3.documents[num].id) && !alreadyAFriend.contains(it3.documents[num].id) && it3.documents[num].id != username)
+                                                                {
+                                                                    // Log.d("friendsuggestion", "True")
+                                                                    arr.add(recommendation(it3.documents[num].id, it2["Branch"].toString()))
+                                                                    alreadyInArr.add(it3.documents[num].id)
+                                                                    added += 1
+                                                                    if (added > 4)
+                                                                        break
+                                                                }
+                                                                if (times >= length || times >= 30)
+                                                                {
+                                                                    break
+                                                                }
+                                                            }
+                                                            //Log.d("friendsuggestion", "out while 2")
+                                                        }
+//                                                        for(doccument in it3)
+//                                                        {
+//                                                            if(doccument.id!="Info" && !alreadyAFriend.contains(doccument.id) && doccument.id != username)
+//                                                            {
+//                                                                arr.add(recommendation(doccument.id, it2["College"].toString()))
+//                                                            }
+//                                                        }
+
+                                                        db.collection("University").document("Next").collection(it2["University"].toString()).document(it2["College"].toString()).collection("Student")
+                                                            .get()
+                                                            .addOnSuccessListener { it3 ->
+                                                                if (it3 != null)
+                                                                {
+                                                                    var length = it3.documents.size
+                                                                    //Log.d("friendsuggestion", "$length")
+                                                                    if (length > 2)
+                                                                    {
+                                                                        var times = 0
+                                                                        var added = 0
+                                                                        while (true)
+                                                                        {
+                                                                            //Log.d("friendsuggestion", "in while 3")
+                                                                            var num = (0 until length).random()
+                                                                            times += 1
+                                                                            if (it3.documents[num].id != "Info" && !alreadyInArr.contains(it3.documents[num].id) && !alreadyAFriend.contains(it3.documents[num].id) && it3.documents[num].id != username)
+                                                                            {
+                                                                                //Log.d("friendsuggestion", "True")
+                                                                                arr.add(recommendation(it3.documents[num].id, it2["College"].toString()))
+                                                                                alreadyInArr.add(it3.documents[num].id)
+                                                                                added += 1
+                                                                                if (added > 2)
+                                                                                    break
+                                                                            }
+                                                                            if (times >= length || times >= 20)
+                                                                            {
+                                                                                //Log.d("friendsuggestion", "break out -> times -> $times")
+                                                                                break
+
+                                                                            }
+                                                                        }
+                                                                        //Log.d("friendsuggestion", "out while 3")
+                                                                    }
+//                                                                    for(doccument in it3)
+//                                                                    {
+//                                                                        if(doccument.id!="Info" && !alreadyAFriend.contains(doccument.id)&&doccument.id != username)
+//                                                                        {
+//                                                                            arr.add(recommendation(doccument.id, it2["Branch"].toString()))
+//                                                                        }
+//                                                                    }
+
+                                                                    db.collection("Users").document(username).collection("Friends")
+                                                                        .get()
+                                                                        .addOnSuccessListener { it3 ->
+                                                                            if (it3 != null)
+                                                                            {
+                                                                                var length = it3.size()
+                                                                                var temp = 4
+                                                                                if (it3.size() < 4)
+                                                                                {
+                                                                                    temp = it3.size()-1
+                                                                                }
+                                                                                while(temp>0)
+                                                                                {
+                                                                                    var num = (0 until length).random()
+                                                                                    var namefriend = it3.documents[num].id
+                                                                                    if (namefriend != "Info")
+                                                                                    {
+                                                                                        db.collection("Users").document(namefriend).collection("Friends")
+                                                                                            .get()
+                                                                                            .addOnSuccessListener { it5 ->
+                                                                                                var length = it5.documents.size
+                                                                                                if (length > 2)
+                                                                                                {
+                                                                                                    var i = 0
+                                                                                                    var smaller = true
+                                                                                                    while (i < 4)
+                                                                                                    {
+                                                                                                        i += 1
+                                                                                                        var num = (0 until length).random()
+                                                                                                        if (it5.documents[num].id != "Info" && !alreadyInArr.contains(it5.documents[num].id) && !alreadyAFriend.contains(it5.documents[num].id) && it5.documents[num].id != username)
+                                                                                                        {
+                                                                                                            arr.add(recommendation(it5.documents[num].id, "You have $namefriend as a mutual friend"))
+                                                                                                            alreadyInArr.add(it5.documents[num].id)
+                                                                                                            if (smaller) {
+                                                                                                                smaller = false
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                break
+                                                                                                            }
+
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                    }
+                                                                                    temp-=1
+                                                                                }
+
+                                                                    db.collection("Users").document(username).collection("Tags")
+                                                                        .get()
+                                                                        .addOnSuccessListener { it3 ->
+                                                                            if (it3 != null)
+                                                                            {
+                                                                                Log.d("friendsuggestion", "for tags")
+                                                                                for (doc in it3.documents)
+                                                                                {
+                                                                                    if (doc.id != "Info")
+                                                                                    {
+                                                                                        //Log.d("friendsuggestion", "for tag -> ${doc.id}")
+                                                                                        var small = false
+                                                                                        if(arr.size<6)
+                                                                                        {
+                                                                                            small = true
+                                                                                        }
+                                                                                        db.collection("Tags").document(doc.id).collection("Student")
+                                                                                            .get()
+                                                                                            .addOnSuccessListener { it5 ->
+                                                                                                var length = it5.documents.size
+                                                                                                Log.d("friendsuggestion", " tags length -> $length")
+                                                                                                if (length > 2)
+                                                                                                {
+                                                                                                    var i = 0
+                                                                                                    while (i < 6)
+                                                                                                    {
+                                                                                                        i += 1
+                                                                                                        var num = (0 until length).random()
+                                                                                                        if (it5.documents[num].id != "Info" && !alreadyInArr.contains(it5.documents[num].id) && !alreadyAFriend.contains(it5.documents[num].id) && it5.documents[num].id != username) {
+                                                                                                            Log.d("friendsuggestion", "adding tag -> ${it5.documents[num].id}")
+                                                                                                            arr.add(recommendation(it5.documents[num].id, doc.id))
+                                                                                                            alreadyInArr.add(it5.documents[num].id)
+                                                                                                            if (small)
+                                                                                                            {
+                                                                                                                //Log.d("friendsuggestion", "will add more")
+                                                                                                                small = false
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                break
+                                                                                                            }
+
+                                                                                                        }
+                                                                                                    }
+
+
+                                                                                                }
+                                                                                            }
+                                                                                    }
+                                                                                }
+
+
+
+                                                                                db.collection("University").document(it2["University"].toString()).collection("Student")
+                                                                                    .get()
+                                                                                    .addOnSuccessListener { it3 ->
+                                                                                        if (it3 != null) {
+                                                                                            var length =
+                                                                                                it3.documents.size
+                                                                                            //Log.d("friendsuggestion", "$length")
+                                                                                            if (length > 2) {
+                                                                                                var times4 =
+                                                                                                    0
+                                                                                                var added =
+                                                                                                    0
+                                                                                                while (true) {
+                                                                                                    // Log.d("friendsuggestion", "in while 4")
+                                                                                                    var num =
+                                                                                                        (0 until length).random()
+                                                                                                    times4 += 1
+                                                                                                    if (it3.documents[num].id != "Info" && !alreadyInArr.contains(
+                                                                                                            it3.documents[num].id
+                                                                                                        ) && !alreadyAFriend.contains(
+                                                                                                            it3.documents[num].id
+                                                                                                        ) && it3.documents[num].id != username
+                                                                                                    ) {
+                                                                                                        // Log.d("friendsuggestion", "True")
+                                                                                                        arr.add(
+                                                                                                            recommendation(
+                                                                                                                it3.documents[num].id,
+                                                                                                                it2["University"].toString()
+                                                                                                            )
+                                                                                                        )
+                                                                                                        alreadyInArr.add(
+                                                                                                            it3.documents[num].id
+                                                                                                        )
+                                                                                                        added += 1
+                                                                                                        if (arr.size < 10) {
+                                                                                                            if (added > 3) {
+                                                                                                                break
+                                                                                                            }
+                                                                                                        } else {
+                                                                                                            if (added > 1)
+                                                                                                                break
+                                                                                                        }
+
+                                                                                                    }
+                                                                                                    if (times4 >= length || times4 >= 40) {
+                                                                                                        break
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+//                                                                                for(doccument in it3)
+//                                                                                {
+//                                                                                    if(doccument.id!="Info" && !alreadyAFriend.contains(doccument.id) && doccument.id != username)
+//                                                                                    {
+//                                                                                        arr.add(recommendation(doccument.id, it2["Semester"].toString()))
+//                                                                                    }
+//                                                                                }
+                                                                                            if (arr.size < 5) {
+                                                                                                Log.d(
+                                                                                                    "friendsuggestion",
+                                                                                                    "size less than 10"
+                                                                                                )
+                                                                                                db.collection(
+                                                                                                    "Users"
+                                                                                                )
+                                                                                                    .get()
+                                                                                                    .addOnSuccessListener { it3 ->
+                                                                                                        if (it3 != null) {
+                                                                                                            var length =
+                                                                                                                it3.documents.size
+                                                                                                            //Log.d("friendsuggestion", "length -> $length")
+                                                                                                            var i =
+                                                                                                                0
+                                                                                                            while (arr.size <= 5 && i < 50) {
+                                                                                                                // Log.d("friendsuggestion", "in while")
+                                                                                                                var num =
+                                                                                                                    (0 until length).random()
+                                                                                                                if (it3.documents[num].id != "Info" && !alreadyInArr.contains(
+                                                                                                                        it3.documents[num].id
+                                                                                                                    ) && !alreadyAFriend.contains(
+                                                                                                                        it3.documents[num].id
+                                                                                                                    ) && it3.documents[num].id != username
+                                                                                                                ) {
+                                                                                                                    // Log.d("friendsuggestion", "True")
+                                                                                                                    arr.add(
+                                                                                                                        recommendation(
+                                                                                                                            it3.documents[num].id,
+                                                                                                                            ""
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                    alreadyInArr.add(
+                                                                                                                        it3.documents[num].id
+                                                                                                                    )
+                                                                                                                }
+                                                                                                                i += 1
+                                                                                                            }
+                                                                                                            // Log.d("friendsuggestion", "out while 5 -> $i")
+                                                                                                            loadFriendSuggestion(
+                                                                                                                arr,
+                                                                                                                db,
+                                                                                                                adapter
+                                                                                                            )
+                                                                                                        }
+                                                                                                    }
+                                                                                            } else {
+                                                                                                loadFriendSuggestion(
+                                                                                                    arr,
+                                                                                                    db,
+                                                                                                    adapter
+                                                                                                )
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                        }
+                                                                                    }
+                                                                            }
+                                                                        }
+                                                                }
+                                                            }
+                                                    }
+                                                }
+                                        }
+                                    }
+
+                            }
+                        }
+
+                }
+            }
+    }
+
+     */
+
+    //TODO: Friend recommendaton engine
+
+    /*
+    private fun loadFriendSuggestion(arr: ArrayList<recommendation>,db: FirebaseFirestore,adapter: GroupAdapter<GroupieViewHolder>)
+    {
+
+       // val addapter = GroupAdapter<GroupieViewHolder>()
+        Log.d("friendsuggestion", "going in for ${arr.size}")
+        var i = 0
+        while(i<arr.size)
+        {
+            Log.d("friendsuggestion", "${arr[i].name} -> ${arr[i].association}")
+            i+=1
+        }
+        if(arr.size==3)
+        {
+            db.collection("Users").document(arr[0].name)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding ${arr[0].name}")
+                        adapter.add(recommendation_Adapter_class(arr[0].name, arr[0].association,it["Picture"].toString(),it["Name"].toString()))
+                    }
+                }
+
+
+            db.collection("Users").document(arr[1].name)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding ${arr[1].name}")
+                        adapter.add(recommendation_Adapter_class(arr[1].name, arr[1].association,it["Picture"].toString(),it["Name"].toString()))
+                    }
+                }
+
+
+            db.collection("Users").document(arr[1].name)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding ${arr[1].name}")
+                        adapter.add(recommendation_Adapter_class(arr[1].name, arr[1].association,it["Picture"].toString(),it["Name"].toString()))
+                    }
+                }
+
+            rvFeed.adapter = adapter
+        }
+        else if(arr.size>3)
+        {
+            var num = (0 until arr.size).random()
+            if(num > arr.size/2)
+            {
+                var again = (0 until 100).random()
+                if(again < 35)
+                {
+                    num = (0 until arr.size/2).random()
+                }
+            }
+            var name1 = arr[num].name
+            var association1 = arr[num].association
+            arr.removeAt(num)
+
+            db.collection("Users").document(name1)
+                .get()
+                .addOnSuccessListener {
+                   if(it!=null)
+                   {
+                       Log.d("friendsuggestion", "adding $name1")
+                       adapter.add(recommendation_Adapter_class(name1, association1,it["Picture"].toString(),it["Name"].toString()))
+                   }
+                }
+
+            num = (0 until arr.size).random()
+            if(num > arr.size/2)
+            {
+                var again = (0 until 100).random()
+                if(again < 35)
+                {
+                    num = (0 until arr.size/2).random()
+                }
+            }
+            var name2 = arr[num].name
+            var association2 = arr[num].association
+            arr.removeAt(num)
+            db.collection("Users").document(name2)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding $name2")
+                        adapter.add(recommendation_Adapter_class(name2, association2,it["Picture"].toString(),it["Name"].toString()))
+
+                    }
+                }
+
+            num = (0 until arr.size).random()
+            if(num > arr.size/2)
+            {
+                var again = (0 until 100).random()
+                if(again < 35)
+                {
+                    num = (0 until arr.size/2).random()
+                }
+            }
+            var name3 = arr[num].name
+            var association3= arr[num].association
+            arr.removeAt(num)
+            db.collection("Users").document(name3)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding $name3")
+                        adapter.add(recommendation_Adapter_class(name3, association3,it["Picture"].toString(),it["Name"].toString()))
+
+                    }
+                }
+
+            num = (0 until arr.size).random()
+            if(num > arr.size/2)
+            {
+                var again = (0 until 100).random()
+                if(again < 35)
+                {
+                    num = (0 until arr.size/2).random()
+                }
+            }
+            var name4 = arr[num].name
+            var association4= arr[num].association
+            arr.removeAt(num)
+            db.collection("Users").document(name4)
+                .get()
+                .addOnSuccessListener {
+                    if(it!=null)
+                    {
+                        Log.d("friendsuggestion", "adding $name4")
+                        adapter.add(recommendation_Adapter_class(name4, association4,it["Picture"].toString(),it["Name"].toString()))
+
+                    }
+                }
+            rvFeed.adapter = adapter
+        }
+    }----------
+     */
+
+
 //    private fun loadFeed(arrayPost: MutableList<postList>, adapter: GroupAdapter<GroupieViewHolder>, username: String, db: FirebaseFirestore)
 //    {
 //
@@ -692,6 +1236,13 @@ class mainFeed : AppCompatActivity() {
 //    }
 }
 
+
+//TODO: Recommendation data class created
+data class recommendation(var name: String, var association: String)
+{
+
+}
+
 data class postList(
     var username: String,
     var imageUrl: String,
@@ -703,6 +1254,45 @@ data class postList(
 {
 
 }
+
+//TODO: new recommendation adapter class
+//class recommendation_class(var adapter: GroupAdapter<GroupieViewHolder>): Item<GroupieViewHolder>()
+//{
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+////        val mLayoutManager = GridLayoutManager(viewHolder.itemView.context, 2, GridLayoutManager.HORIZONTAL, false)
+////        viewHolder.itemView.rvRecommend.layoutManager = mLayoutManager
+//        Log.d("friendsuggestion", "adapter added")
+//        viewHolder.itemView.rvRecommend.adapter = adapter
+//    }
+//    override fun getLayout(): Int {
+//        return R.layout.friend_recommendation
+//    }
+//}
+
+//TODO: new recommendation class
+//class recommendation_Adapter_class(var username: String, var common: String, var url: String, var name: String): Item<GroupieViewHolder>()
+//{
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+//        Log.d("friendsuggestion", "$username added")
+//        viewHolder.itemView.tvSimilarity.text = common
+//        viewHolder.itemView.tvName.text = username
+//        Picasso.get().load(url)
+//            .into(viewHolder.itemView.postImageProfile, object : Callback {
+//                override fun onSuccess() {
+//
+//                }
+//
+//                override fun onError(e: java.lang.Exception?) {
+//                    Log.d("loading", "ERROR - $e")
+//                }
+//            })
+//
+//    }
+//
+//    override fun getLayout(): Int {
+//        return R.layout.friend_recommendation_addapter
+//    }
+//}
 
 class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>, var adapterComment: GroupAdapter<GroupieViewHolder>, var isComBox: Boolean): Item<GroupieViewHolder>()
 {

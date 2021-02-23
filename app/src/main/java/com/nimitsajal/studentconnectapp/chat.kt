@@ -622,7 +622,6 @@ class Send(val text: String, val id: String, val From: String, val To: String, v
 
     private  fun sendMessage(text: String, To: String, From: String, replyTo: String){
         val db = FirebaseFirestore.getInstance()
-        //TODO: changes
         val time = FieldValue.serverTimestamp()
         var string = replyTo
 
