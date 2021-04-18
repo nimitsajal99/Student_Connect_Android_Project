@@ -3,6 +3,9 @@ package com.nimitsajal.studentconnectapp
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -11,14 +14,23 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.FirebaseFunctionsException
+import com.google.firebase.functions.HttpsCallableResult
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_college_details_databasse.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_sign_up.toLoginPage
 import kotlinx.android.synthetic.main.toast_login_adapter.*
 import java.util.*
+import kotlin.concurrent.schedule
 
 
 class collegeDetailsDatabase : AppCompatActivity() {
@@ -28,6 +40,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
     var semester_name: String = "Semester"
 
     private lateinit var storageReference: StorageReference
+    private lateinit var functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +48,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
 
         val auth = FirebaseAuth.getInstance()
         val db = FirebaseFirestore.getInstance()
+        functions = Firebase.functions
 
         storageReference = FirebaseStorage.getInstance().reference
 
@@ -427,13 +441,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
             }
     }
 
-//    fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {
-//        val bytes = ByteArrayOutputStream()
-//        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-//        val path = Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null)
-//        Uri.parse(path)
-//    }
-
     private fun performRegister(auth: FirebaseAuth) {
 
         Log.d(
@@ -480,90 +487,364 @@ class collegeDetailsDatabase : AppCompatActivity() {
 
         if (userEmail != null) {
             if (userPassword != null && userName != null && userUserName != null && userPhone != null) {
-                auth.createUserWithEmailAndPassword(userEmail, userPassword)
-                    .addOnSuccessListener {
-                        btnRegister.isEnabled = true
+
+                val filename = userUserName.toString()
+                val ref = FirebaseStorage.getInstance().getReference("images/dp/$filename")
+                ref.putFile(selectedPhotoUrl)
+                    .addOnSuccessListener { img ->
                         Log.d(
                             "Registration",
-                            "Registration successful for uid: ${it.user.toString()}"
+                            "Image successfully uploaded at location: ${img.metadata?.path}"
                         )
-                        var user = auth.currentUser
-                        if (user != null) {
-                            showToast("Registration Successful $userUserName", 2)
-                            Log.d("database", "String => $selectedPhotoUrl_string")
-                            Log.d("database", "URI => $selectedPhotoUrl")
-                            val filename = userUserName.toString()
-                            val ref = FirebaseStorage.getInstance().getReference("images/dp/$filename")
-                            ref.putFile(selectedPhotoUrl)
-                                .addOnSuccessListener { img ->
-                                    Log.d(
-                                        "Registration",
-                                        "Image successfully uploaded at location: ${img.metadata?.path}"
-                                    )
-                                    ref.downloadUrl
-                                        .addOnSuccessListener { img_link ->
-                                            Log.d("Registration", "image url: $img_link")
-                                            url = img_link.toString()
-                                            savedata(
-                                                userName,
-                                                userEmail,
-                                                userUserName,
-                                                userPhone,
-                                                url
-                                            )
-                                        }
-                                }
-                                .addOnFailureListener {
-                                    Log.d("Registration", "Image upload failed: ${it.message}")
-                                    url = "https://firebasestorage.googleapis.com/v0/b/student-connect-b96e6.appspot.com/o/user_dp%2Fuser_default_dp.png?alt=media&token=4a2736ef-c5cb-4845-9d0f-894e7bf3c6a2"
-                                    Log.d("database", "out String => $selectedPhotoUrl_string")
-                                    Log.d("database", "out URI => $selectedPhotoUrl")
-                                    savedata(userName, userEmail, userUserName, userPhone, url)
-                                }
-                        }
+                        ref.downloadUrl
+                            .addOnSuccessListener { img_link ->
+                                Log.d("Registration", "image url: $img_link")
+                                url = img_link.toString()
+                                createUserCaller(
+                                    userPhone,
+                                    userEmail,
+                                    userPassword,
+                                    userUserName,
+                                    userName,
+                                    selectedPhotoUrl,
+                                    university_name,
+                                    college_name,
+                                    branch_name,
+                                    semester_name,
+                                    url
+                                )
 
-                        val db = FirebaseFirestore.getInstance()
-                        var Emailing: HashMap<String, Any> = hashMapOf<String, Any>()
-                        if (user != null) {
-                            Emailing.put("Username", userUserName)
-                            db.collection("User Table").document(user.uid)
-                                .set(Emailing)
-                                .addOnCompleteListener{
-                                    if(it.isSuccessful)
-                                    {
-                                        Log.d(
-                                            "Registration",
-                                            "Added The Link"
-                                        )
+                                var i = 0
+                                var j = 0
+                                var k = 0
+                                while(j<90000){
+                                    while(i<90000){
+                                        while(k<10000){
+                                            k+=1
+                                        }
+                                        i+=1
                                     }
-                                    else
-                                    {
-                                        Log.d(
-                                            "Registration",
-                                            "Link not added"
-                                        )
-                                    }
+                                    j+=1
+                                    Log.d("delay", j.toString())
                                 }
-                        }
-//                        Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
-                        val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_constraint_layout)
-                        Toast(this).apply {
-                            duration = Toast.LENGTH_SHORT
-                            setGravity(Gravity.CENTER, 0, 0)
-                            view = layout
-                        }.show()
-                        val intent = Intent(this, mainFeed::class.java)
-                        intent.putExtra("username", userUserName)
-                        startActivity(intent)
-                        finish()
+//                                auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
+//                                    if(it.isSuccessful) {
+//                                        val layout = layoutInflater.inflate(
+//                                            R.layout.toast_login_adapter,
+//                                            toast_constraint_layout
+//                                        )
+//                                        Toast(this@collegeDetailsDatabase).apply {
+//                                            duration = Toast.LENGTH_SHORT
+//                                            setGravity(Gravity.CENTER, 0, 0)
+//                                            view = layout
+//                                        }.show()
+//                                        val intent = Intent(this@collegeDetailsDatabase, mainFeed::class.java)
+//                                        intent.putExtra("username", userUserName)
+//                                        startActivity(intent)
+//                                        finish()
+//                                    }
+//                                    else
+//                                    {
+                                        showToast("Account created, Try Logging in", 1)
+                                        val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+                                        startActivity(intent)
+                                        finish()
+                                        finish()
+//                                    }
+//                                }
+                            }
                     }
                     .addOnFailureListener {
-                        btnRegister.isEnabled = true
-                        Log.d("Registration", "Registration failed! : ${it.message}")
-                        showToast("Registration Failed: ${it.message}", 1)
+                        Log.d("Registration", "Image upload failed: ${it.message}")
+                        url = "https://firebasestorage.googleapis.com/v0/b/student-connect-b96e6.appspot.com/o/user_dp%2Fuser_default_dp.png?alt=media&token=4a2736ef-c5cb-4845-9d0f-894e7bf3c6a2"
+                        Log.d("database", "out String => $selectedPhotoUrl_string")
+                        Log.d("database", "out URI => $selectedPhotoUrl")
+                        createUserCaller(
+                            userPhone,
+                            userEmail,
+                            userPassword,
+                            userUserName,
+                            userName,
+                            selectedPhotoUrl,
+                            university_name,
+                            college_name,
+                            branch_name,
+                            semester_name,
+                            url
+                        )
+
+//                        val handler = Handler(Looper.getMainLooper())
+//                        handler.postDelayed({
+//                        }, 15000)
+
+                        var i = 0
+                        var j = 0
+                        var k = 0
+                        while(j<90000){
+                            while(i<90000){
+                                while(k<10000){
+                                    k+=1
+                                }
+                                i+=1
+                            }
+                            j+=1
+                            Log.d("delay", j.toString())
+                        }
+//                        auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
+//                            if(it.isSuccessful) {
+//                                val layout = layoutInflater.inflate(
+//                                    R.layout.toast_login_adapter,
+//                                    toast_constraint_layout
+//                                )
+//                                Toast(this@collegeDetailsDatabase).apply {
+//                                    duration = Toast.LENGTH_SHORT
+//                                    setGravity(Gravity.CENTER, 0, 0)
+//                                    view = layout
+//                                }.show()
+//                                val intent = Intent(this@collegeDetailsDatabase, mainFeed::class.java)
+//                                intent.putExtra("username", userUserName)
+//                                startActivity(intent)
+//                                finish()
+//                            }
+//                            else
+//                            {
+                                showToast("Account created, Try Logging in", 1)
+                                val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                                finish()
+//                            }
+//                        }
                     }
             }
         }
+    }
+
+//    private fun performRegister(auth: FirebaseAuth) {
+//
+//        Log.d(
+//            "database",
+//            "${university_name.toString()} -> ${college_name.toString()} -> ${branch_name.toString()} -> ${semester_name.toString()}"
+//        )
+//        if(university_name == "University")
+//        {
+//            btnRegister.isEnabled = true
+//            showToast("Enter The University", 3)
+//            return
+//        }
+//        if(college_name == "College")
+//        {
+//            btnRegister.isEnabled = true
+//            showToast("Enter The College", 3)
+//            return
+//        }
+//        if(branch_name == "Branch")
+//        {
+//            btnRegister.isEnabled = true
+//            showToast("Enter The Branch", 3)
+//            return
+//        }
+//        if(semester_name == "Semester")
+//        {
+//            btnRegister.isEnabled = true
+//            showToast("Enter The Semester", 3)
+//            return
+//        }
+//
+//        //Toast.makeText(this, "Entered Perform Register", Toast.LENGTH_SHORT).show()
+//
+//        val userName = intent.getStringExtra("userName_signup")
+//        val userEmail = intent.getStringExtra("userEmail_signup")
+//        val userPassword = intent.getStringExtra("userPassword_signup")
+//        val userUserName = intent.getStringExtra("userUserName_signup")
+//        val userPhone = intent.getStringExtra("userPhone_signup")
+//        val selectedPhotoUrl_string: String? = intent.getStringExtra("dpImage_string")
+//
+//        val selectedPhotoUrl = Uri.parse(selectedPhotoUrl_string)
+//
+//        var url = ""
+//
+//        if (userEmail != null) {
+//            if (userPassword != null && userName != null && userUserName != null && userPhone != null) {
+//
+//                createUserCaller(userPhone, userEmail, userPassword)
+//
+//                auth.createUserWithEmailAndPassword(userEmail, userPassword)
+//                    .addOnSuccessListener {
+//                        btnRegister.isEnabled = true
+//                        Log.d(
+//                            "Registration",
+//                            "Registration successful for uid: ${it.user.toString()}"
+//                        )
+//                        var user = auth.currentUser
+//                        if (user != null) {
+//                            showToast("Registration Successful $userUserName", 2)
+//                            Log.d("database", "String => $selectedPhotoUrl_string")
+//                            Log.d("database", "URI => $selectedPhotoUrl")
+//                            val filename = userUserName.toString()
+//                            val ref = FirebaseStorage.getInstance().getReference("images/dp/$filename")
+//                            ref.putFile(selectedPhotoUrl)
+//                                .addOnSuccessListener { img ->
+//                                    Log.d(
+//                                        "Registration",
+//                                        "Image successfully uploaded at location: ${img.metadata?.path}"
+//                                    )
+//                                    ref.downloadUrl
+//                                        .addOnSuccessListener { img_link ->
+//                                            Log.d("Registration", "image url: $img_link")
+//                                            url = img_link.toString()
+//                                            savedata(
+//                                                userName,
+//                                                userEmail,
+//                                                userUserName,
+//                                                userPhone,
+//                                                url
+//                                            )
+//                                        }
+//                                }
+//                                .addOnFailureListener {
+//                                    Log.d("Registration", "Image upload failed: ${it.message}")
+//                                    url = "https://firebasestorage.googleapis.com/v0/b/student-connect-b96e6.appspot.com/o/user_dp%2Fuser_default_dp.png?alt=media&token=4a2736ef-c5cb-4845-9d0f-894e7bf3c6a2"
+//                                    Log.d("database", "out String => $selectedPhotoUrl_string")
+//                                    Log.d("database", "out URI => $selectedPhotoUrl")
+//                                    savedata(userName, userEmail, userUserName, userPhone, url)
+//                                }
+//                        }
+//
+//                        val db = FirebaseFirestore.getInstance()
+//                        var Emailing: HashMap<String, Any> = hashMapOf<String, Any>()
+//                        if (user != null) {
+//                            Emailing.put("Username", userUserName)
+//                            db.collection("User Table").document(user.uid)
+//                                .set(Emailing)
+//                                .addOnCompleteListener{
+//                                    if(it.isSuccessful)
+//                                    {
+//                                        Log.d(
+//                                            "Registration",
+//                                            "Added The Link"
+//                                        )
+//                                    }
+//                                    else
+//                                    {
+//                                        Log.d(
+//                                            "Registration",
+//                                            "Link not added"
+//                                        )
+//                                    }
+//                                }
+//                        }
+////                        Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+//                        val layout = layoutInflater.inflate(R.layout.toast_login_adapter, toast_constraint_layout)
+//                        Toast(this).apply {
+//                            duration = Toast.LENGTH_SHORT
+//                            setGravity(Gravity.CENTER, 0, 0)
+//                            view = layout
+//                        }.show()
+//                        val intent = Intent(this, mainFeed::class.java)
+//                        intent.putExtra("username", userUserName)
+//                        startActivity(intent)
+//                        finish()
+//                    }
+//                    .addOnFailureListener {
+//                        btnRegister.isEnabled = true
+//                        Log.d("Registration", "Registration failed! : ${it.message}")
+//                        showToast("Registration Failed: ${it.message}", 1)
+//                    }
+//            }
+//        }
+//    }
+
+    private fun createUserCloud(
+        phoneNumber: String,
+        email: String,
+        password: String,
+        userUserName: String,
+        userName: String,
+        selectedPhotoUrl: Uri,
+        university_name: String,
+        college_name: String,
+        branch_name: String,
+        semester_name: String,
+        url: String
+    ): Task<HttpsCallableResult> {
+
+
+        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+        data.put("email", email)
+        data.put("password", password)
+        data.put("phoneNumber", phoneNumber)
+        data.put("userName", userUserName)
+        data.put("name", userName)
+        data.put("universityName", university_name)
+        data.put("collegeName", college_name)
+        data.put("branchName", branch_name)
+        data.put("semesterName", semester_name)
+        data.put("url", url)
+
+//        Toast.makeText(this, data["phoneNumber"].toString(), Toast.LENGTH_SHORT).show()
+
+        return functions
+            .getHttpsCallable("createUser")
+            .call(data)
+            .addOnCompleteListener { task ->
+                val result = task.result?.data as String
+                result
+            }
+//            .continueWith { task ->
+//                // This continuation runs on either success or failure, but if the task
+//                // has failed then result will throw an Exception which will be
+//                // propagated down.
+//                val result = task.result?.data as String
+//                result
+//            }
+    }
+
+    private fun createUserCaller(
+        phoneNumber: String,
+        email: String,
+        password: String,
+        userUserName: String,
+        userName: String,
+        selectedPhotoUrl: Uri,
+        university_name: String,
+        college_name: String,
+        branch_name: String,
+        semester_name: String,
+        url: String
+    ){
+        Toast.makeText(this, phoneNumber, Toast.LENGTH_SHORT).show()
+        createUserCloud(
+            phoneNumber,
+            email,
+            password,
+            userUserName,
+            userName,
+            selectedPhotoUrl,
+            university_name,
+            college_name,
+            branch_name,
+            semester_name,
+            url
+        )
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    val e = task.exception
+                    if (e is FirebaseFunctionsException) {
+                        val code = e.code
+                        val details = e.details
+                        Log.d("cloud", "code = ${e.code}, details = $details")
+                    }
+                    // [START_EXCLUDE]
+                    Log.d("cloud", "addMessage:onFailure", e)
+//                    showSnackbar("An error occurred.")
+                    return@OnCompleteListener
+                    // [END_EXCLUDE]
+                } else {
+                    return@OnCompleteListener
+                }
+            }
+            )
     }
 
     private fun savedata(
@@ -600,18 +881,22 @@ class collegeDetailsDatabase : AppCompatActivity() {
 //        val inner = Inner_class("info")
 
         val db = FirebaseFirestore.getInstance()
-        db.collection("University").document("Next").collection(university_name).document(college_name)
+        db.collection("University").document("Next").collection(university_name).document(
+            college_name
+        )
             .get()
             .addOnSuccessListener {
                 if(it!=null)
                 {
                     val course = it["Course"].toString()
-                    db.collection("Tags").document(course).collection("Student").document(userUserName)
+                    db.collection("Tags").document(course).collection("Student").document(
+                        userUserName
+                    )
                         .set(inner)
                         .addOnCompleteListener {
                             if (it.isSuccessful)
                             {
-                                Log.d("database","User added in Tags")
+                                Log.d("database", "User added in Tags")
                             }
                         }
                 }
@@ -627,16 +912,18 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener { it2 ->
                             if (it2.isSuccessful)
                             {
-                                Log.d("database","Friends created")
+                                Log.d("database", "Friends created")
                             }
                         }
 
-                    db.collection("Users").document(userUserName).collection("Medals").document(college_name)
+                    db.collection("Users").document(userUserName).collection("Medals").document(
+                        college_name
+                    )
                         .set(inner)
                         .addOnCompleteListener { it3 ->
                             if (it3.isSuccessful)
                             {
-                                Log.d("database","Medals created with college name")
+                                Log.d("database", "Medals created with college name")
                             }
                         }
 
@@ -645,16 +932,18 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener { it3 ->
                             if (it3.isSuccessful)
                             {
-                                Log.d("database","Medals created with college name")
+                                Log.d("database", "Medals created with college name")
                             }
                         }
 
-                    db.collection("Users").document(userUserName).collection("Medals").document(branch_name)
+                    db.collection("Users").document(userUserName).collection("Medals").document(
+                        branch_name
+                    )
                         .set(inner)
                         .addOnCompleteListener { it4 ->
                             if (it4.isSuccessful)
                             {
-                                Log.d("database","Medals created with branch name")
+                                Log.d("database", "Medals created with branch name")
                             }
                         }
 
@@ -663,7 +952,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener { it5 ->
                             if (it5.isSuccessful)
                             {
-                                Log.d("database","My feed created")
+                                Log.d("database", "My feed created")
                             }
                         }
 
@@ -672,7 +961,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener { it6 ->
                             if (it6.isSuccessful)
                             {
-                                Log.d("database","My Post created")
+                                Log.d("database", "My Post created")
                             }
                         }
 
@@ -681,57 +970,73 @@ class collegeDetailsDatabase : AppCompatActivity() {
                         .addOnCompleteListener{ it7->
                             if(it7.isSuccessful)
                             {
-                                Log.d("database","Tags created")
+                                Log.d("database", "Tags created")
                             }
                         }
-                    db.collection("University").document(university_name).collection("Student").document(userUserName)
+                    db.collection("University").document(university_name).collection("Student").document(
+                        userUserName
+                    )
                         .set(inner)
                         .addOnCompleteListener { it8->
                             if (it8.isSuccessful)
                             {
-                                Log.d("database","Updated University")
+                                Log.d("database", "Updated University")
                             }
                         }
-                    db.collection("University").document("Next").collection(university_name).document(college_name)
+                    db.collection("University").document("Next").collection(university_name).document(
+                        college_name
+                    )
                         .collection("Student").document(userUserName)
                         .set(inner)
                         .addOnCompleteListener { it9->
                             if (it9.isSuccessful)
                             {
-                                Log.d("database","Updated College")
+                                Log.d("database", "Updated College")
                             }
                         }
-                    db.collection("University").document("Next").collection(university_name).document("Next")
-                        .collection(college_name).document(branch_name).collection("Student").document(userUserName)
+                    db.collection("University").document("Next").collection(university_name).document(
+                        "Next"
+                    )
+                        .collection(college_name).document(branch_name).collection("Student").document(
+                            userUserName
+                        )
                         .set(inner)
                         .addOnCompleteListener { it10->
                             if (it10.isSuccessful)
                             {
-                                Log.d("database","Updated Branch")
+                                Log.d("database", "Updated Branch")
                             }
                         }
-                    db.collection("University").document("Next").collection(university_name).document("Next")
-                        .collection(college_name).document("Next").collection(branch_name).document(semester_name)
+                    db.collection("University").document("Next").collection(university_name).document(
+                        "Next"
+                    )
+                        .collection(college_name).document("Next").collection(branch_name).document(
+                            semester_name
+                        )
                         .collection("Student").document(userUserName)
                         .set(inner)
                         .addOnCompleteListener { it11->
                             if (it11.isSuccessful)
                             {
-                                Log.d("database","Updated Semester")
+                                Log.d("database", "Updated Semester")
                             }
                         }
-                    db.collection("University").document("Next").collection(university_name).document(college_name)
+                    db.collection("University").document("Next").collection(university_name).document(
+                        college_name
+                    )
                         .get()
-                        .addOnSuccessListener {it13->
+                        .addOnSuccessListener { it13->
                             if(it13!=null)
                             {
                                 val course = it13["Course"].toString()
-                                db.collection("Users").document(userUserName).collection("Tags").document(course)
+                                db.collection("Users").document(userUserName).collection("Tags").document(
+                                    course
+                                )
                                     .set(inner)
                                     .addOnCompleteListener { it14->
                                         if (it14.isSuccessful)
                                         {
-                                            Log.d("database","Updated User with course")
+                                            Log.d("database", "Updated User with course")
                                         }
                                     }
                             }
@@ -739,10 +1044,10 @@ class collegeDetailsDatabase : AppCompatActivity() {
                     db.collection("Users").document(userUserName)
                         .collection("Chats").document("Info")
                         .set(inner)
-                        .addOnCompleteListener {it12->
+                        .addOnCompleteListener { it12->
                             if(it12.isSuccessful)
                             {
-                                Log.d("database","Chats created")
+                                Log.d("database", "Chats created")
                             }
                         }
                 }
