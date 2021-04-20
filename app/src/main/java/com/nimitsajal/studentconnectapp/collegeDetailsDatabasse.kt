@@ -511,22 +511,23 @@ class collegeDetailsDatabase : AppCompatActivity() {
                                     college_name,
                                     branch_name,
                                     semester_name,
-                                    url
+                                    url,
+                                    auth
                                 )
 
-                                var i = 0
-                                var j = 0
-                                var k = 0
-                                while(j<90000){
-                                    while(i<90000){
-                                        while(k<10000){
-                                            k+=1
-                                        }
-                                        i+=1
-                                    }
-                                    j+=1
-                                    Log.d("delay", j.toString())
-                                }
+//                                var i = 0
+//                                var j = 0
+//                                var k = 0
+//                                while(j<90000){
+//                                    while(i<90000){
+//                                        while(k<10000){
+//                                            k+=1
+//                                        }
+//                                        i+=1
+//                                    }
+//                                    j+=1
+//                                    Log.d("delay", j.toString())
+//                                }
 //                                auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
 //                                    if(it.isSuccessful) {
 //                                        val layout = layoutInflater.inflate(
@@ -545,11 +546,11 @@ class collegeDetailsDatabase : AppCompatActivity() {
 //                                    }
 //                                    else
 //                                    {
-                                        showToast("Account created, Try Logging in", 1)
-                                        val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
-                                        startActivity(intent)
-                                        finish()
-                                        finish()
+//                                        showToast("Account created, Try Logging in", 1)
+//                                        val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+//                                        startActivity(intent)
+//                                        finish()
+//                                        finish()
 //                                    }
 //                                }
                             }
@@ -570,26 +571,27 @@ class collegeDetailsDatabase : AppCompatActivity() {
                             college_name,
                             branch_name,
                             semester_name,
-                            url
+                            url,
+                            auth
                         )
 
 //                        val handler = Handler(Looper.getMainLooper())
 //                        handler.postDelayed({
 //                        }, 15000)
 
-                        var i = 0
-                        var j = 0
-                        var k = 0
-                        while(j<90000){
-                            while(i<90000){
-                                while(k<10000){
-                                    k+=1
-                                }
-                                i+=1
-                            }
-                            j+=1
-                            Log.d("delay", j.toString())
-                        }
+//                        var i = 0
+//                        var j = 0
+//                        var k = 0
+//                        while(j<90000){
+//                            while(i<90000){
+//                                while(k<10000){
+//                                    k+=1
+//                                }
+//                                i+=1
+//                            }
+//                            j+=1
+//                            Log.d("delay", j.toString())
+//                        }
 //                        auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
 //                            if(it.isSuccessful) {
 //                                val layout = layoutInflater.inflate(
@@ -608,11 +610,11 @@ class collegeDetailsDatabase : AppCompatActivity() {
 //                            }
 //                            else
 //                            {
-                                showToast("Account created, Try Logging in", 1)
-                                val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                                finish()
+//                                showToast("Account created, Try Logging in", 1)
+//                                val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+//                                startActivity(intent)
+//                                finish()
+//                                finish()
 //                            }
 //                        }
                     }
@@ -788,7 +790,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
             .getHttpsCallable("createUser")
             .call(data)
             .addOnCompleteListener { task ->
-                val result = task.result?.data as String
+                val result = task.result?.data
                 result
             }
 //            .continueWith { task ->
@@ -811,9 +813,9 @@ class collegeDetailsDatabase : AppCompatActivity() {
         college_name: String,
         branch_name: String,
         semester_name: String,
-        url: String
+        url: String,
+        auth: FirebaseAuth
     ){
-        Toast.makeText(this, phoneNumber, Toast.LENGTH_SHORT).show()
         createUserCloud(
             phoneNumber,
             email,
@@ -838,9 +840,39 @@ class collegeDetailsDatabase : AppCompatActivity() {
                     // [START_EXCLUDE]
                     Log.d("cloud", "addMessage:onFailure", e)
 //                    showSnackbar("An error occurred.")
+                    showToast("Account created, Try Logging in", 1)
+                    val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    finish()
                     return@OnCompleteListener
                     // [END_EXCLUDE]
                 } else {
+                    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+                        if(it.isSuccessful) {
+                            val layout = layoutInflater.inflate(
+                                R.layout.toast_login_adapter,
+                                toast_constraint_layout
+                            )
+                            Toast(this@collegeDetailsDatabase).apply {
+                                duration = Toast.LENGTH_SHORT
+                                setGravity(Gravity.CENTER, 0, 0)
+                                view = layout
+                            }.show()
+                            val intent = Intent(this@collegeDetailsDatabase, mainFeed::class.java)
+                            intent.putExtra("username", userUserName)
+                            startActivity(intent)
+                            finish()
+                        }
+                        else
+                        {
+                            showToast("Account created, Try Logging in", 1)
+                            val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                            finish()
+                        }
+                    }
                     return@OnCompleteListener
                 }
             }

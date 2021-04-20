@@ -63,9 +63,10 @@ exports.createUser = functions.https.onCall((data, context) => {
             .set({
               "Info": "Info",
             });
-        users.doc(data.userName).collection("Medals").doc(data.branchName).set({
-          "Info": "Info",
-        });
+        users.doc(data.userName).collection("Medals").doc(data.branchName)
+            .set({
+              "Info": "Info",
+            });
         const year = "Year - " + data.semesterName;
         users.doc(data.userName).collection("Medals").doc(year)
             .set({
@@ -106,6 +107,7 @@ exports.createUser = functions.https.onCall((data, context) => {
                 "Info": "Info",
               });
         });
+
         const d2 = new Date();
         const n2 = d2.getTime();
         const n = n2-n1;
@@ -115,5 +117,55 @@ exports.createUser = functions.https.onCall((data, context) => {
       })
       .catch((error) => {
         console.log("Error creating new user:", error);
+      });
+});
+
+exports.uploadPost = functions.https.onCall((data, context) => {
+  const post = admin.firestore().collection("Post");
+  const time = admin.firestore.FieldValue.serverTimestamp();
+  post.add({
+    "Description": data.description,
+    "Dp": data.dp,
+    "From": data.userName,
+    "Likes": 0,
+    "Picture": data.picture,
+    "Time": time,
+  })
+      .then(function(docRef) {
+        console.log("Picture uploaded: ", docRef.id);
+        post.doc(docRef.id).collection("Comments").doc("Info")
+            .set({
+              "Info": "Info",
+            });
+        post.doc(docRef.id).collection("Tags").doc("Info")
+            .set({
+              "Info": "Info",
+            });
+        const users = admin.firestore().collection("Users");
+        users.doc(data.userName).collection("My Posts").doc(docRef.id)
+            .set({
+              "Liked": false,
+              "Time": time,
+            });
+        users.doc(data.userName).collection("Friends")
+            .get()
+            .then((snapshot) => {
+              snapshot.forEach((doc) => {
+                if (doc.id != "Info") {
+                  console.log("Uploading picture in ", doc.id, " Feed");
+                  users.doc(doc.id).collection("My Feed").doc(docRef.id)
+                      .set({
+                        "Liked": false,
+                        "Time": time,
+                      });
+                }
+              });
+            })
+            .catch((err) => {
+              console.log("Error getting documents", err);
+            });
+      })
+      .catch(function(error) {
+        console.error("Error while uploading picture: ", error);
       });
 });
