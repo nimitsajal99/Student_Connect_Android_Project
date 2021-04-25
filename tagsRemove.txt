@@ -1,0 +1,59 @@
+Tableware
+Smile
+Skin
+Hairstyle
+Facial expression
+Happy
+Gesture
+Leisure
+Cosmetic dentistry
+Beauty
+Comfort
+Thumb
+Outerwear
+Vertebrate
+White-collar worker
+Fur
+Hair
+Head
+Chin
+Neck
+Jaw
+Sleeve
+Eyelash
+Rectangle
+Font
+Red hair
+Forehead
+Nose
+Eyebrow
+Muscle
+Collar
+Symmetry
+Brand
+Human
+Finger
+Youth
+People
+T-shirt
+Wrist
+Trousers
+Waist
+Plaid
+Lip
+Beard
+Facial hair
+Moustache
+Snapshot
+Chest
+Flesh
+Magenta
+
+
+@+id/bottomBar
+@+id/squareImageView
+@+id/btnDP
+
+@+id/ImageViewTag
+@+id/recyclerTag
+@+id/searchTag

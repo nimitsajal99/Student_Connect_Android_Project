@@ -130,6 +130,9 @@ exports.uploadPost = functions.https.onCall((data, context) => {
     "Likes": 0,
     "Picture": data.picture,
     "Time": time,
+    "Faces": data.noOfFaces,
+    "Tags": data.noOfTags,
+    "Emotion": data.smile,
   })
       .then(function(docRef) {
         console.log("Picture uploaded: ", docRef.id);
@@ -138,6 +141,10 @@ exports.uploadPost = functions.https.onCall((data, context) => {
               "Info": "Info",
             });
         post.doc(docRef.id).collection("Tags").doc("Info")
+            .set({
+              "Info": "Info",
+            });
+        post.doc(docRef.id).collection("Faces").doc("Info")
             .set({
               "Info": "Info",
             });
@@ -164,6 +171,136 @@ exports.uploadPost = functions.https.onCall((data, context) => {
             .catch((err) => {
               console.log("Error getting documents", err);
             });
+        if (data.tagNo1 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo1)
+              .set({
+                "Confidence": data.confidence1,
+              });
+        }
+        if (data.tagNo2 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo2)
+              .set({
+                "Confidence": data.confidence2,
+              });
+        }
+        if (data.tagNo3 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo3)
+              .set({
+                "Confidence": data.confidence3,
+              });
+        }
+        if (data.tagNo4 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo4)
+              .set({
+                "Confidence": data.confidence4,
+              });
+        }
+        if (data.tagNo0 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo0)
+              .set({
+                "Confidence": data.confidence0,
+              });
+        }
+        if (data.faceId0 != "xxxxx") {
+          const smile = (data.smile0 == "true" || data.smile0 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId0)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY0,
+                "RotZ": data.rotZ0,
+                "Bound": data.bound0,
+              });
+        }
+        if (data.faceId1 != "xxxxx") {
+          const smile = (data.smile1 == "true" || data.smile1 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId1)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY1,
+                "RotZ": data.rotZ1,
+                "Bound": data.bound1,
+              });
+        }
+        if (data.faceId2 != "xxxxx") {
+          const smile = (data.smile2 == "true" || data.smile2 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId2)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY2,
+                "RotZ": data.rotZ2,
+                "Bound": data.bound2,
+              });
+        }
+        if (data.faceId3 != "xxxxx") {
+          const smile = (data.smile3 == "true" || data.smile3 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId3)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY3,
+                "RotZ": data.rotZ3,
+                "Bound": data.bound3,
+              });
+        }
+        if (data.faceId4 != "xxxxx") {
+          const smile = (data.smile4 == "true" || data.smile4 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId4)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY4,
+                "RotZ": data.rotZ4,
+                "Bound": data.bound4,
+              });
+        }
+        if (data.faceId5 != "xxxxx") {
+          const smile = (data.smile5 == "true" || data.smile5 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId5)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY5,
+                "RotZ": data.rotZ5,
+                "Bound": data.bound5,
+              });
+        }
+        if (data.faceId6 != "xxxxx") {
+          const smile = (data.smile6 == "true" || data.smile6 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId6)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY6,
+                "RotZ": data.rotZ6,
+                "Bound": data.bound6,
+              });
+        }
+        if (data.faceId7 != "xxxxx") {
+          const smile = (data.smile7 == "true" || data.smile7 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId7)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY7,
+                "RotZ": data.rotZ7,
+                "Bound": data.bound7,
+              });
+        }
+        if (data.faceId8 != "xxxxx") {
+          const smile = (data.smile8 == "true" || data.smile8 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId8)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY8,
+                "RotZ": data.rotZ8,
+                "Bound": data.bound8,
+              });
+        }
+        if (data.faceId9 != "xxxxx") {
+          const smile = (data.smile9 == "true" || data.smile9 == "True");
+          post.doc(docRef.id).collection("Faces").doc(data.faceId9)
+              .set({
+                "Smile": smile,
+                "RotY": data.rotY9,
+                "RotZ": data.rotZ9,
+                "Bound": data.bound9,
+              });
+        }
       })
       .catch(function(error) {
         console.error("Error while uploading picture: ", error);

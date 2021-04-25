@@ -87,6 +87,14 @@ android {
         // When using the BoM, you don't specify versions in Firebase library dependencies
         implementation 'com.google.firebase:firebase-functions-ktx'
 
+        implementation 'com.google.firebase:firebase-functions:19.2.0'
+        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'com.google.mlkit:image-labeling:17.0.3'
+        implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.3'
+
+        implementation 'com.google.mlkit:face-detection:16.0.6'
+        implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.5'
+
     }
 }
 

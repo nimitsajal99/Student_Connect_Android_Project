@@ -514,45 +514,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
                                     url,
                                     auth
                                 )
-
-//                                var i = 0
-//                                var j = 0
-//                                var k = 0
-//                                while(j<90000){
-//                                    while(i<90000){
-//                                        while(k<10000){
-//                                            k+=1
-//                                        }
-//                                        i+=1
-//                                    }
-//                                    j+=1
-//                                    Log.d("delay", j.toString())
-//                                }
-//                                auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
-//                                    if(it.isSuccessful) {
-//                                        val layout = layoutInflater.inflate(
-//                                            R.layout.toast_login_adapter,
-//                                            toast_constraint_layout
-//                                        )
-//                                        Toast(this@collegeDetailsDatabase).apply {
-//                                            duration = Toast.LENGTH_SHORT
-//                                            setGravity(Gravity.CENTER, 0, 0)
-//                                            view = layout
-//                                        }.show()
-//                                        val intent = Intent(this@collegeDetailsDatabase, mainFeed::class.java)
-//                                        intent.putExtra("username", userUserName)
-//                                        startActivity(intent)
-//                                        finish()
-//                                    }
-//                                    else
-//                                    {
-//                                        showToast("Account created, Try Logging in", 1)
-//                                        val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
-//                                        startActivity(intent)
-//                                        finish()
-//                                        finish()
-//                                    }
-//                                }
                             }
                     }
                     .addOnFailureListener {
@@ -574,49 +535,6 @@ class collegeDetailsDatabase : AppCompatActivity() {
                             url,
                             auth
                         )
-
-//                        val handler = Handler(Looper.getMainLooper())
-//                        handler.postDelayed({
-//                        }, 15000)
-
-//                        var i = 0
-//                        var j = 0
-//                        var k = 0
-//                        while(j<90000){
-//                            while(i<90000){
-//                                while(k<10000){
-//                                    k+=1
-//                                }
-//                                i+=1
-//                            }
-//                            j+=1
-//                            Log.d("delay", j.toString())
-//                        }
-//                        auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener {
-//                            if(it.isSuccessful) {
-//                                val layout = layoutInflater.inflate(
-//                                    R.layout.toast_login_adapter,
-//                                    toast_constraint_layout
-//                                )
-//                                Toast(this@collegeDetailsDatabase).apply {
-//                                    duration = Toast.LENGTH_SHORT
-//                                    setGravity(Gravity.CENTER, 0, 0)
-//                                    view = layout
-//                                }.show()
-//                                val intent = Intent(this@collegeDetailsDatabase, mainFeed::class.java)
-//                                intent.putExtra("username", userUserName)
-//                                startActivity(intent)
-//                                finish()
-//                            }
-//                            else
-//                            {
-//                                showToast("Account created, Try Logging in", 1)
-//                                val intent = Intent(this@collegeDetailsDatabase, MainActivity::class.java)
-//                                startActivity(intent)
-//                                finish()
-//                                finish()
-//                            }
-//                        }
                     }
             }
         }

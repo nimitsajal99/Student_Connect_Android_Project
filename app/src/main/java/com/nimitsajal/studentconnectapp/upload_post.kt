@@ -2,41 +2,51 @@ package com.nimitsajal.studentconnectapp
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.*
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
-import android.view.Gravity
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
-import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.*
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.squareup.picasso.Picasso
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.activity_chat.btnBack
 import kotlinx.android.synthetic.main.activity_chat.circularImageView
+import kotlinx.android.synthetic.main.activity_main_feed.*
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.tvUsername
 import kotlinx.android.synthetic.main.activity_sign_up.*
-import kotlinx.android.synthetic.main.activity_sign_up.btnDP
 import kotlinx.android.synthetic.main.activity_upload_post.*
+import kotlinx.android.synthetic.main.activity_upload_post.btnUpload
 import kotlinx.android.synthetic.main.toast_login_adapter.*
-import java.lang.System.currentTimeMillis
+import java.io.ByteArrayOutputStream
 import java.util.*
+
 
 class upload_post : AppCompatActivity() {
 
+    var POS = 0
     var selectedUri: Uri? = null
     var userDpUrl: String = ""
     private lateinit var functions: FirebaseFunctions
@@ -44,6 +54,13 @@ class upload_post : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload_post)
+
+        val adapter = GroupAdapter<GroupieViewHolder>()
+
+        var faceDetect = mutableListOf<faceDetection>()
+        var uploadC = mutableListOf<uploadCaller>()
+
+        var count = 0
 
         var username = intent.getStringExtra("username")
         functions = Firebase.functions
@@ -76,8 +93,24 @@ class upload_post : AppCompatActivity() {
             finish()
         }
 
-        btnDP.setOnClickListener {
+        btnDP_upload.setOnClickListener {
             photoPicker()
+        }
+
+        btnSearch_upload.setOnClickListener {
+            loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!)
+        }
+
+        editTextTag.addTextChangedListener {
+            loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!)
+        }
+
+        btnTagNone.setOnClickListener {
+            POS += 1
+            if(POS == (faceDetect.size-1)){
+                //TODO: UploadPost
+                tagging(uploadC, selectedUri!!, faceDetect)
+            }
         }
 
         btnUpload.setOnClickListener {
@@ -85,7 +118,7 @@ class upload_post : AppCompatActivity() {
             if(username != null){
                 if(selectedUri != null){
                     if(userDpUrl != null){
-                        uploadPost(username!!, description, selectedUri!!, userDpUrl, db)
+                        uploadPost(username!!, description, selectedUri!!, userDpUrl, db, faceDetect, uploadC)
                     }
                 }
             }
@@ -151,37 +184,311 @@ class upload_post : AppCompatActivity() {
 
     }
 
-    private fun uploadPost(username: String, description: String, imageUri: Uri, userDpUrl: String, db: FirebaseFirestore){
-        pbUpload.isVisible = true
-        val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("images/uploads/$username/$filename")
-        ref.putFile(imageUri)
-            .addOnSuccessListener { img ->
-                Log.d(
-                    "Registration",
-                    "Image successfully uploaded at location: ${img.metadata?.path}"
-                )
-                ref.downloadUrl
-                    .addOnSuccessListener { img_link ->
-//                        val calendar = Calendar.getInstance()
-//                        val time = calendar.timeInMillis
-                        uploadPostCaller(description, userDpUrl, username, img_link.toString())
-                    }
-            }
-            .addOnFailureListener {
-                Log.d("Registration", "Image upload failed: ${it.message}")
+    private fun scaleBitmapDown(bitmap: Bitmap, maxDimension: Int): Bitmap {
+        val originalWidth = bitmap.width
+        val originalHeight = bitmap.height
+        var resizedWidth = maxDimension
+        var resizedHeight = maxDimension
+        if (originalHeight > originalWidth) {
+            resizedHeight = maxDimension
+            resizedWidth =
+                (resizedHeight * originalWidth.toFloat() / originalHeight.toFloat()).toInt()
+        } else if (originalWidth > originalHeight) {
+            resizedWidth = maxDimension
+            resizedHeight =
+                (resizedWidth * originalHeight.toFloat() / originalWidth.toFloat()).toInt()
+        } else if (originalHeight == originalWidth) {
+            resizedHeight = maxDimension
+            resizedWidth = maxDimension
+        }
+        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false)
+    }
+
+    private fun annotateImage(requestJson: String): Task<JsonElement> {
+        Log.d(
+            "cloud",
+            "In annotateImage"
+        )
+        return functions
+            .getHttpsCallable("annotateImage")
+            .call(requestJson)
+//            .addOnCompleteListener {
+//                val result = it.result?.data
+//                JsonParser.parseString(Gson().toJson(result))
+//            }
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data
+                JsonParser.parseString(Gson().toJson(result))
             }
     }
 
-    private fun uploadPostCloud(description: String, userDp: String, userName: String, picture: String): Task<Any> {
+    private fun imageLabeler(bitmap: Bitmap){
+        Log.d("cloud", "Inside Image Labeler")
+
+//        val image = FirebaseVisionImage.fromBitmap(bitmap)
+//        val labeler = FirebaseVision.getInstance().getCloudImageLabeler()
+
+// Or, to set the minimum confidence required:
+// val options = FirebaseVisionCloudImageLabelerOptions.Builder()
+//     .setConfidenceThreshold(0.7f)
+//     .build()
+// val labeler = FirebaseVision.getInstance().getCloudImageLabeler(options)
+
+//        labeler.processImage(image)
+//            .addOnSuccessListener { labels ->
+//                // Task completed successfully
+//                for (label in labels) {
+//                    val text = label.text
+//                    val entityId = label.entityId
+//                    val confidence = label.confidence
+//                    Log.d("cloud", "Text = $text, Confidence = $confidence, EntityId = $entityId")
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                // Task failed with an exception
+//                Log.d("cloud", "Labelling Failed")
+//            }
+
+//        val image = InputImage.fromBitmap(bitmap, 0)
+//        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+//        labeler.process(image)
+//            .addOnSuccessListener { labels ->
+//                // Task completed successfully
+//                for (label in labels) {
+//                    val text = label.text
+//                    val confidence = label.confidence
+//                    val index = label.index
+//                    Log.d("cloud", "Text = $text, Confidence = $confidence, Index = $index")
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                // Task failed with an exception
+//                Log.d("cloud", "Labelling Failed")
+//            }
+    }
+
+    private fun uploadPost(
+        username: String,
+        description: String,
+        imageUri: Uri,
+        userDpUrl: String,
+        db: FirebaseFirestore,
+        faceDetect: MutableList<faceDetection>,
+        uploadC: MutableList<uploadCaller>
+    ){
+        pbUpload.isVisible = true
+        var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+
+        //imageLabeler(bitmap)
+
+        // Scale down bitmap size
+        bitmap = scaleBitmapDown(bitmap, 640)
+        // Convert bitmap to base64 encoded string
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val imageBytes: ByteArray = byteArrayOutputStream.toByteArray()
+        val base64encoded = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
+        // Create json request to cloud vision
+        val request = JsonObject()
+        // Add image to request
+        val image = JsonObject()
+        image.add("content", JsonPrimitive(base64encoded))
+        request.add("image", image)
+        //Add features to the request
+        val feature = JsonObject()
+        feature.add("maxResults", JsonPrimitive(25))
+        feature.add("setConfidenceThreshold", JsonPrimitive(90))
+        feature.add("type", JsonPrimitive("LABEL_DETECTION"))
+        val features = JsonArray()
+        features.add(feature)
+        request.add("features", features)
+
+        val highAccuracyOpts = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+            .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+            .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+            .build()
+        var faceBitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+        val faceImage = InputImage.fromBitmap(faceBitmap, 0)
+        val detector = FaceDetection.getClient(highAccuracyOpts)
+//        var faceDetect = mutableListOf<faceDetection>()
+        val result = detector.process(faceImage)
+            .addOnSuccessListener { faces ->
+                // Task completed successfully
+                var count = 1
+                for (face in faces) {
+                    val id = count
+                    val bounds = face.boundingBox
+                    val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
+                    val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+                    var smileProb: Float = 0.0f
+                    // If classification was enabled:
+                    if (face.smilingProbability != null) {
+                        smileProb = face.smilingProbability
+                    }
+                    else{
+                        smileProb = -1.0f
+                    }
+//                    if (face.rightEyeOpenProbability != null) {
+//                        val rightEyeOpenProb = face.rightEyeOpenProbability
+//                    }
+                    if(count < 11){
+                        var faceObject: faceDetection = faceDetection(
+                            id.toString(),
+                            bounds,
+                            rotY,
+                            rotZ,
+                            smileProb,
+                            false,
+                            faceBitmap
+                        )
+                        faceObject.log()
+                        faceDetect.add(faceObject)
+                    }
+                    else{
+//                        var faceObject: faceDetection = faceDetection(id.toString(), bounds, rotY, rotZ, smileProb, false)
+//                        faceObject.log()
+                    }
+                    count += 1
+//                    if(count > 10){
+//                        break
+//                    }
+                }
+
+                Log.d("cloud", "Number of faces detected = ${faceDetect.size}")
+
+//                squareImageView.setImageBitmap(drawDetectionResult(faceBitmap, faceDetect))
+
+                var caller = uploadCaller(description, userDpUrl, username, "", request)
+                uploadC.add(caller)
+
+                if(faceDetect.size == 0){
+                    tagging(uploadC, imageUri, faceDetect)
+                }
+                else{
+                    bottomBar_upload.visibility = View.GONE
+                    squareImageView.visibility = View.GONE
+                    btnDP_upload.visibility = View.GONE
+
+                    ImageViewTag.visibility = View.VISIBLE
+                    recyclerTag.visibility = View.VISIBLE
+                    searchTag.visibility = View.VISIBLE
+
+                    drawDetectionResult(faceBitmap, faceDetect, POS)
+                }
+
+
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+                Log.d("cloud", "Face Detection Failed - ${e.toString()}")
+                //TODO: uploadPost
+                tagging(uploadC, imageUri, faceDetect)
+            }
+    }
+
+    private fun uploadPostCloud(
+        description: String,
+        userDp: String,
+        userName: String,
+        picture: String,
+        results: MutableList<String>,
+        confidence: MutableList<String>,
+        faceDetect: MutableList<faceDetection>
+    ): Task<Any> {
         //val time = FieldValue.serverTimestamp()
         var data: HashMap<String, Any> = hashMapOf<String, Any>()
         data.put("description", description)
         data.put("dp", userDp)
         data.put("userName", userName)
         data.put("picture", picture)
+        var count = 0
+        data.put("noOfTags", results.size.toString())
+        for(tag in results){
+            var string = "tagNo" + count
+            var str = "confidence" + count
+            data.put(string, tag)
+            data.put(str, confidence[count])
+            count += 1
+            Log.d("cloud", tag)
+        }
+        while(count < 5){
+            var string = "tagNo" + count
+            var str = "confidence" + count
+            data.put(string, "xxxxx")
+            data.put(str, "xxxxx")
+            count += 1
+        }
 
-        Log.d("uploadCloud", "${data["description"]}, ${data["dp"]}, ${data["userName"]}, ${data["picture"]}, ${data["timeStamp"]}")
+        data.put("noOfFaces", faceDetect.size.toString())
+        count = 0
+        var smiles = 0
+        for(face in faceDetect){
+            var string = "faceId" + count
+            data.put(string, face.faceId)
+            string = "bound" + count
+            data.put(string, face.boundingBox.toString())
+            string = "rotY" + count
+            data.put(string, face.rotY)
+            string = "rotZ" + count
+            data.put(string, face.rotZ)
+            string = "smile" + count
+            var smile = false
+            if(face.smileProb > 0.65){
+                smile = true
+                smiles += 1
+                data.put(string, "true")
+                Log.d(
+                    "cloud",
+                    "SmileProb = ${face.smileProb}, turned true = $smiles, data = ${data[string]}"
+                )
+            }
+            else{
+                data.put(string, "false")
+            }
+            count += 1
+        }
+        if(count > 0){
+            val smileRatio: Float = (smiles.toFloat()/(count).toFloat())
+            if(smileRatio > 0.70){
+                data.put("smile", "Happy")
+                Log.d("cloud", "Ratio Happy = $smileRatio")
+            }
+            else if(smileRatio < 0.26){
+                data.put("smile", "Sad")
+                Log.d("cloud", "Ratio Sad = $smileRatio")
+            }
+            else{
+                data.put("smile", "Can't Say")
+                Log.d("cloud", "Ratio Can't Say = $smileRatio")
+            }
+        }
+        else{
+            data.put("smile", "Can't Say")
+            Log.d("cloud", "Ratio Can't Say")
+        }
+        while(count < 10){
+            var string = "faceId" + count
+            data.put(string, "xxxxx")
+            string = "bound" + count
+            data.put(string, "xxxxx")
+            string = "rotY" + count
+            data.put(string, "xxxxx")
+            string = "rotZ" + count
+            data.put(string, "xxxxx")
+            string = "smile" + count
+            var smile = false
+            data.put(string, smile)
+            count += 1
+        }
+
+        Log.d(
+            "uploadCloud",
+            "${data["description"]}, ${data["dp"]}, ${data["userName"]}, ${data["picture"]}, ${data["timeStamp"]}"
+        )
 
         return functions
             .getHttpsCallable("uploadPost")
@@ -199,40 +506,169 @@ class upload_post : AppCompatActivity() {
             }
     }
 
-    private fun uploadPostCaller(description: String, userDp: String, userName: String, picture: String){
-        uploadPostCloud(description, userDp, userName, picture)
-            .addOnCompleteListener(OnCompleteListener { task ->
+    private fun uploadPostCaller(
+        description: String,
+        userDp: String,
+        userName: String,
+        picture: String,
+        request: JsonObject,
+        faceDetect: MutableList<faceDetection>
+    ){
+        Log.d(
+            "cloud",
+            "sending into annotataImage"
+        )
+        annotateImage(request.toString())
+            .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    val e = task.exception
-                    if (e is FirebaseFunctionsException) {
-                        val code = e.code
-                        val details = e.details
-                        Log.d("cloud", "code = ${e.code}, details = $details")
-                    }
-                    // [START_EXCLUDE]
-                    Log.d("cloud", "addMessage:onFailure", e)
-//                    showSnackbar("An error occurred.")
-                    showToast("Image Not Uploaded", 1)
-                    val intent = Intent(this, mainFeed::class.java)
-                    intent.putExtra("username", userName)
-                    pbUpload.isVisible = false
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.zoom_out_upload, R.anim.static_transition)
-                    finish()
-                    return@OnCompleteListener
-                    // [END_EXCLUDE]
+                    // Task failed with an exception
+                    Log.d("cloud", "AnnotateImage Failed ${task.exception}")
                 } else {
-                    showToast("Image Uploaded", 2)
-                    val intent = Intent(this, mainFeed::class.java)
-                    intent.putExtra("username", userName)
-                    pbUpload.isVisible = false
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.zoom_out_upload, R.anim.static_transition)
-                    finish()
-                    return@OnCompleteListener
+                    Log.d("cloud", "AnnotateImage Success")
+                    val jsonArray = task.result!! as JsonArray
+                    var results = mutableListOf<String>()
+                    var confidenceResult = mutableListOf<String>()
+                    var count = 0
+                    for (label in jsonArray[0].asJsonObject["labelAnnotations"].asJsonArray) {
+                        val labelObj = label.asJsonObject
+                        var text = labelObj["description"]
+                        val entityId = labelObj["mid"]
+                        val confidence = labelObj["score"]
+                        var Text = text.toString().substring(1, text.toString().length - 1)
+                        Log.d(
+                            "cloud",
+                            "text = $Text, confidence = $confidence, entityID = $entityId"
+                        )
+                        if(confidence.toString().toFloat() > 0.90 && count < 5){
+                            results.add(Text.toString())
+                            confidenceResult.add(confidence.toString())
+                            count += 1
+                        }
+                        else{
+                            //break
+                        }
+                    }
+                    // Task completed successfully
+                    uploadPostCloud(
+                        description,
+                        userDp,
+                        userName,
+                        picture,
+                        results,
+                        confidenceResult,
+                        faceDetect
+                    )
+                        .addOnCompleteListener(OnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                val e = task.exception
+                                if (e is FirebaseFunctionsException) {
+                                    val code = e.code
+                                    val details = e.details
+                                    Log.d("cloud", "code = ${e.code}, details = $details")
+                                }
+                                // [START_EXCLUDE]
+                                Log.d("cloud", "addMessage:onFailure", e)
+//                    showSnackbar("An error occurred.")
+                                showToast("Image Not Uploaded", 1)
+                                val intent = Intent(this, mainFeed::class.java)
+                                intent.putExtra("username", userName)
+                                pbUpload.isVisible = false
+                                startActivity(intent)
+                                overridePendingTransition(
+                                    R.anim.zoom_out_upload,
+                                    R.anim.static_transition
+                                )
+                                finish()
+                                return@OnCompleteListener
+                                // [END_EXCLUDE]
+                            } else {
+                                showToast("Image Uploaded", 2)
+                                val intent = Intent(this, mainFeed::class.java)
+                                intent.putExtra("username", userName)
+                                pbUpload.isVisible = false
+                                startActivity(intent)
+                                overridePendingTransition(
+                                    R.anim.zoom_out_upload,
+                                    R.anim.static_transition
+                                )
+                                finish()
+                                return@OnCompleteListener
+                            }
+                        }
+                        )
                 }
             }
+    }
+
+    /**
+     * Draw bounding boxes around objects together with the object's name.
+     */
+    private fun drawDetectionResult(bitmap: Bitmap, detectionResults: List<faceDetection>, pos: Int) {
+        val outputBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(outputBitmap)
+        val pen = Paint()
+        pen.textAlign = Paint.Align.LEFT
+        var count = 0
+
+        detectionResults.forEach {
+            Log.d("cloud", "Creating Another Square")
+            // draw bounding box
+            if(count < pos){
+                pen.color = Color.GRAY
+            }
+            else if(count == pos){
+                pen.color = Color.RED
+            }
+            else{
+                pen.color = Color.TRANSPARENT
+            }
+
+            pen.strokeWidth = 6F
+            pen.style = Paint.Style.STROKE
+            val box = it.boundingBox
+            box.left = box.left - 25
+            box.top = box.top - 25
+            box.right = box.right + 25
+            box.bottom = box.bottom + 25
+            canvas.drawRect(box, pen)
+
+            val tagSize = Rect(0, 0, 0, 0)
+
+            // calculate the right font size
+            pen.style = Paint.Style.FILL_AND_STROKE
+            pen.color = Color.YELLOW
+            if(count < pos){
+                if(it.named == true){
+                    pen.color = Color.GRAY
+                }
+                else{
+                    pen.color = Color.TRANSPARENT
+                }
+            }
+            else if(count == pos){
+                pen.color = Color.RED
+            }
+            else{
+                pen.color = Color.TRANSPARENT
+            }
+            pen.strokeWidth = 2F
+
+            pen.textSize = 96F
+            pen.getTextBounds(it.faceId, 0, it.faceId.length, tagSize)
+            val fontSize: Float = pen.textSize * box.width() / tagSize.width()
+
+            // adjust the font size so texts are inside the bounding box
+            if (fontSize < pen.textSize) pen.textSize = fontSize
+
+            var margin = (box.width() - tagSize.width()) / 2.0F
+            if (margin < 0F) margin = 0F
+            canvas.drawText(
+                it.faceId, box.left + margin,
+                box.top + tagSize.height().times(1F), pen
             )
+        }
+        Log.d("cloud", "NEW BITMAP CREATED")
+        ImageViewTag.setImageBitmap(outputBitmap)
     }
 
 
@@ -348,11 +784,143 @@ class upload_post : AppCompatActivity() {
             selectedUri = data.data
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedUri)
             squareImageView.setImageBitmap(bitmap)
-            btnDP.alpha = 0f
+            btnDP_upload.alpha = 0f
 
 //            val bitmapDrawable = BitmapDrawable(bitmap)
 //            btnDP.setBackgroundDrawable(bitmapDrawable)
         }
     }
 
+    private fun tagging(uploadC: MutableList<uploadCaller>, imageUri: Uri, faceDetect: MutableList<faceDetection>){
+        val filename = UUID.randomUUID().toString()
+        val ref = FirebaseStorage.getInstance().getReference("images/uploads/$username/$filename")
+        ref.putFile(imageUri)
+            .addOnSuccessListener { img ->
+                Log.d(
+                    "cloud",
+                    "Image successfully uploaded at location: ${img.metadata?.path}"
+                )
+                ref.downloadUrl
+                    .addOnSuccessListener { img_link ->
+//                        val calendar = Calendar.getInstance()
+//                        val time = calendar.timeInMillis
+                        Log.d(
+                            "cloud",
+                            "Image successfully uploaded at location: ${img_link.toString()}}"
+                        )
+                        uploadPostCaller(uploadC[0].description, uploadC[0].userDpUrl, uploadC[0].username, img_link.toString(), uploadC[0].request, faceDetect)
+                    }
+            }
+            .addOnFailureListener {
+                Log.d("Registration", "Image upload failed: ${it.message}")
+            }
+    }
+
+    private fun loadSearch(
+        db: FirebaseFirestore,
+        adapter: GroupAdapter<GroupieViewHolder>,
+        faceDetect: MutableList<faceDetection>,
+        pos: Int,
+        uploadC: MutableList<uploadCaller>,
+        imageUri: Uri
+    ){
+        val search = editTextTag.text.toString()
+        var waiting = false
+        if(search != "" || search != null)
+        {
+            val words = search.split("\\s+".toRegex()).map { word ->
+                word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+            }
+            db.collection("Users")
+                .addSnapshotListener { value, error ->
+                    if(value == null || error != null){
+                        showToast("ERROR", 1)
+                        return@addSnapshotListener
+                    }
+                    for(document in value.documents)
+                    {
+                        if(document.id != "Info")
+                        {
+                            var contains = true
+                            for(word in words)
+                            {
+                                val pattern = word.toRegex(RegexOption.IGNORE_CASE)
+
+                                if(pattern.containsMatchIn(document["Name"].toString()) || pattern.containsMatchIn(
+                                        document.id
+                                    )
+                                    || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(
+                                        document["Branch"].toString()
+                                    )
+                                    || pattern.containsMatchIn(document["Semester"].toString()))
+                                {
+
+                                }
+                                else
+                                {
+                                    contains = false
+                                    break
+                                }
+                            }
+                            if(contains)
+                            {
+//                                val temp = usersList(document.id, "", document["Name"].toString(), document["Picture"].toString(), "")
+//                                arraySearch.add(temp)
+                                adapter.add(
+                                    UserSearch(
+                                        document.id,
+                                        document["Picture"].toString(),
+                                        document["Name"].toString(),
+                                        true
+                                    )
+                                )
+                            }
+
+                        }
+                    }
+
+                    adapter.setOnItemClickListener { item, view ->
+                        val searchItem: UserSearch = item as UserSearch
+                        val to = searchItem.username
+                        adapter.clear()
+                        faceDetect[pos].faceId = to
+                        faceDetect[pos].named = true
+                        waiting = true
+                        POS += 1
+                        drawDetectionResult(faceDetect[0].faceBitmap, faceDetect, POS)
+                        editTextTag.setText("")
+                        if(POS == (faceDetect.size-1)){
+                            //TODO: uploadPost
+                            tagging(uploadC, imageUri, faceDetect)
+                        }
+                        return@setOnItemClickListener
+                    }
+                    recyclerTag.adapter = adapter
+                }
+        }
+//        if(waiting == true){
+//            return true
+//        }
+    }
+}
+
+data class uploadCaller(var description: String, var userDpUrl: String, var username: String, var img_link: String, var request: JsonObject){
+
+}
+
+data class faceDetection(
+    var faceId: String,
+    var boundingBox: Rect,
+    var rotY: Float,
+    var rotZ: Float,
+    var smileProb: Float,
+    var named: Boolean,
+    var faceBitmap: Bitmap
+) {
+    public fun log(){
+        Log.d(
+            "cloud",
+            "FaceID = $faceId \n SmileProb = $smileProb \n rotY = $rotY \n rotZ = $rotZ \n Bound = $boundingBox"
+        )
+    }
 }

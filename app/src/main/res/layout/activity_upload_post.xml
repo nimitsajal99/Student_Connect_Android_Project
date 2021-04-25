@@ -78,26 +78,86 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnDP"
+        android:id="@+id/btnDP_upload"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginLeft="35dp"
+        android:visibility="visible"
 
         android:background="@drawable/upload_image_1"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"/>
+        app:layout_constraintBottom_toTopOf="@id/bottomBar_upload"/>
 
     <ImageView
         android:id="@+id/squareImageView"
         android:layout_width="300dp"
         android:layout_height="300dp"
+        android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar_upload"
         />
+
+    <ImageView
+        android:id="@+id/ImageViewTag"
+        android:layout_width="270dp"
+        android:layout_height="270dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/searchTag"
+        />
+
+    <LinearLayout
+        android:id="@+id/searchTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ImageViewTag">
+
+        <EditText
+            android:id="@+id/editTextTag"
+            android:layout_weight="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Search Usernames"/>
+
+        <ImageButton
+            android:id="@+id/btnSearch_upload"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/search_button"
+            tools:ignore="NotSibling" />
+
+        <Button
+            android:id="@+id/btnTagNone"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/rounded_corners_buttons"
+            android:textColor="@color/base0"
+            android:layout_height="40dp"
+            android:text="    None    "
+            android:layout_gravity="end"
+            android:textSize="20sp"/>
+
+
+    </LinearLayout>
+
+
+
 
 <!--    <com.github.siyamed.shapeimageview.RoundedImageView-->
 <!--        android:layout_width="300dp"-->
@@ -113,13 +173,14 @@
 <!--        app:layout_constraintBottom_toTopOf="@id/bottomBar"/>-->
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomBar"
+        android:id="@+id/bottomBar_upload"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/base0light"
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="4"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -139,7 +200,7 @@
             android:textColorHint="@color/base4"
             android:inputType="textMultiLine"
             android:textColor="@color/base3"
-            app:layout_constraintTop_toTopOf="@id/bottomBar"
+            app:layout_constraintTop_toTopOf="@id/bottomBar_upload"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnSendMessage_chat"
             app:layout_constraintStart_toStartOf="parent"
@@ -161,6 +222,15 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerTag"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/searchTag" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
