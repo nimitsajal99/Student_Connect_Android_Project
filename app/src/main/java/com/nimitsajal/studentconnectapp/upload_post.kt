@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.drawToBitmap
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.android.gms.tasks.OnCompleteListener
@@ -41,6 +42,7 @@ import kotlinx.android.synthetic.main.activity_upload_post.*
 import kotlinx.android.synthetic.main.activity_upload_post.btnUpload
 import kotlinx.android.synthetic.main.toast_login_adapter.*
 import java.io.ByteArrayOutputStream
+import java.lang.Integer.min
 import java.util.*
 
 
@@ -98,18 +100,27 @@ class upload_post : AppCompatActivity() {
         }
 
         btnSearch_upload.setOnClickListener {
-            loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!)
+            loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!, username!!)
         }
 
         editTextTag.addTextChangedListener {
-            loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!)
+            if(editTextTag.text.toString() != "" && editTextTag.text != null)
+            {
+                loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!, username!!)
+            }
+            else{
+//                ImageViewTag.visibility = View.VISIBLE
+                editTextTag.setText("")
+            }
         }
 
         btnTagNone.setOnClickListener {
             POS += 1
-            if(POS == (faceDetect.size-1)){
-                //TODO: UploadPost
-                tagging(uploadC, selectedUri!!, faceDetect)
+//            ImageViewTag.visibility = View.VISIBLE
+            editTextTag.setText("")
+            drawDetectionResult(faceDetect[0].faceBitmap, faceDetect, POS)
+            if(POS == (faceDetect.size)&& POS!=0){
+                tagging(uploadC, selectedUri!!, faceDetect, username!!)
             }
         }
 
@@ -322,6 +333,31 @@ class upload_post : AppCompatActivity() {
                 for (face in faces) {
                     val id = count
                     val bounds = face.boundingBox
+//                    bounds.left = bounds.left - 25
+//                    bounds.top = bounds.top - 25
+//                    bounds.right = bounds.right + 25
+//                    bounds.bottom = bounds.bottom + 25
+
+                    var margin = 0
+                    if(bounds.right-bounds.left < bounds.bottom-bounds.top){
+                        margin = (bounds.right - bounds.left)/5
+//                        margin = bounds.left - (bounds.left.toFloat() * (84F/100F).toFloat()).toInt()
+                    }
+                    else{
+                        margin = (bounds.bottom - bounds.top)/5
+//                        margin = bounds.top - (bounds.top.toFloat() * (84F/100F).toFloat()).toInt()
+                    }
+
+                    if(margin > 25){
+                        margin = 25
+                    }
+                    bounds.left = bounds.left - margin
+                    bounds.top = bounds.top - margin
+                    bounds.right = bounds.right + margin
+                    bounds.bottom = bounds.bottom + margin
+
+                    Log.d("cloud", bounds.toString())
+
                     val rotY = face.headEulerAngleY // Head is rotated to the right rotY degrees
                     val rotZ = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
                     var smileProb: Float = 0.0f
@@ -343,7 +379,8 @@ class upload_post : AppCompatActivity() {
                             rotZ,
                             smileProb,
                             false,
-                            faceBitmap
+                            faceBitmap,
+                            margin
                         )
                         faceObject.log()
                         faceDetect.add(faceObject)
@@ -362,11 +399,12 @@ class upload_post : AppCompatActivity() {
 
 //                squareImageView.setImageBitmap(drawDetectionResult(faceBitmap, faceDetect))
 
-                var caller = uploadCaller(description, userDpUrl, username, "", request)
+                var abc= mutableListOf<String>()
+                var caller = uploadCaller(description, userDpUrl, username, "", request,abc)
                 uploadC.add(caller)
 
                 if(faceDetect.size == 0){
-                    tagging(uploadC, imageUri, faceDetect)
+                    tagging(uploadC, imageUri, faceDetect, username)
                 }
                 else{
                     bottomBar_upload.visibility = View.GONE
@@ -378,15 +416,15 @@ class upload_post : AppCompatActivity() {
                     searchTag.visibility = View.VISIBLE
 
                     drawDetectionResult(faceBitmap, faceDetect, POS)
+
+                    pbUpload.visibility = View.GONE
                 }
-
-
             }
             .addOnFailureListener { e ->
                 // Task failed with an exception
                 Log.d("cloud", "Face Detection Failed - ${e.toString()}")
                 //TODO: uploadPost
-                tagging(uploadC, imageUri, faceDetect)
+                tagging(uploadC, imageUri, faceDetect, username)
             }
     }
 
@@ -430,6 +468,25 @@ class upload_post : AppCompatActivity() {
             var string = "faceId" + count
             data.put(string, face.faceId)
             string = "bound" + count
+//            face.boundingBox.left = face.boundingBox.left + 25
+//            face.boundingBox.top = face.boundingBox.top + 25
+//            face.boundingBox.right = face.boundingBox.right - 25
+//            face.boundingBox.bottom = face.boundingBox.bottom - 25
+
+            var margin = face.margin
+//            if(face.boundingBox.right-face.boundingBox.left < face.boundingBox.bottom-face.boundingBox.top){
+//                margin = (face.boundingBox.left.toFloat() * 1.19047619F).toInt() - face.boundingBox.left
+//            }
+//            else{
+//                margin = (face.boundingBox.top.toFloat() * 1.19047619F).toInt() - face.boundingBox.top
+//            }
+            face.boundingBox.left = face.boundingBox.left + margin
+            face.boundingBox.top = face.boundingBox.top + margin
+            face.boundingBox.right = face.boundingBox.right - margin
+            face.boundingBox.bottom = face.boundingBox.bottom - margin
+
+            Log.d("cloud", face.boundingBox.toString())
+
             data.put(string, face.boundingBox.toString())
             string = "rotY" + count
             data.put(string, face.rotY)
@@ -523,6 +580,7 @@ class upload_post : AppCompatActivity() {
                 if (!task.isSuccessful) {
                     // Task failed with an exception
                     Log.d("cloud", "AnnotateImage Failed ${task.exception}")
+                    uploadPostCaller(description,userDp,userName,picture,request,faceDetect)
                 } else {
                     Log.d("cloud", "AnnotateImage Success")
                     val jsonArray = task.result!! as JsonArray
@@ -614,7 +672,12 @@ class upload_post : AppCompatActivity() {
             Log.d("cloud", "Creating Another Square")
             // draw bounding box
             if(count < pos){
-                pen.color = Color.GRAY
+                if(it.named == true){
+                    pen.color = Color.GREEN
+                }
+                else{
+                    pen.color = Color.GRAY
+                }
             }
             else if(count == pos){
                 pen.color = Color.RED
@@ -623,14 +686,15 @@ class upload_post : AppCompatActivity() {
                 pen.color = Color.TRANSPARENT
             }
 
-            pen.strokeWidth = 6F
+            pen.strokeWidth = 2F
             pen.style = Paint.Style.STROKE
             val box = it.boundingBox
-            box.left = box.left - 25
-            box.top = box.top - 25
-            box.right = box.right + 25
-            box.bottom = box.bottom + 25
-            canvas.drawRect(box, pen)
+//            box.left = box.left - 25
+//            box.top = box.top - 25
+//            box.right = box.right + 25
+//            box.bottom = box.bottom + 25
+//            canvas.drawRect(box, pen)
+            canvas.drawRoundRect(box.left.toFloat(), box.top.toFloat(), box.right.toFloat(), box.bottom.toFloat(), 7F, 7F, pen)
 
             val tagSize = Rect(0, 0, 0, 0)
 
@@ -639,7 +703,7 @@ class upload_post : AppCompatActivity() {
             pen.color = Color.YELLOW
             if(count < pos){
                 if(it.named == true){
-                    pen.color = Color.GRAY
+                    pen.color = Color.GREEN
                 }
                 else{
                     pen.color = Color.TRANSPARENT
@@ -653,7 +717,7 @@ class upload_post : AppCompatActivity() {
             }
             pen.strokeWidth = 2F
 
-            pen.textSize = 96F
+            pen.textSize = 40F
             pen.getTextBounds(it.faceId, 0, it.faceId.length, tagSize)
             val fontSize: Float = pen.textSize * box.width() / tagSize.width()
 
@@ -662,10 +726,20 @@ class upload_post : AppCompatActivity() {
 
             var margin = (box.width() - tagSize.width()) / 2.0F
             if (margin < 0F) margin = 0F
-            canvas.drawText(
-                it.faceId, box.left + margin,
-                box.top + tagSize.height().times(1F), pen
-            )
+            if(box.top-tagSize.height().times(1.3F) > 0){
+                canvas.drawText(
+                    it.faceId, box.left + margin,
+                    box.top - tagSize.height().times(0.3F), pen
+                )
+            }
+            else{
+                canvas.drawText(
+                    it.faceId, box.left + margin,
+                    box.bottom + tagSize.height().times(1.3F), pen
+                )
+            }
+
+            count += 1
         }
         Log.d("cloud", "NEW BITMAP CREATED")
         ImageViewTag.setImageBitmap(outputBitmap)
@@ -791,7 +865,16 @@ class upload_post : AppCompatActivity() {
         }
     }
 
-    private fun tagging(uploadC: MutableList<uploadCaller>, imageUri: Uri, faceDetect: MutableList<faceDetection>){
+    private fun tagging(uploadC: MutableList<uploadCaller>, imageUri: Uri, faceDetect: MutableList<faceDetection>, username: String){
+        ImageViewTag.visibility = View.GONE
+        recyclerTag.visibility = View.GONE
+        searchTag.visibility = View.GONE
+        pbUpload.visibility = View.VISIBLE
+        if(faceDetect.size != 0){
+            squareImageView.setImageBitmap(ImageViewTag.drawToBitmap())
+        }
+        squareImageView.visibility = View.VISIBLE
+
         val filename = UUID.randomUUID().toString()
         val ref = FirebaseStorage.getInstance().getReference("images/uploads/$username/$filename")
         ref.putFile(imageUri)
@@ -822,12 +905,15 @@ class upload_post : AppCompatActivity() {
         faceDetect: MutableList<faceDetection>,
         pos: Int,
         uploadC: MutableList<uploadCaller>,
-        imageUri: Uri
+        imageUri: Uri,
+        username: String
     ){
         val search = editTextTag.text.toString()
         var waiting = false
+        adapter.clear()
         if(search != "" || search != null)
         {
+//            ImageViewTag.visibility = View.GONE
             val words = search.split("\\s+".toRegex()).map { word ->
                 word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
             }
@@ -846,13 +932,12 @@ class upload_post : AppCompatActivity() {
                             {
                                 val pattern = word.toRegex(RegexOption.IGNORE_CASE)
 
-                                if(pattern.containsMatchIn(document["Name"].toString()) || pattern.containsMatchIn(
-                                        document.id
-                                    )
-                                    || pattern.containsMatchIn(document["College"].toString())|| pattern.containsMatchIn(
-                                        document["Branch"].toString()
-                                    )
-                                    || pattern.containsMatchIn(document["Semester"].toString()))
+                                if((pattern.containsMatchIn(document["Name"].toString()) ||
+                                            pattern.containsMatchIn(document.id) ||
+                                            pattern.containsMatchIn(document["College"].toString())||
+                                            pattern.containsMatchIn(document["Branch"].toString()) ||
+                                            pattern.containsMatchIn(document["Semester"].toString()))
+                                    && !(document.id in uploadC[0].listselected))
                                 {
 
                                 }
@@ -880,6 +965,7 @@ class upload_post : AppCompatActivity() {
                     }
 
                     adapter.setOnItemClickListener { item, view ->
+//                        ImageViewTag.visibility = View.VISIBLE
                         val searchItem: UserSearch = item as UserSearch
                         val to = searchItem.username
                         adapter.clear()
@@ -887,11 +973,12 @@ class upload_post : AppCompatActivity() {
                         faceDetect[pos].named = true
                         waiting = true
                         POS += 1
+                        uploadC[0].listselected.add(to)
                         drawDetectionResult(faceDetect[0].faceBitmap, faceDetect, POS)
                         editTextTag.setText("")
-                        if(POS == (faceDetect.size-1)){
+                        if(POS == (faceDetect.size) && POS != 0){
                             //TODO: uploadPost
-                            tagging(uploadC, imageUri, faceDetect)
+                            tagging(uploadC, imageUri, faceDetect, username)
                         }
                         return@setOnItemClickListener
                     }
@@ -904,7 +991,7 @@ class upload_post : AppCompatActivity() {
     }
 }
 
-data class uploadCaller(var description: String, var userDpUrl: String, var username: String, var img_link: String, var request: JsonObject){
+data class uploadCaller(var description: String, var userDpUrl: String, var username: String, var img_link: String, var request: JsonObject, var listselected: MutableList<String>){
 
 }
 
@@ -915,7 +1002,8 @@ data class faceDetection(
     var rotZ: Float,
     var smileProb: Float,
     var named: Boolean,
-    var faceBitmap: Bitmap
+    var faceBitmap: Bitmap,
+    var margin: Int
 ) {
     public fun log(){
         Log.d(

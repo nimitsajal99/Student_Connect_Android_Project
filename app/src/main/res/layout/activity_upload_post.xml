@@ -92,8 +92,8 @@
 
     <ImageView
         android:id="@+id/squareImageView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="330dp"
+        android:layout_height="330dp"
         android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
