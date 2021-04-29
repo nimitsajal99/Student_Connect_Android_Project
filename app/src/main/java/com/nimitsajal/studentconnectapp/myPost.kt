@@ -16,10 +16,14 @@ import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -28,14 +32,18 @@ import kotlinx.android.synthetic.main.activity_my_post.*
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.*
+import java.util.HashMap
 
 class myPost : AppCompatActivity() {
 
     private lateinit var detector: GestureDetectorCompat
+    private lateinit var functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_post)
+
+        functions = Firebase.functions
 
         var username = ""
         var myUsername = intent.getStringExtra("username")
@@ -261,20 +269,55 @@ class myPost : AppCompatActivity() {
         return true
     }
 
-    private fun deletePost(username: String, uid: String, db: FirebaseFirestore){
-        db.collection("Users").document(username).collection("My Posts").document(uid)
-            .delete()
-            .addOnSuccessListener {
-                Log.d("mainfeed", "post deleted from $username")
+    private fun deletePostCloud(username: String, uid: String): Task<Any?> {
+        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+        data.put("userName", username)
+        data.put("uid", uid)
+        return functions
+            .getHttpsCallable("deletePost")
+            .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data
+                result
             }
-        db.collection("Post").document(uid)
-            .delete()
-            .addOnSuccessListener {
-                Log.d("mainfeed", "post deleted from Posts")
-            }
-        showToast("Post DELETED", 2)
-        goToProfile(username, "false", 2)
     }
+
+    private fun deletePost(username: String, uid: String, db: FirebaseFirestore){
+        deletePostCloud(username, uid)
+            .addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    showToast("Post DELETED", 2)
+                    goToProfile(username, "false", 2)
+                }
+                else{
+                    showToast("Deletion Error", 1)
+                    Log.d("cloud", "Error : ${task.exception}")
+                    goToProfile(username, "false", 1)
+                }
+            }
+    }
+
+//    private fun deletePost(username: String, uid: String, db: FirebaseFirestore){
+//        db.collection("Users").document(username).collection("My Posts").document(uid)
+//            .delete()
+//            .addOnSuccessListener {
+//                Log.d("mainfeed", "post deleted from $username")
+//            }
+//        db.collection("Post").document(uid)
+//            .delete()
+//            .addOnSuccessListener {
+//                Log.d("mainfeed", "post deleted from Posts")
+//            }
+//        showToast("Post DELETED", 2)
+//        goToProfile(username, "false", 2)
+//    }
 
     private fun commented(comment: String, username: String, uid: String, db: FirebaseFirestore){
         val time = FieldValue.serverTimestamp()

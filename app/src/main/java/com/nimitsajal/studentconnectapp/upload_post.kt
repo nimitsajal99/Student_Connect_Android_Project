@@ -109,14 +109,14 @@ class upload_post : AppCompatActivity() {
                 loadSearch(db, adapter, faceDetect, POS, uploadC, selectedUri!!, username!!)
             }
             else{
-//                ImageViewTag.visibility = View.VISIBLE
-                editTextTag.setText("")
+                ImageViewTag.visibility = View.VISIBLE
             }
         }
 
         btnTagNone.setOnClickListener {
             POS += 1
-//            ImageViewTag.visibility = View.VISIBLE
+            ImageViewTag.visibility = View.VISIBLE
+            adapter.clear()
             editTextTag.setText("")
             drawDetectionResult(faceDetect[0].faceBitmap, faceDetect, POS)
             if(POS == (faceDetect.size)&& POS!=0){
@@ -467,27 +467,30 @@ class upload_post : AppCompatActivity() {
         for(face in faceDetect){
             var string = "faceId" + count
             data.put(string, face.faceId)
-            string = "bound" + count
-//            face.boundingBox.left = face.boundingBox.left + 25
-//            face.boundingBox.top = face.boundingBox.top + 25
-//            face.boundingBox.right = face.boundingBox.right - 25
-//            face.boundingBox.bottom = face.boundingBox.bottom - 25
 
             var margin = face.margin
-//            if(face.boundingBox.right-face.boundingBox.left < face.boundingBox.bottom-face.boundingBox.top){
-//                margin = (face.boundingBox.left.toFloat() * 1.19047619F).toInt() - face.boundingBox.left
-//            }
-//            else{
-//                margin = (face.boundingBox.top.toFloat() * 1.19047619F).toInt() - face.boundingBox.top
-//            }
+            string = "boundLeft" + count
             face.boundingBox.left = face.boundingBox.left + margin
+            data.put(string, face.boundingBox.left.toString())
+            string = "boundRight" + count
             face.boundingBox.top = face.boundingBox.top + margin
+            data.put(string, face.boundingBox.right.toString())
+            string = "boundTop" + count
             face.boundingBox.right = face.boundingBox.right - margin
+            data.put(string, face.boundingBox.top.toString())
+            string = "boundBottom" + count
             face.boundingBox.bottom = face.boundingBox.bottom - margin
-
+            data.put(string, face.boundingBox.bottom.toString())
+            string = "named" + count
+            if(face.named){
+                data.put(string, "true")
+            }
+            else{
+                data.put(string, "false")
+            }
             Log.d("cloud", face.boundingBox.toString())
 
-            data.put(string, face.boundingBox.toString())
+
             string = "rotY" + count
             data.put(string, face.rotY)
             string = "rotZ" + count
@@ -686,7 +689,7 @@ class upload_post : AppCompatActivity() {
                 pen.color = Color.TRANSPARENT
             }
 
-            pen.strokeWidth = 2F
+            pen.strokeWidth = 4F
             pen.style = Paint.Style.STROKE
             val box = it.boundingBox
 //            box.left = box.left - 25
@@ -913,7 +916,7 @@ class upload_post : AppCompatActivity() {
         adapter.clear()
         if(search != "" || search != null)
         {
-//            ImageViewTag.visibility = View.GONE
+            ImageViewTag.visibility = View.GONE
             val words = search.split("\\s+".toRegex()).map { word ->
                 word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
             }
@@ -965,7 +968,7 @@ class upload_post : AppCompatActivity() {
                     }
 
                     adapter.setOnItemClickListener { item, view ->
-//                        ImageViewTag.visibility = View.VISIBLE
+                        ImageViewTag.visibility = View.VISIBLE
                         val searchItem: UserSearch = item as UserSearch
                         val to = searchItem.username
                         adapter.clear()
