@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
@@ -52,8 +53,6 @@ class myPost : AppCompatActivity() {
         var description = intent.getStringExtra("description")
         var dp = intent.getStringExtra("dp")
         var isOther = intent.getStringExtra("others")
-
-
 
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -290,6 +289,8 @@ class myPost : AppCompatActivity() {
     }
 
     private fun deletePost(username: String, uid: String, db: FirebaseFirestore){
+        rvComments.visibility = View.GONE
+        pbDelete.visibility = View.VISIBLE
         deletePostCloud(username, uid)
             .addOnCompleteListener { task ->
                 if(task.isSuccessful){

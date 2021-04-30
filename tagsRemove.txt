@@ -49,11 +49,3 @@ Chest
 Flesh
 Magenta
 
-
-@+id/bottomBar
-@+id/squareImageView
-@+id/btnDP
-
-@+id/ImageViewTag
-@+id/recyclerTag
-@+id/searchTag

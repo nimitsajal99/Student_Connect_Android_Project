@@ -447,7 +447,17 @@ exports.deletePost = functions.https.onCall((data, context) => {
         promises.push(post.doc(data.uid).delete());
         promises.push(users.doc(data.userName).collection("My Posts")
             .doc(data.uid).delete());
-        return Promise.all(promises);
+        return users.doc(data.userName).collection("Friends")
+            .get()
+            .then((friends) => {
+              friends.forEach((user) => {
+                if (user.id != "Info") {
+                  promises.push(users.doc(user.id).collection("My Feed")
+                      .doc(data.uid).delete());
+                }
+              });
+              return Promise.all(promises);
+            });
       })
       .then((metaData) => {
         console.log("post deleted", data.uid, " metadata = ", metaData);

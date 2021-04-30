@@ -596,11 +596,13 @@ class upload_post : AppCompatActivity() {
                         val entityId = labelObj["mid"]
                         val confidence = labelObj["score"]
                         var Text = text.toString().substring(1, text.toString().length - 1)
-                        Log.d(
-                            "cloud",
-                            "text = $Text, confidence = $confidence, entityID = $entityId"
-                        )
-                        if(confidence.toString().toFloat() > 0.90 && count < 5){
+                        if(isTagValid(Text)){
+                            Log.d(
+                                "cloud",
+                                "text = $Text, confidence = $confidence, entityID = $entityId"
+                            )
+                        }
+                        if(confidence.toString().toFloat() > 0.75 && count < 5 && isTagValid(Text)){
                             results.add(Text.toString())
                             confidenceResult.add(confidence.toString())
                             count += 1
@@ -991,6 +993,20 @@ class upload_post : AppCompatActivity() {
 //        if(waiting == true){
 //            return true
 //        }
+    }
+
+    private fun isTagValid(tag: String): Boolean{
+        var blockedList = mutableListOf<String>("Tableware","Smile","Skin","Hairstyle","Facial expression","Happy","Gesture",
+            "Leisure","Cosmetic dentistry","Beauty","Comfort","Thumb","Outerwear",
+            "Vertebrate","White-collar worker","Fur","Hair","Head","Chin","Neck","Jaw",
+            "Sleeve","Eyelash","Rectangle","Font","Red hair","Forehead","Nose","Eyebrow","Muscle",
+            "Collar","Symmetry","Brand","Human","Finger","Youth","People","T-shirt","Wrist",
+            "Trousers","Waist","Plaid","Lip","Beard","Facial hair","Moustache","Snapshot","Chest",
+            "Flesh","Magenta","Sky","Water","Vision care","Eyewear","Shorts","Fun")
+        if(tag in blockedList){
+            return false
+        }
+        return true
     }
 }
 
