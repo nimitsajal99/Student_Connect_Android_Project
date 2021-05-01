@@ -1,25 +1,23 @@
 package com.nimitsajal.studentconnectapp
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.squareup.picasso.Callback
@@ -43,6 +41,7 @@ import java.lang.System
 class profilePage : AppCompatActivity() {
 
     private lateinit var detector: GestureDetectorCompat
+    private var toggle: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +101,30 @@ class profilePage : AppCompatActivity() {
 
         btnChat.setOnClickListener {
             goToChat(username!!)
+        }
+
+        tvUploads.setOnClickListener {
+            if(toggle){
+                tvTagged.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
+                tvUploads.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24F)
+                tvUploads.setTextColor(ContextCompat.getColor(this, R.color.base1))
+                tvTagged.setTextColor(ContextCompat.getColor(this, R.color.base0light))
+                toggle = false
+                adapter.clear()
+                loadPost(db, username!!, adapter, dp)
+            }
+        }
+
+        tvTagged.setOnClickListener {
+            if(!toggle){
+                tvTagged.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24F)
+                tvUploads.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
+                tvUploads.setTextColor(ContextCompat.getColor(this, R.color.base0light))
+                tvTagged.setTextColor(ContextCompat.getColor(this, R.color.base1))
+                toggle = true
+                adapter.clear()
+                loadPost(db, username!!, adapter, dp)
+            }
         }
 
         btnLogout.setOnClickListener {
@@ -219,12 +242,14 @@ class profilePage : AppCompatActivity() {
                 show()
             }
         }
-
     }
 
     private fun loadPost(db: FirebaseFirestore, username: String, adapter: GroupAdapter<GroupieViewHolder>, dp: picture){
-        db.collection("Users").document(username).collection("My Posts")
-            .orderBy("Time", Query.Direction.DESCENDING)
+        var link = db.collection("Users").document(username).collection("My Posts")
+        if(toggle){
+            link = db.collection("Users").document(username).collection("My Tags")
+        }
+        link.orderBy("Time", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener {
                 if(it != null){
@@ -240,7 +265,7 @@ class profilePage : AppCompatActivity() {
                                             .addOnSuccessListener {it3 ->
                                                 if(it3 != null){
                                                     comCount = it3.size()-1
-                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id))
+                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id, toggle))
                                                 }
                                             }
                                     }
@@ -250,16 +275,18 @@ class profilePage : AppCompatActivity() {
                 }
                 adapter.setOnItemLongClickListener { item, view ->
 //                    Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
-                    val post: profile_post_class = item as profile_post_class
-                    val intent = Intent(this, myPost::class.java)
-                    intent.putExtra("username", username)
-                    intent.putExtra("picture", post.url)
-                    intent.putExtra("uid", post.uid)
-                    intent.putExtra("description", post.description)
-                    intent.putExtra("dp", dp.picture)
-                    intent.putExtra("others", "false")
-                    startActivity(intent)
-                    overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
+                    if(!toggle){
+                        val post: profile_post_class = item as profile_post_class
+                        val intent = Intent(this, myPost::class.java)
+                        intent.putExtra("username", username)
+                        intent.putExtra("picture", post.url)
+                        intent.putExtra("uid", post.uid)
+                        intent.putExtra("description", post.description)
+                        intent.putExtra("dp", dp.picture)
+                        intent.putExtra("others", "false")
+                        startActivity(intent)
+                        overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
+                    }
                     return@setOnItemLongClickListener true
                 }
                 rvProfilePage.adapter = adapter
@@ -588,7 +615,7 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
 
 }
 
-class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String): Item<GroupieViewHolder>(){
+class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String, var toggle: Boolean): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         Picasso.get().load(url).into(viewHolder.itemView.postImageProfile, object : Callback {
@@ -642,21 +669,48 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
             viewHolder.itemView.tvComCount.text = likes
         }
 
-        db.collection("Users").document(username).collection("My Posts").document(uid)
+        var temp1 = false
+        var temp2 = false
+        var link = db.collection("Users").document(username).collection("My Posts").document(uid)
+        db.collection("Users").document(username).collection("My Feed").document(uid)
             .get()
-            .addOnSuccessListener {
-                if (it != null) {
-                    if (it["Liked"].toString().toBoolean()) {
-                        viewHolder.itemView.likeIconUnfilled.visibility = View.GONE
-                        viewHolder.itemView.likeIcon.visibility = View.VISIBLE
-                    }
+            .addOnSuccessListener { it1 ->
+                if(it1.exists()){
+                    Log.d("profilePage", "In Exists")
+                    temp1 = true
                 }
+                db.collection("Users").document(username).collection("My Posts").document(uid)
+                    .get()
+                    .addOnSuccessListener { it2 ->
+                        if(it2.exists()){
+                            Log.d("profilePage", "In Post")
+                            temp2 = true
+                        }
+                        if(toggle && !temp1 && !temp2){
+                            link = db.collection("Users").document(username).collection("My Tags").document(uid)
+                        }
+                        else if(toggle && temp1){
+                            link = db.collection("Users").document(username).collection("My Feed").document(uid)
+                        }
+                        else if(toggle && temp2){
+                            link = db.collection("Users").document(username).collection("My Posts").document(uid)
+                        }
+                        link.get()
+                            .addOnSuccessListener {
+                                if (it != null) {
+                                    if (it["Liked"].toString().toBoolean()) {
+                                        viewHolder.itemView.likeIconUnfilled.visibility = View.GONE
+                                        viewHolder.itemView.likeIcon.visibility = View.VISIBLE
+                                    }
+                                }
+                            }
+                    }
             }
 
         viewHolder.itemView.btnLikeCount.setOnClickListener {
             Log.d("profilepage", "clicked like button")
             viewHolder.itemView.btnLikeCount.isEnabled = false
-            likePost(viewHolder)
+            likePost(viewHolder, link)
 
         }
 //        viewHolder.itemView.postImageProfile.setOnClickListener {
@@ -665,15 +719,13 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
 //        }
     }
 
-    private fun likePost(viewHolder: GroupieViewHolder){
-        db.collection("Users").document(username).collection("My Posts").document(uid)
-            .get()
+    private fun likePost(viewHolder: GroupieViewHolder, link: DocumentReference){
+        link.get()
             .addOnSuccessListener {
                 if(it != null){
                     if(it["Liked"].toString().toBoolean()){
                         Log.d("profilepage", "disliking")
-                        db.collection("Users").document(username).collection("My Posts").document(uid)
-                            .update("Liked", false)
+                        link.update("Liked", false)
                             .addOnSuccessListener { it2 ->
                                 if(it2 != null){
                                     Log.d("profilepage", "user updated")
@@ -718,8 +770,7 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                     }
                     else{
                         Log.d("profilepage", "liking")
-                        db.collection("Users").document(username).collection("My Posts").document(uid)
-                            .update("Liked", true)
+                        link.update("Liked", true)
                             .addOnSuccessListener { it2 ->
                                 if(it2 != null){
                                     Log.d("profilepage", "user updated")

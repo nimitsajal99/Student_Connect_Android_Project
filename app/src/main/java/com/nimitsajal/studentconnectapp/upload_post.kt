@@ -1002,7 +1002,17 @@ class upload_post : AppCompatActivity() {
             "Sleeve","Eyelash","Rectangle","Font","Red hair","Forehead","Nose","Eyebrow","Muscle",
             "Collar","Symmetry","Brand","Human","Finger","Youth","People","T-shirt","Wrist",
             "Trousers","Waist","Plaid","Lip","Beard","Facial hair","Moustache","Snapshot","Chest",
-            "Flesh","Magenta","Sky","Water","Vision care","Eyewear","Shorts","Fun")
+            "Flesh","Magenta","Sky","Water","Vision care","Eyewear","Shorts","Fun",
+
+            "Pink","Red","Blue","Green","Electric blue","Purple","Peach","Neon",
+
+            "Pattern","Wood","Hardwood","Display case","Column","Light fixture",
+            "Varnish","Hybrid tea rose","Woody plant","Ground cover","Shrub","Annual plant","Rose order",
+            "Branch","Hybrid tea rose","Petal","Arm","Cool","Black hair","Long hair","Body jewelry","Facade","Signage",
+            "Neon sign","Electronic signage","Abdomen","Eye","Rite","Carmine","Twig","Wheel","Tire","Bumper",
+            "Wrinkle","Woody plant","Leaf","Human body","Elbow","Joint","Shoulder","Thigh","Knee","Grass","Human leg",
+            "Hand","Circle","Number","Flooring","Floor","Gas","Room","Metal","Composite material","Ceiling",
+            "Cheek","Curtain")
         if(tag in blockedList){
             return false
         }
