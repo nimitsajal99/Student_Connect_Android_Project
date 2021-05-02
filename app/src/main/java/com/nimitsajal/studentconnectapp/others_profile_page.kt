@@ -334,7 +334,7 @@ class others_profile_page : AppCompatActivity() {
                                             .addOnSuccessListener {it3 ->
                                                 if(it3 != null){
                                                     comCount = it3.size()-1
-                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id, false))
+                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id, false, ""))
                                                 }
                                             }
                                     }

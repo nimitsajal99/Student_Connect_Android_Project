@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.NoActionBar">
-        <activity android:name=".myPost"></activity>
+        <activity android:name=".taggedPost"></activity>
+        <activity android:name=".myPost" />
         <activity android:name=".eventPage" />
         <activity android:name=".editProfile" />
         <!--
@@ -41,15 +42,12 @@
             android:value="AIzaSyAgSCTZvb3WJy0hc8PryEAxgihFd_JN92k" />
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-<!--        <meta-data-->
-<!--            android:name="com.google.mlkit.vision.DEPENDENCIES"-->
-<!--            android:value="ica" />-->
-
+            android:value="@integer/google_play_services_version" /> <!-- <meta-data -->
+        <!-- android:name="com.google.mlkit.vision.DEPENDENCIES" -->
+        <!-- android:value="ica" /> -->
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="label" />
-
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="face" />

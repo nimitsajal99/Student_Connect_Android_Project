@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base0"
+    tools:context=".mainFeed">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/base0light"
+            android:foregroundGravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/back_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="NotSibling" />
+
+            <ImageView
+                android:id="@+id/studentConnectNewChat"
+                android:layout_width="200dp"
+                android:layout_height="30dp"
+                android:src="@drawable/rutu_logo"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="67dp"
+                android:visibility="visible"
+                />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="60dp"
+            app:layout_constraintTop_toBottomOf="@id/topBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:scrollbars="vertical"
+            android:overScrollMode="ifContentScrolls"
+            android:isScrollContainer="true"
+            android:fadeScrollbars="true">
+
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:cardCornerRadius="2dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/base0card"
+                android:clickable="true"
+                android:focusable="true"
+                >
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="10dp"
+                    tools:ignore="ExtraText">
+
+                    <ProgressBar
+                        android:id="@+id/pbDpMyPost"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:indeterminate="true"
+                        android:indeterminateTintMode="src_atop"
+                        android:indeterminateTint="@color/base3"
+                        app:layout_constraintBottom_toBottomOf="@id/circularImageViewCard"
+                        app:layout_constraintTop_toTopOf="@id/circularImageViewCard"
+                        app:layout_constraintRight_toRightOf="@id/circularImageViewCard"
+                        app:layout_constraintLeft_toLeftOf="@id/circularImageViewCard"
+                        />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/circularImageViewCard"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        app:civ_border_width="2dp"
+                        app:civ_border_color="@color/base2"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="13dp"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/postImageCard"/>
+
+                    <TextView
+                        android:id="@+id/tvUsernameCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:text="username"
+                        android:textColor="@color/base3"
+                        android:textSize="21sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:layout_marginLeft="8sp"
+                        app:layout_constraintLeft_toRightOf="@id/circularImageViewCard"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
+
+                    <TextView
+                        android:id="@+id/tvLikeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Likes"
+                        android:textColor="@color/base3"
+                        android:textSize="17sp"
+                        android:textStyle="normal"
+                        android:gravity="center"
+                        android:layout_marginBottom="3dp"
+                        android:layout_marginRight="3dp"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/postImageCard"
+                        />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cvBehindImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:cardCornerRadius="2dp"
+                        app:cardUseCompatPadding="true"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@color/base1"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ProgressBar
+                            android:id="@+id/pbMyPost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:layout_gravity="center"
+                            android:elevation="10dp"
+                            android:indeterminateTintMode="src_atop"
+                            android:indeterminateTint="@color/base3"
+                            />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <ImageView
+                        android:id="@+id/postImageCard"
+                        android:layout_height="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="0dp"
+                        android:padding="3dp"
+                        android:elevation="2dp"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintTop_toBottomOf="@id/tvUsernameCard"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        />
+
+
+                    <!--        <ImageView-->
+                    <!--            android:layout_width="match_parent"-->
+                    <!--            android:layout_height="2dp"-->
+                    <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+                    <!--            app:layout_constraintBottom_toTopOf="@id/postImageCard"/>-->
+                    <!--        <ImageView-->
+                    <!--            android:layout_width="match_parent"-->
+                    <!--            android:layout_height="2dp"-->
+                    <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+                    <!--            app:layout_constraintTop_toBottomOf="@id/postImageCard"/>-->
+
+                    <TextView
+                        android:id="@+id/tvDescriptionCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/base3"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:text=""
+                        android:gravity="center_horizontal"
+                        app:layout_constraintTop_toBottomOf="@id/postImageCard"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="5dp"/>
+
+                    <TextView
+                        android:id="@+id/tvRemoveTag"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/base2"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:text="Remove Tag"
+                        android:visibility="visible"
+                        android:gravity="center_horizontal"
+                        app:layout_constraintTop_toBottomOf="@id/tvDescriptionCard"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="5dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvComments_tagged"
+                        android:clickable="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:visibility="visible"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintTop_toBottomOf="@id/tvRemoveTag"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/pbRemoveTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:layout_gravity="center"
+                        android:elevation="10dp"
+                        android:visibility="gone"
+                        android:indeterminateTintMode="src_atop"
+                        android:indeterminateTint="@color/base3"
+                        app:layout_constraintTop_toBottomOf="@id/tvDescriptionCard"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        />
+
+                    <!--        <ImageView-->
+                    <!--            android:layout_width="match_parent"-->
+                    <!--            android:layout_height="2dp"-->
+                    <!--            android:background="@drawable/rounded_corners_textfields_base1"-->
+                    <!--            app:layout_constraintTop_toBottomOf="@id/rvComments"/>-->
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.core.widget.NestedScrollView>
+
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

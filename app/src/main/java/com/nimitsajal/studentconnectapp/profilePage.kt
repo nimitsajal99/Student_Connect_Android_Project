@@ -107,7 +107,7 @@ class profilePage : AppCompatActivity() {
             if(toggle){
                 tvTagged.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
                 tvUploads.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24F)
-                tvUploads.setTextColor(ContextCompat.getColor(this, R.color.base1))
+                tvUploads.setTextColor(ContextCompat.getColor(this, R.color.base2))
                 tvTagged.setTextColor(ContextCompat.getColor(this, R.color.base0light))
                 toggle = false
                 adapter.clear()
@@ -120,7 +120,7 @@ class profilePage : AppCompatActivity() {
                 tvTagged.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24F)
                 tvUploads.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
                 tvUploads.setTextColor(ContextCompat.getColor(this, R.color.base0light))
-                tvTagged.setTextColor(ContextCompat.getColor(this, R.color.base1))
+                tvTagged.setTextColor(ContextCompat.getColor(this, R.color.base2))
                 toggle = true
                 adapter.clear()
                 loadPost(db, username!!, adapter, dp)
@@ -265,7 +265,7 @@ class profilePage : AppCompatActivity() {
                                             .addOnSuccessListener {it3 ->
                                                 if(it3 != null){
                                                     comCount = it3.size()-1
-                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id, toggle))
+                                                    adapter.add(profile_post_class(it2["Picture"].toString(), it2["Likes"].toString().toInt(), comCount, it2["Description"].toString(), username, db, document.id, toggle, it2["From"].toString()))
                                                 }
                                             }
                                     }
@@ -284,6 +284,18 @@ class profilePage : AppCompatActivity() {
                         intent.putExtra("description", post.description)
                         intent.putExtra("dp", dp.picture)
                         intent.putExtra("others", "false")
+                        startActivity(intent)
+                        overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
+                    }
+                    else{
+                        val post: profile_post_class = item as profile_post_class
+                        val intent = Intent(this, taggedPost::class.java)
+                        intent.putExtra("username", post.myUsername)
+                        intent.putExtra("picture", post.url)
+                        intent.putExtra("uid", post.uid)
+                        intent.putExtra("description", post.description)
+                        intent.putExtra("dp", dp.picture)
+                        intent.putExtra("others", "true")
                         startActivity(intent)
                         overridePendingTransition(R.anim.slide_from_bottom, R.anim.slide_to_top)
                     }
@@ -615,7 +627,7 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
 
 }
 
-class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String, var toggle: Boolean): Item<GroupieViewHolder>(){
+class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String, var toggle: Boolean, var myUsername: String): Item<GroupieViewHolder>(){
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         Picasso.get().load(url).into(viewHolder.itemView.postImageProfile, object : Callback {
