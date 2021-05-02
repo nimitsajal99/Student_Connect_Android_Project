@@ -3,13 +3,14 @@ package com.nimitsajal.studentconnectapp
 import android.annotation.SuppressLint
 import android.companion.AssociationRequest
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.icu.number.NumberFormatter.with
 import android.os.Build
 import android.os.Bundle
 import android.transition.Transition
 import android.util.Log
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -17,7 +18,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.text.HtmlCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -622,7 +625,9 @@ class mainFeed : AppCompatActivity() {
                                                                 username,
                                                                 adapter,
                                                                 adapterComments,
-                                                                false
+                                                                false,
+                                                                it2["Faces"].toString().toInt(),
+                                                                0
                                                             )
                                                         )
                                                     }
@@ -1313,20 +1318,43 @@ data class postList(
 //    }
 //}
 
-class post_class(var username: String, var imageUrl: String, var dpUrl: String, var description: String, var likeCount: Int, var uid: String, var myusername: String, var adapter: GroupAdapter<GroupieViewHolder>, var adapterComment: GroupAdapter<GroupieViewHolder>, var isComBox: Boolean): Item<GroupieViewHolder>()
+class post_class(
+    var username: String,
+    var imageUrl: String,
+    var dpUrl: String,
+    var description: String,
+    var likeCount: Int,
+    var uid: String,
+    var myusername: String,
+    var adapter: GroupAdapter<GroupieViewHolder>,
+    var adapterComment: GroupAdapter<GroupieViewHolder>,
+    var isComBox: Boolean,
+    var faces: Int,
+    var tagged: Int
+): Item<GroupieViewHolder>()
 {
+    var taggedBitmap: Bitmap? = null
+    var untaggedBitmap: Bitmap? = null
+    var showTagged = false
+
     @SuppressLint("RestrictedApi", "ResourceType")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.pbFeed.isVisible = true
         if(likeCount == 0){
             val likes = "No Likes Yet"
+            viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f)
+            viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.ITALIC)
             viewHolder.itemView.tvLikeCount.text = likes
         }
         else if(likeCount == 1){
             val likes = "1 Like"
+            viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+            viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
             viewHolder.itemView.tvLikeCount.text = likes
         }
         else{
+            viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+            viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
             var count: Double = likeCount.toDouble()
             if(likeCount >= 1000000){
                 var ans: Double = ((count - count%10000)/1000000).toDouble()
@@ -1343,9 +1371,48 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
                 viewHolder.itemView.tvLikeCount.text = likes
             }
         }
-
+        if(faces > 0){
+            Glide.with(viewHolder.itemView.context)
+                .asBitmap()
+                .load(imageUrl)
+                .into(object : CustomTarget<Bitmap>(){
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        untaggedBitmap = resource
+                        getTagged(viewHolder)
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // this is called when imageView is cleared on lifecycle call or for
+                        // some other reason.
+                        // if you are referencing the bitmap somewhere else too other than this imageView
+                        // clear it here as you can no longer have the bitmap
+                    }
+                })
+        }
         viewHolder.itemView.rvComments.adapter = adapterComment
-
+        viewHolder.itemView.tvTagCount.setOnClickListener {
+            if(tagged > 0){
+                if(showTagged){
+                    showTagged = false
+                    viewHolder.itemView.postImageCard.setImageBitmap(untaggedBitmap)
+                    var string = viewHolder.itemView.tvTagCount.text
+                    val htmlString = "$string"
+                    viewHolder.itemView.tvTagCount.text = HtmlCompat.fromHtml(
+                        htmlString,
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                }
+                else{
+                    showTagged = true
+                    viewHolder.itemView.postImageCard.setImageBitmap(taggedBitmap)
+                    var string = viewHolder.itemView.tvTagCount.text
+                    val htmlString = "<u>$string</>"
+                    viewHolder.itemView.tvTagCount.text = HtmlCompat.fromHtml(
+                        htmlString,
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                }
+            }
+        }
         viewHolder.itemView.tvUsernameCard.text = username
         viewHolder.itemView.tvDescriptionCard.text = description
         Picasso.get().load(dpUrl).into(viewHolder.itemView.circularImageViewCard, object : Callback {
@@ -1405,13 +1472,19 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             liked(true)
             if(likeCount == 0){
                 val likes = "No Likes Yet"
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.ITALIC)
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else if(likeCount == 1){
                 val likes = "1 Like"
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else{
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
                 var count: Double = likeCount.toDouble()
                 if(likeCount >= 1000000){
                     var ans: Double = ((count - count%10000)/1000000).toDouble()
@@ -1435,13 +1508,19 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
             liked(false)
             if(likeCount == 0){
                 val likes = "No Likes Yet"
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.ITALIC)
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else if(likeCount == 1){
                 val likes = "1 Like"
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
                 viewHolder.itemView.tvLikeCount.text = likes
             }
             else{
+                viewHolder.itemView.tvLikeCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,17f)
+                viewHolder.itemView.tvLikeCount.setTypeface(null, Typeface.NORMAL)
                 var count: Double = likeCount.toDouble()
                 if(likeCount >= 1000000){
                     var ans: Double = ((count - count%10000)/1000000).toDouble()
@@ -1575,6 +1654,108 @@ class post_class(var username: String, var imageUrl: String, var dpUrl: String, 
 
     override fun getLayout(): Int {
         return R.layout.post_adapter_cardiew
+    }
+
+    private fun getTagged(viewHolder: GroupieViewHolder){
+        val db = FirebaseFirestore.getInstance()
+        var faceDetect = mutableListOf<faceDetection>()
+        var count = 0
+        db.collection("Post").document(uid).collection("Faces")
+            .get()
+            .addOnSuccessListener {
+                for(doc in it.documents){
+                    if(doc.id != "Info"){
+                        var rect = Rect(doc["Left"].toString().toInt(), doc["Top"].toString().toInt(), doc["Right"].toString().toInt(), doc["Bottom"].toString().toInt())
+                        var faceObject = faceDetection(doc.id.toString(), rect, doc["RotY"].toString().toFloat(), doc["RotZ"].toString().toFloat(), 0.0f, doc["Tagged"].toString().toBoolean(), untaggedBitmap!!, 0)
+                        faceDetect.add(faceObject)
+                        if(doc["Tagged"].toString().toBoolean()){
+                            count += 1
+                        }
+                    }
+                }
+                tagged = count
+                if(tagged > 0){
+                    var string = tagged.toString() + " Tags"
+                    viewHolder.itemView.tvTagCount.text = string
+                    viewHolder.itemView.tvTagCount.setTextSize(TypedValue.COMPLEX_UNIT_SP,20f)
+                    viewHolder.itemView.tvTagCount.setTypeface(null, Typeface.BOLD)
+                    viewHolder.itemView.tvTagCount.setTextColor(ContextCompat.getColor(viewHolder.itemView.context, R.color.base2));
+
+                }
+                drawDetectionResult(untaggedBitmap!!, faceDetect)
+            }
+    }
+
+
+
+    private fun drawDetectionResult(bitmap: Bitmap, detectionResults: List<faceDetection>) {
+        val outputBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(outputBitmap)
+        val pen = Paint()
+        pen.textAlign = Paint.Align.LEFT
+        var count = 0
+
+        detectionResults.forEach {
+            Log.d("cloud", "Creating Another Square")
+            // draw bounding box
+            if(it.named){
+                pen.color = Color.GREEN
+            }
+            else{
+                pen.color = Color.GRAY
+            }
+
+            pen.strokeWidth = 4F
+            pen.style = Paint.Style.STROKE
+            val box = it.boundingBox
+//            box.left = box.left - 25
+//            box.top = box.top - 25
+//            box.right = box.right + 25
+//            box.bottom = box.bottom + 25
+//            canvas.drawRect(box, pen)
+            canvas.drawRoundRect(box.left.toFloat(), box.top.toFloat(), box.right.toFloat() - 5f, box.bottom.toFloat(), 7F, 7F, pen)
+
+            val tagSize = Rect(0, 0, 0, 0)
+
+            // calculate the right font size
+            pen.style = Paint.Style.FILL_AND_STROKE
+            pen.color = Color.YELLOW
+
+            if(it.named){
+                pen.color = Color.GREEN
+            }
+            else{
+                pen.color = Color.TRANSPARENT
+            }
+
+            pen.strokeWidth = 2F
+
+            pen.textSize = 40F
+            pen.getTextBounds(it.faceId, 0, it.faceId.length, tagSize)
+            val fontSize: Float = pen.textSize * box.width() / tagSize.width()
+
+            // adjust the font size so texts are inside the bounding box
+            if (fontSize < pen.textSize) pen.textSize = fontSize
+
+            var margin = (box.width() - tagSize.width()) / 2.0F
+            if (margin < 0F) margin = 0F
+            if(box.top-tagSize.height().times(1.3F) > 0){
+                canvas.drawText(
+                    it.faceId, box.left + margin,
+                    box.top - tagSize.height().times(0.3F), pen
+                )
+            }
+            else{
+                canvas.drawText(
+                    it.faceId, box.left + margin,
+                    box.bottom + tagSize.height().times(1.3F), pen
+                )
+            }
+
+            count += 1
+        }
+        Log.d("cloud", "NEW BITMAP CREATED")
+        taggedBitmap = outputBitmap
     }
 
     private fun commented(comment: String){

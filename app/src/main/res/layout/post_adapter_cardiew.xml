@@ -42,8 +42,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circularImageViewCard"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:civ_border_width="2dp"
             app:civ_border_color="@color/base2"
             android:layout_marginStart="0dp"
@@ -57,10 +57,10 @@
         <TextView
             android:id="@+id/tvUsernameCard"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
+            android:layout_height="50dp"
             android:text="username"
             android:textColor="@color/base3"
-            android:textSize="21sp"
+            android:textSize="23sp"
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginLeft="8sp"
@@ -80,6 +80,23 @@
             android:layout_marginBottom="3dp"
             android:layout_marginRight="3dp"
             app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tvTagCount"
+            />
+
+        <TextView
+            android:id="@+id/tvTagCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nobody was Tagged"
+            android:textColor="@color/base3"
+            android:textSize="15sp"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:layout_marginBottom="3dp"
+            android:layout_marginRight="3dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvLikeCount"
             app:layout_constraintBottom_toTopOf="@id/postImageCard"
             />
 
