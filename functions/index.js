@@ -1,5 +1,4 @@
 const functions = require("firebase-functions");
-
 // The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
 // const {user} = require("firebase-functions/lib/providers/auth");
@@ -25,8 +24,6 @@ exports.createUser = functions.https.onCall((data, context) => {
     displayName: data.name,
   })
       .then((userRecord) => {
-        const d = new Date();
-        const n1 = d.getTime();
         console.log("Successfully created new user:", userRecord.uid);
         const userTable = admin.firestore().collection("User Table");
         userTable.doc(userRecord.uid).set({
@@ -43,6 +40,8 @@ exports.createUser = functions.https.onCall((data, context) => {
           "Picture": data.url,
           "Semester": data.semesterName,
           "University": data.universityName,
+          "Logged": true,
+          "Tags": 3,
         });
         users.doc(data.userName).collection("Chats").doc("Info").set({
           "Info": "Info",
@@ -105,18 +104,44 @@ exports.createUser = functions.https.onCall((data, context) => {
           // console.log("Document data:", doc.data());
           // console.log("Document data:", doc.data().Course);
           const tags = admin.firestore().collection("Tags");
+          users.doc(data.userName).collection("Tags")
+              .doc(doc.data().Course).set({
+                "Value": 1,
+                "Inbuilt": true,
+              });
           tags.doc(doc.data().Course).collection("Student")
               .doc(data.userName).set({
                 "Info": "Info",
               });
         });
-
-        const d2 = new Date();
-        const n2 = d2.getTime();
-        const n = n2-n1;
-        console.log("n1 = ", n1);
-        console.log("n2 = ", n2);
-        console.log("n = ", n);
+        const branchInfo = university.doc("Next")
+            .collection(data.universityName)
+            .doc("Next")
+            .collection(data.collegeName)
+            .doc(data.branchName);
+        branchInfo.get().then((doc) => {
+          // console.log("Document data:", doc.data());
+          // console.log("Document data:", doc.data().Course);
+          const tags = admin.firestore().collection("Tags");
+          users.doc(data.userName).collection("Tags")
+              .doc(doc.data().Course).set({
+                "Value": 1,
+                "Inbuilt": true,
+              });
+          tags.doc(doc.data().Course).collection("Student")
+              .doc(data.userName).set({
+                "Info": "Info",
+              });
+          tags.doc(doc.data().Level).collection("Student")
+              .doc(data.userName).set({
+                "Info": "Info",
+              });
+          users.doc(data.userName).collection("Tags")
+              .doc(doc.data().Level).set({
+                "Value": 1,
+                "Inbuilt": true,
+              });
+        });
       })
       .catch((error) => {
         console.log("Error creating new user:", error);
@@ -466,3 +491,45 @@ exports.deletePost = functions.https.onCall((data, context) => {
         console.error("Error while uploading picture: ", error);
       });
 });
+
+exports.addTag = functions.https.onCall((data, context) => {
+  const tag = admin.firestore().collection("Users").doc(data.userName)
+      .collection("Tags").doc(data.tagName);
+  tag.get().then(function(doc) {
+    if (doc.exists) {
+      console.log("Tag already exists", doc.id);
+      tag.set({
+        "Value": (doc.data().Value + 1),
+        "Inbuilt": doc.data().Inbuilt,
+      });
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+      tag.set({
+        "Value": 1,
+        "Inbuilt": false,
+      });
+    }
+  });
+});
+
+exports.removeTag = functions.https.onCall((data, context) => {
+  const tag = admin.firestore().collection("Users").doc(data.userName)
+      .collection("Tags").doc(data.tagName);
+  tag.get().then(function(doc) {
+    if (doc.exists) {
+      console.log("Tag already exists", doc.id);
+      if (doc.data().Value > 1) {
+        tag.set({
+          "Value": (doc.data().Value - 1),
+          "Inbuilt": doc.data().Inbuilt,
+        });
+      } else {
+        tag.delete().then((doc) => {
+          console.log("Tag Deleted", data.tagName);
+        });
+      }
+    }
+  });
+});
+

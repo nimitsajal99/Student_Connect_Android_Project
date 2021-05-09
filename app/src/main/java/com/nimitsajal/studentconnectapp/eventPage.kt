@@ -9,18 +9,26 @@ import android.view.MotionEvent
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main_feed.*
+import java.util.HashMap
 
 class eventPage : AppCompatActivity() {
 
     private lateinit var detector: GestureDetectorCompat
+    private lateinit var functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_page)
 
+        functions = Firebase.functions
         var username = intent.getStringExtra("username")
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -32,6 +40,7 @@ class eventPage : AppCompatActivity() {
                     username = result.getString("Username").toString()
                     Log.d("profilePage", username.toString())
                     detector = GestureDetectorCompat(this,DiaryGestureListener(username))
+//                    tagCaller(username!!, "Hello", false, db)
                 }
                 else{
                     showToast("ERROR", 1)
@@ -66,6 +75,74 @@ class eventPage : AppCompatActivity() {
         btnFeed.setOnClickListener {
             goToFeed(username!!)
         }
+    }
+
+    private fun tagCloud(username: String, tagName: String, add: Boolean): Task<Any> {
+        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+        data.put("userName", username)
+        data.put("tagName", tagName)
+        if(add){
+            return functions
+                .getHttpsCallable("addTag")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+        }
+        else{
+            return functions
+                .getHttpsCallable("removeTag")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+        }
+    }
+
+    private fun tagCaller(username: String, tagName: String, add: Boolean, db: FirebaseFirestore){
+        tagCloud(username, tagName, add)
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if(task.isSuccessful){
+                    if(add){
+                        db.collection("Users").document(username)
+                            .get()
+                            .addOnSuccessListener {
+                                db.collection("Users").document(username)
+                                    .update("Tags", (it["Tags"].toString().toInt() + 1))
+                                    .addOnSuccessListener {
+                                        Log.d("tag", "Tag updated - added")
+                                    }
+                            }
+                    }
+                    else{
+                        db.collection("Users").document(username)
+                            .get()
+                            .addOnSuccessListener {
+                                db.collection("Users").document(username)
+                                    .update("Tags", (it["Tags"].toString().toInt() - 1))
+                                    .addOnSuccessListener {
+                                        Log.d("tag", "Tag updated - subtracted")
+                                    }
+                            }
+                    }
+                }
+            })
     }
 
     private fun showToast(message: String, type: Int)

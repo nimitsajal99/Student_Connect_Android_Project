@@ -74,6 +74,11 @@ class mainFeed : AppCompatActivity() {
                             arraySearch
                         )
                     )
+                    db.collection("Users").document(username!!)
+                        .update("Logged", true)
+                        .addOnSuccessListener {
+                            Log.d("profilePage", "User Logged as TRUE")
+                        }
                     loadFeed(arrayPost, adapter, username!!, db)
                     //TODO: friendsuggestion called
 //                    friendSuggestion(db,username!!,adapter)
