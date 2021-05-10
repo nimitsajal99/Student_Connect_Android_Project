@@ -204,30 +204,120 @@ exports.uploadPost = functions.https.onCall((data, context) => {
               .set({
                 "Confidence": data.confidence1,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo1);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              tag.set({
+                "Value": (docc.data().Value + 1),
+                "Inbuilt": docc.data().Inbuilt,
+              });
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              tag.set({
+                "Value": 1,
+                "Inbuilt": false,
+              });
+            }
+          });
         }
         if (data.tagNo2 != "xxxxx") {
           post.doc(docRef.id).collection("Tags").doc(data.tagNo2)
               .set({
                 "Confidence": data.confidence2,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo2);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              tag.set({
+                "Value": (docc.data().Value + 1),
+                "Inbuilt": docc.data().Inbuilt,
+              });
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              tag.set({
+                "Value": 1,
+                "Inbuilt": false,
+              });
+            }
+          });
         }
         if (data.tagNo3 != "xxxxx") {
           post.doc(docRef.id).collection("Tags").doc(data.tagNo3)
               .set({
                 "Confidence": data.confidence3,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo3);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              tag.set({
+                "Value": (docc.data().Value + 1),
+                "Inbuilt": docc.data().Inbuilt,
+              });
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              tag.set({
+                "Value": 1,
+                "Inbuilt": false,
+              });
+            }
+          });
         }
         if (data.tagNo4 != "xxxxx") {
           post.doc(docRef.id).collection("Tags").doc(data.tagNo4)
               .set({
                 "Confidence": data.confidence4,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo4);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              tag.set({
+                "Value": (docc.data().Value + 1),
+                "Inbuilt": docc.data().Inbuilt,
+              });
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              tag.set({
+                "Value": 1,
+                "Inbuilt": false,
+              });
+            }
+          });
         }
         if (data.tagNo0 != "xxxxx") {
           post.doc(docRef.id).collection("Tags").doc(data.tagNo0)
               .set({
                 "Confidence": data.confidence0,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo0);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              tag.set({
+                "Value": (docc.data().Value + 1),
+                "Inbuilt": docc.data().Inbuilt,
+              });
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              tag.set({
+                "Value": 1,
+                "Inbuilt": false,
+              });
+            }
+          });
         }
         if (data.faceId0 != "xxxxx") {
           const smile = (data.smile0 == "true" || data.smile0 == "True");

@@ -15,10 +15,15 @@ import android.widget.Toast
 import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -32,10 +37,12 @@ import kotlinx.android.synthetic.main.details_adapter.view.*
 class others_profile_page : AppCompatActivity() {
 
     private lateinit var detector: GestureDetectorCompat
+    private lateinit var functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile_page)
+        functions = Firebase.functions
 
         var username: String = ""
         var isFriend: Boolean = false
@@ -209,7 +216,6 @@ class others_profile_page : AppCompatActivity() {
                 show()
             }
         }
-
     }
 
     private fun goToFeed(username: String){
@@ -360,42 +366,197 @@ class others_profile_page : AppCompatActivity() {
             }
     }
 
+    private fun deletefriend(From: String, db: FirebaseFirestore, Removing: String)
+    {
+        Log.d("others", "in delete")
+        var list = mutableListOf<String>()
+        db.collection("Users").document(From).collection("Friends").document(Removing)
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful)
+                {
+                    var i = 0
+                    val temp = it.getResult()
+                    while(i<temp["HashTags"].toString().toInt())
+                    {
+                        var string = "Tag" + i
+                        list.add(temp[string].toString())
+                        Log.d("others", "$string -> ${list[i]}")
+//                        tagCaller(From,list[i],false,db)
+                        i+=1
+                    }
+                    db.collection("Users").document(From).collection("Friends").document(Removing)
+                        .delete()
+                        .addOnCompleteListener {it2->
+                            if(it2.isSuccessful)
+                            {
+                                Log.d("others", "$From is removed")
+                            }
+                        }
+                    db.collection("Users").document(From)
+                        .get()
+                        .addOnSuccessListener {
+                            db.collection("Users").document(From)
+                                .update("Tags", (it["Tags"].toString().toInt() - list.size))
+                                .addOnSuccessListener {
+                                    Log.d("others", "Tag updated - subtracted")
+                                }
+                        }
+                    i = 0
+                    for(abc in list){
+                        db.collection("Users").document(From).collection("Tags").document(abc)
+                            .get()
+                            .addOnSuccessListener { it2 ->
+                                if(it2.exists()){
+                                    if(it2["Value"].toString().toInt() > 1){
+                                        db.collection("Users").document(From).collection("Tags").document(abc)
+                                            .update("Value", (it2["Value"].toString().toInt() - 1))
+                                            .addOnCompleteListener {
+                                                Log.d("others", "$From updated - subtracted, ${abc}")
+                                            }
+                                    }
+                                    else{
+                                        db.collection("Users").document(From).collection("Tags").document(abc)
+                                            .delete()
+                                            .addOnCompleteListener {
+                                                Log.d("others", "$From updated - subtracted, ${abc}")
+                                            }
+                                    }
+                                }
+                            }
+                            .addOnFailureListener {
+                                db.collection("Users").document(From).collection("Tags").document(abc)
+                                    .delete()
+                                    .addOnCompleteListener {
+                                        Log.d("others", "$From updated - subtracted, ${abc}")
+                                    }
+                            }
+                        i += 1
+                    }
+                }
+            }
+    }
+
+    private fun addfriend(From: String, db: FirebaseFirestore, FromHash: HashMap<String, String>, To: String)
+    {
+        var percent = 0.0F
+        var list = mutableListOf<String>()
+        db.collection("Users").document(From)
+            .get()
+            .addOnSuccessListener { count ->
+                db.collection("Users").document(From).collection("Tags")
+                    .get()
+                    .addOnSuccessListener {
+                        if (it.size() != 0)
+                        {
+                            for (tag in it.documents)
+                            {
+
+//                                percent = tag["Value"].toString().toFloat()/count["Tags"].toString().toFloat()
+                                if (tag["Inbuilt"].toString().toBoolean())
+                                {
+                                    list.add(tag.id)
+                                }
+                                else if(count["Tags"].toString().toInt() > 25 && percent >= 0.20F)
+                                {
+                                    list.add(tag.id)
+                                }
+                            }
+                            FromHash.put("HashTags", list.size.toString())
+                            var i = 0
+                            while(i<list.size)
+                            {
+                                var string = "Tag" + i
+                                FromHash.put(string, list[i])
+                                Log.d("others", "$string -> ${list[i]}")
+//                                tagCaller(To,list[i],true,db)
+                                i+=1
+                            }
+                            db.collection("Users").document(To).collection("Friends").document(From)
+                                .set(FromHash)
+                                .addOnCompleteListener {it3 ->
+                                    if(it3.isSuccessful){
+                                        Log.d("others", "$From is added")
+                                    }
+                                    else{
+                                        Log.d("others", "inner user not entered = $it3")
+                                    }
+                                }
+                            db.collection("Users").document(To)
+                                .get()
+                                .addOnSuccessListener {
+                                    db.collection("Users").document(To)
+                                        .update("Tags", (it["Tags"].toString().toInt() + list.size))
+                                        .addOnSuccessListener {
+                                            Log.d("others", "Tag updated - added")
+                                        }
+                                }
+                            i = 0
+                            for(abc in list){
+                                db.collection("Users").document(To).collection("Tags").document(abc)
+                                    .get()
+                                    .addOnSuccessListener { it2 ->
+                                        if(it2.exists()){
+                                            db.collection("Users").document(To).collection("Tags").document(abc)
+                                                .update("Value", (it2["Value"].toString().toInt() + 1))
+                                                .addOnCompleteListener {
+                                                    Log.d("others", "$To updated - added, ${abc}")
+                                                }
+                                        }
+                                        else{
+                                            var data: HashMap<String, Any> = hashMapOf<String, Any>()
+                                            data.put("Inbuilt", false)
+                                            data.put("Value", 1)
+                                            db.collection("Users").document(To).collection("Tags").document(abc)
+                                                .set(data)
+                                                .addOnCompleteListener{
+                                                    Log.d("others", "$To updated - added, ${abc}")
+                                                }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+                                        data.put("Inbuilt", false)
+                                        data.put("Value", 1)
+                                        db.collection("Users").document(To).collection("Tags").document(abc)
+                                            .set(data)
+                                            .addOnCompleteListener{
+                                                Log.d("others", "$To updated - added, ${abc}")
+                                            }
+                                    }
+                                i += 1
+                            }
+                        }
+                    }
+            }
+    }
+
     private fun friend(username: String, usernameOthers: String, db: FirebaseFirestore, friend: isFriend, adapterPost: GroupAdapter<GroupieViewHolder>){
-        if(friend.isFriend){
-            db.collection("Users").document(username).collection("Friends").document(usernameOthers)
-                .delete()
-                .addOnCompleteListener{
-                    if(it.isSuccessful){
-                        Log.d("others", "userOther removed from user")
-                    }
-                }
-            db.collection("Users").document(usernameOthers).collection("Friends").document(username)
-                .delete()
-                .addOnCompleteListener {it2 ->
-                    if(it2.isSuccessful){
-                        showToast("$usernameOthers is no longer a Friend", 2)
-                        friend.isFriend = false
-                        friend.count = friend.count-1
+        if(friend.isFriend)
+        {
+            deletefriend(username,db,usernameOthers)
+            deletefriend(usernameOthers,db,username)
+            showToast("$usernameOthers is no longer a Friend", 2)
+            friend.isFriend = false
+            friend.count = friend.count-1
 
-                        var double: Double = friend.count.toDouble()
-                        if(friend.count >= 1000000){
-                            double = (double - double%100000)/1000000
-                            val str = "Add Friend (" + double + "M)"
-                            btnFriendsOthers.text = str
-                        }
-                        else if(friend.count >= 1000){
-                            double = (double - double%100)/1000
-                            val str = "Add Friend (" + double + "K)"
-                            btnFriendsOthers.text = str
-                        }
-                        else{
-                            val str = "Add Friend (" + friend.count + ")"
-                            btnFriendsOthers.text = str
-                        }
+            var double: Double = friend.count.toDouble()
+            if(friend.count >= 1000000){
+                double = (double - double%100000)/1000000
+                val str = "Add Friend (" + double + "M)"
+                btnFriendsOthers.text = str
+            }
+            else if(friend.count >= 1000){
+                double = (double - double%100)/1000
+                val str = "Add Friend (" + double + "K)"
+                btnFriendsOthers.text = str
+            }
+            else{
+                val str = "Add Friend (" + friend.count + ")"
+                btnFriendsOthers.text = str
+            }
 
-                        btnFriendsOthers.isEnabled = true
-                    }
-                }
+            btnFriendsOthers.isEnabled = true
             rvProfilePageOthers.adapter = null
         }
         else{
@@ -408,59 +569,143 @@ class others_profile_page : AppCompatActivity() {
                         dpUsername = it.getString("Picture").toString()
                         name = it.getString("Name").toString()
                         Log.d("others", "user name = $name, dp = $dpUsername")
-                                    val user = hashMapOf(
-                                        "Picture" to dpUsername,
-                                        "Name" to name
-                                    )
-                                    val userOthers = hashMapOf(
-                                        "Picture" to friend.url,
-                                        "Name" to friend.name
-                                    )
-                                    db.collection("Users").document(username).collection("Friends").document(usernameOthers)
-                                        .set(userOthers)
-                                        .addOnCompleteListener {it3 ->
-                                            if(it3.isSuccessful){
-                                                Log.d("others", "user other added in user")
-                                            }
-                                            else{
-                                                Log.d("others", "inner user not entered = $it3")
-                                            }
-                                        }
-                                    db.collection("Users").document(usernameOthers).collection("Friends").document(username)
-                                        .set(user)
-                                        .addOnCompleteListener {it4 ->
-                                            if(it4.isSuccessful){
-                                                showToast("${friend.name} added as a Friend", 2)
-                                                friend.isFriend = true
-                                                friend.count = friend.count+1
+                        val user = hashMapOf(
+                            "Picture" to dpUsername,
+                            "Name" to name
+                        )
+                        val userOthers = hashMapOf(
+                            "Picture" to friend.url,
+                            "Name" to friend.name
+                        )
+                        addfriend(usernameOthers,db,userOthers,username)
+                        addfriend(username,db,user,usernameOthers)
+                        friend.isFriend = true
+                        friend.count = friend.count+1
 
-                                                var double: Double = friend.count.toDouble()
-                                                if(friend.count >= 1000000){
-                                                    double = (double - double%100000)/1000000
-                                                    val str = "Unfriend (" + double + "M)"
-                                                    btnFriendsOthers.text = str
-                                                }
-                                                else if(friend.count >= 1000){
-                                                    double = (double - double%100)/1000
-                                                    val str = "Unfriend (" + double + "K)"
-                                                    btnFriendsOthers.text = str
-                                                }
-                                                else{
-                                                    val str = "Unfriend (" + friend.count + ")"
-                                                    btnFriendsOthers.text = str
-                                                }
+                        var double: Double = friend.count.toDouble()
+                        if(friend.count >= 1000000){
+                            double = (double - double%100000)/1000000
+                            val str = "Unfriend (" + double + "M)"
+                            btnFriendsOthers.text = str
+                        }
+                        else if(friend.count >= 1000){
+                            double = (double - double%100)/1000
+                            val str = "Unfriend (" + double + "K)"
+                            btnFriendsOthers.text = str
+                        }
+                        else{
+                            val str = "Unfriend (" + friend.count + ")"
+                            btnFriendsOthers.text = str
+                        }
 
-                                                btnFriendsOthers.isEnabled = true
-                                            }
-                                        }
-                                        .addOnFailureListener {it5 ->
-                                            Log.d("others", "outer user not entered = ${it5.message}")
-                                        }
+                        btnFriendsOthers.isEnabled = true
                         loadPost(db, usernameOthers, adapterPost, friend.url)
-                                }
+                    }
                 }
         }
     }
+
+//    private fun friend(username: String, usernameOthers: String, db: FirebaseFirestore, friend: isFriend, adapterPost: GroupAdapter<GroupieViewHolder>){
+//        if(friend.isFriend){
+//            db.collection("Users").document(username).collection("Friends").document(usernameOthers)
+//                .delete()
+//                .addOnCompleteListener{
+//                    if(it.isSuccessful){
+//                        Log.d("others", "userOther removed from user")
+//                    }
+//                }
+//            db.collection("Users").document(usernameOthers).collection("Friends").document(username)
+//                .delete()
+//                .addOnCompleteListener {it2 ->
+//                    if(it2.isSuccessful){
+//                        showToast("$usernameOthers is no longer a Friend", 2)
+//                        friend.isFriend = false
+//                        friend.count = friend.count-1
+//
+//                        var double: Double = friend.count.toDouble()
+//                        if(friend.count >= 1000000){
+//                            double = (double - double%100000)/1000000
+//                            val str = "Add Friend (" + double + "M)"
+//                            btnFriendsOthers.text = str
+//                        }
+//                        else if(friend.count >= 1000){
+//                            double = (double - double%100)/1000
+//                            val str = "Add Friend (" + double + "K)"
+//                            btnFriendsOthers.text = str
+//                        }
+//                        else{
+//                            val str = "Add Friend (" + friend.count + ")"
+//                            btnFriendsOthers.text = str
+//                        }
+//
+//                        btnFriendsOthers.isEnabled = true
+//                    }
+//                }
+//            rvProfilePageOthers.adapter = null
+//        }
+//        else{
+//            var dpUsername = ""
+//            var name = ""
+//            db.collection("Users").document(username)
+//                .get()
+//                .addOnSuccessListener {
+//                    if(it != null){
+//                        dpUsername = it.getString("Picture").toString()
+//                        name = it.getString("Name").toString()
+//                        Log.d("others", "user name = $name, dp = $dpUsername")
+//                                    val user = hashMapOf(
+//                                        "Picture" to dpUsername,
+//                                        "Name" to name
+//                                    )
+//                                    val userOthers = hashMapOf(
+//                                        "Picture" to friend.url,
+//                                        "Name" to friend.name
+//                                    )
+//                                    db.collection("Users").document(username).collection("Friends").document(usernameOthers)
+//                                        .set(userOthers)
+//                                        .addOnCompleteListener {it3 ->
+//                                            if(it3.isSuccessful){
+//                                                Log.d("others", "user other added in user")
+//                                            }
+//                                            else{
+//                                                Log.d("others", "inner user not entered = $it3")
+//                                            }
+//                                        }
+//                                    db.collection("Users").document(usernameOthers).collection("Friends").document(username)
+//                                        .set(user)
+//                                        .addOnCompleteListener {it4 ->
+//                                            if(it4.isSuccessful){
+//                                                showToast("${friend.name} added as a Friend", 2)
+//                                                friend.isFriend = true
+//                                                friend.count = friend.count+1
+//
+//                                                var double: Double = friend.count.toDouble()
+//                                                if(friend.count >= 1000000){
+//                                                    double = (double - double%100000)/1000000
+//                                                    val str = "Unfriend (" + double + "M)"
+//                                                    btnFriendsOthers.text = str
+//                                                }
+//                                                else if(friend.count >= 1000){
+//                                                    double = (double - double%100)/1000
+//                                                    val str = "Unfriend (" + double + "K)"
+//                                                    btnFriendsOthers.text = str
+//                                                }
+//                                                else{
+//                                                    val str = "Unfriend (" + friend.count + ")"
+//                                                    btnFriendsOthers.text = str
+//                                                }
+//
+//                                                btnFriendsOthers.isEnabled = true
+//                                            }
+//                                        }
+//                                        .addOnFailureListener {it5 ->
+//                                            Log.d("others", "outer user not entered = ${it5.message}")
+//                                        }
+//                        loadPost(db, usernameOthers, adapterPost, friend.url)
+//                                }
+//                }
+//        }
+//    }
 
     //TODO: search if document exists optimisation
     private fun chat(username: String, db: FirebaseFirestore, friend: isFriend, usernameOthers: String){

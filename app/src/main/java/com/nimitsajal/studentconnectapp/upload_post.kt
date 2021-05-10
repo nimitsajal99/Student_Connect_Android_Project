@@ -461,6 +461,17 @@ class upload_post : AppCompatActivity() {
             count += 1
         }
 
+        val db = FirebaseFirestore.getInstance()
+        db.collection("Users").document(userName)
+            .get()
+            .addOnSuccessListener {
+                db.collection("Users").document(userName)
+                    .update("Tags", (it["Tags"].toString().toInt() + results.size))
+                    .addOnSuccessListener {
+                        Log.d("others", "Tag updated - added")
+                    }
+            }
+
         data.put("noOfFaces", faceDetect.size.toString())
         count = 0
         var smiles = 0
