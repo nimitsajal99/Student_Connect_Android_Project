@@ -199,6 +199,54 @@ exports.uploadPost = functions.https.onCall((data, context) => {
             .catch((err) => {
               console.log("Error getting documents", err);
             });
+        if (data.tagNo0 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo0)
+              .set({
+                "Confidence": data.confidence0,
+              });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo0);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              if (data.confidence0 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence0 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              if (data.confidence0 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence0 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
+            }
+          });
+        }
         if (data.tagNo1 != "xxxxx") {
           post.doc(docRef.id).collection("Tags").doc(data.tagNo1)
               .set({
@@ -209,17 +257,41 @@ exports.uploadPost = functions.https.onCall((data, context) => {
           tag.get().then(function(docc) {
             if (docc.exists) {
               console.log("Tag already exists", docc.id);
-              tag.set({
-                "Value": (docc.data().Value + 1),
-                "Inbuilt": docc.data().Inbuilt,
-              });
+              if (data.confidence1 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence1 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
             } else {
               // doc.data() will be undefined in this case
               console.log("No such document!");
-              tag.set({
-                "Value": 1,
-                "Inbuilt": false,
-              });
+              if (data.confidence1 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence1 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
             }
           });
         }
@@ -233,17 +305,41 @@ exports.uploadPost = functions.https.onCall((data, context) => {
           tag.get().then(function(docc) {
             if (docc.exists) {
               console.log("Tag already exists", docc.id);
-              tag.set({
-                "Value": (docc.data().Value + 1),
-                "Inbuilt": docc.data().Inbuilt,
-              });
+              if (data.confidence2 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence2 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
             } else {
               // doc.data() will be undefined in this case
               console.log("No such document!");
-              tag.set({
-                "Value": 1,
-                "Inbuilt": false,
-              });
+              if (data.confidence2 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence2 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
             }
           });
         }
@@ -257,17 +353,41 @@ exports.uploadPost = functions.https.onCall((data, context) => {
           tag.get().then(function(docc) {
             if (docc.exists) {
               console.log("Tag already exists", docc.id);
-              tag.set({
-                "Value": (docc.data().Value + 1),
-                "Inbuilt": docc.data().Inbuilt,
-              });
+              if (data.confidence3 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence3 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
             } else {
               // doc.data() will be undefined in this case
               console.log("No such document!");
-              tag.set({
-                "Value": 1,
-                "Inbuilt": false,
-              });
+              if (data.confidence3 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence3 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
             }
           });
         }
@@ -281,41 +401,281 @@ exports.uploadPost = functions.https.onCall((data, context) => {
           tag.get().then(function(docc) {
             if (docc.exists) {
               console.log("Tag already exists", docc.id);
-              tag.set({
-                "Value": (docc.data().Value + 1),
-                "Inbuilt": docc.data().Inbuilt,
-              });
+              if (data.confidence4 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence4 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
             } else {
               // doc.data() will be undefined in this case
               console.log("No such document!");
-              tag.set({
-                "Value": 1,
-                "Inbuilt": false,
-              });
+              if (data.confidence4 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence4 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
             }
           });
         }
-        if (data.tagNo0 != "xxxxx") {
-          post.doc(docRef.id).collection("Tags").doc(data.tagNo0)
+        if (data.tagNo5 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo5)
               .set({
-                "Confidence": data.confidence0,
+                "Confidence": data.confidence5,
               });
           const tag = admin.firestore().collection("Users").doc(data.userName)
-              .collection("Tags").doc(data.tagNo0);
+              .collection("Tags").doc(data.tagNo5);
           tag.get().then(function(docc) {
             if (docc.exists) {
               console.log("Tag already exists", docc.id);
-              tag.set({
-                "Value": (docc.data().Value + 1),
-                "Inbuilt": docc.data().Inbuilt,
-              });
+              if (data.confidence5 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence5 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
             } else {
               // doc.data() will be undefined in this case
               console.log("No such document!");
-              tag.set({
-                "Value": 1,
-                "Inbuilt": false,
+              if (data.confidence5 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence5 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
+            }
+          });
+        }
+        if (data.tagNo6 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo6)
+              .set({
+                "Confidence": data.confidence6,
               });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo6);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              if (data.confidence6 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence6 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              if (data.confidence6 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence6 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
+            }
+          });
+        }
+        if (data.tagNo7 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo7)
+              .set({
+                "Confidence": data.confidence7,
+              });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo7);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              if (data.confidence7 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence7 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              if (data.confidence7 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence7 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
+            }
+          });
+        }
+        if (data.tagNo8 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo8)
+              .set({
+                "Confidence": data.confidence8,
+              });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo8);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              if (data.confidence8 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence8 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              if (data.confidence8 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence8 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
+            }
+          });
+        }
+        if (data.tagNo9 != "xxxxx") {
+          post.doc(docRef.id).collection("Tags").doc(data.tagNo9)
+              .set({
+                "Confidence": data.confidence9,
+              });
+          const tag = admin.firestore().collection("Users").doc(data.userName)
+              .collection("Tags").doc(data.tagNo9);
+          tag.get().then(function(docc) {
+            if (docc.exists) {
+              console.log("Tag already exists", docc.id);
+              if (data.confidence9 > 0.75) {
+                tag.set({
+                  "Value": (docc.data().Value + 3),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else if (data.confidence9 > 0.60) {
+                tag.set({
+                  "Value": (docc.data().Value + 2),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              } else {
+                tag.set({
+                  "Value": (docc.data().Value + 1),
+                  "Inbuilt": docc.data().Inbuilt,
+                });
+              }
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+              if (data.confidence9 > 0.75) {
+                tag.set({
+                  "Value": 3,
+                  "Inbuilt": false,
+                });
+              } else if (data.confidence9 > 0.60) {
+                tag.set({
+                  "Value": 2,
+                  "Inbuilt": false,
+                });
+              } else {
+                tag.set({
+                  "Value": 1,
+                  "Inbuilt": false,
+                });
+              }
             }
           });
         }
@@ -339,6 +699,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId0).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId1 != "xxxxx") {
@@ -361,6 +891,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId1).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId2 != "xxxxx") {
@@ -384,6 +1084,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId2).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId3 != "xxxxx") {
@@ -406,6 +1276,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId3).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId4 != "xxxxx") {
@@ -428,6 +1468,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId4).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId5 != "xxxxx") {
@@ -450,6 +1660,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId5).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId6 != "xxxxx") {
@@ -472,6 +1852,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId6).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId7 != "xxxxx") {
@@ -494,6 +2044,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId7).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId8 != "xxxxx") {
@@ -516,6 +2236,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId8).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
         if (data.faceId9 != "xxxxx") {
@@ -538,6 +2428,176 @@ exports.uploadPost = functions.https.onCall((data, context) => {
                   "Liked": false,
                   "Time": time,
                 });
+            if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo0);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo1 != "xxxxx" && data.confidence1 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo1);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo2 != "xxxxx" && data.confidence2 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo2);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo3 != "xxxxx" && data.confidence3 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo3);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo4 != "xxxxx" && data.confidence4 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo4);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo5 != "xxxxx" && data.confidence5 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo5);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo6 != "xxxxx" && data.confidence6 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo6);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo7 != "xxxxx" && data.confidence7 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo7);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo8 != "xxxxx" && data.confidence8 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo8);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
+            if (data.tagNo9 != "xxxxx" && data.confidence9 > 0.60) {
+              const tag = admin.firestore().collection("Users")
+                  .doc(data.faceId9).collection("Tags").doc(data.tagNo9);
+              tag.get().then(function(docc) {
+                if (docc.exists) {
+                  tag.set({
+                    "Value": (docc.data().Value + 1),
+                    "Inbuilt": docc.data().Inbuilt,
+                  });
+                } else {
+                  tag.set({
+                    "Value": 1,
+                    "Inbuilt": false,
+                  });
+                }
+              });
+            }
           }
         }
       })

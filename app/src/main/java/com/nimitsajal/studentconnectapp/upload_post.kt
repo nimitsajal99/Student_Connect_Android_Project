@@ -445,28 +445,41 @@ class upload_post : AppCompatActivity() {
         data.put("picture", picture)
         var count = 0
         data.put("noOfTags", results.size.toString())
+        var increment = 0
+        var tagIncrement = 0
         for(tag in results){
             var string = "tagNo" + count
             var str = "confidence" + count
             data.put(string, tag)
             data.put(str, confidence[count])
+            if(confidence[count].toFloat() > 0.75f){
+                increment += 3
+                tagIncrement += 1
+            }
+            else if(confidence[count].toFloat() > 0.60f){
+                increment += 2
+                tagIncrement += 1
+            }
+            else{
+                increment += 1
+            }
             count += 1
             Log.d("cloud", tag)
         }
-        while(count < 5){
+        while(count < 10){
             var string = "tagNo" + count
             var str = "confidence" + count
             data.put(string, "xxxxx")
             data.put(str, "xxxxx")
             count += 1
         }
-
+        Log.d("cloud", "iIncrement = $increment")
         val db = FirebaseFirestore.getInstance()
         db.collection("Users").document(userName)
             .get()
             .addOnSuccessListener {
                 db.collection("Users").document(userName)
-                    .update("Tags", (it["Tags"].toString().toInt() + results.size))
+                    .update("Tags", (it["Tags"].toString().toInt() + increment))
                     .addOnSuccessListener {
                         Log.d("others", "Tag updated - added")
                     }
@@ -495,6 +508,15 @@ class upload_post : AppCompatActivity() {
             string = "named" + count
             if(face.named){
                 data.put(string, "true")
+                db.collection("Users").document(face.faceId)
+                    .get()
+                    .addOnSuccessListener {
+                        db.collection("Users").document(face.faceId)
+                            .update("Tags", (it["Tags"].toString().toInt() + tagIncrement))
+                            .addOnSuccessListener {
+                                Log.d("others", "Tag updated - $tagIncrement")
+                            }
+                    }
             }
             else{
                 data.put(string, "false")
@@ -613,7 +635,7 @@ class upload_post : AppCompatActivity() {
                                 "text = $Text, confidence = $confidence, entityID = $entityId"
                             )
                         }
-                        if(confidence.toString().toFloat() > 0.75 && count < 5 && isTagValid(Text)){
+                        if(confidence.toString().toFloat() > 0.50 && count < 10 && isTagValid(Text)){
                             results.add(Text.toString())
                             confidenceResult.add(confidence.toString())
                             count += 1
@@ -1015,7 +1037,7 @@ class upload_post : AppCompatActivity() {
             "Trousers","Waist","Plaid","Lip","Beard","Facial hair","Moustache","Snapshot","Chest",
             "Flesh","Magenta","Sky","Water","Vision care","Eyewear","Shorts","Fun",
 
-            "Pink","Red","Blue","Green","Electric blue","Purple","Peach","Neon",
+            "Pink","Red","Blue","Green","Electric blue","Purple","Peach","Neon","Fawn", "Orange",
 
             "Pattern","Wood","Hardwood","Display case","Column","Light fixture",
             "Varnish","Hybrid tea rose","Woody plant","Ground cover","Shrub","Annual plant","Rose order",
@@ -1023,7 +1045,11 @@ class upload_post : AppCompatActivity() {
             "Neon sign","Electronic signage","Abdomen","Eye","Rite","Carmine","Twig","Wheel","Tire","Bumper",
             "Wrinkle","Woody plant","Leaf","Human body","Elbow","Joint","Shoulder","Thigh","Knee","Grass","Human leg",
             "Hand","Circle","Number","Flooring","Floor","Gas","Room","Metal","Composite material","Ceiling",
-            "Cheek","Curtain")
+            "Cheek","Curtain",
+
+            "Logo", "Communication Device", "Major appliance", "Material property", "Official", "Urban design",
+            "Sharing","Bone","Tap","Window","Face","Mammal","Carnivore","Gun dog","Beak","Organism","Flightless bird",
+            "Illustration","Tail","Liquid","Iris", "Ecoregion","Plate","Bowl")
         if(tag in blockedList){
             return false
         }
