@@ -2683,3 +2683,205 @@ exports.removeTag = functions.https.onCall((data, context) => {
   });
 });
 
+exports.likePost = functions.https.onCall((data, context) => {
+  if (data.tagNo0 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo0);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo1 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo1);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo2 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo2);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo3 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo3);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo4 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo4);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo5 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo5);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo6 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo6);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo7 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo7);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo8 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo8);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+  if (data.tagNo9 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo9);
+    tag.get().then(function(docc) {
+      if (docc.exists) {
+        console.log("Tag already exists", docc.id);
+        tag.set({
+          "Value": (docc.data().Value + 1),
+          "Inbuilt": docc.data().Inbuilt,
+        });
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        tag.set({
+          "Value": 1,
+          "Inbuilt": false,
+        });
+      }
+    });
+  }
+});

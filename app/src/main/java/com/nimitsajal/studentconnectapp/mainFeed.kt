@@ -1,14 +1,10 @@
 package com.nimitsajal.studentconnectapp
 
 import android.annotation.SuppressLint
-import android.companion.AssociationRequest
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.icu.number.NumberFormatter.with
-import android.os.Build
 import android.os.Bundle
-import android.transition.Transition
 import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
@@ -16,10 +12,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
@@ -27,10 +21,15 @@ import androidx.core.widget.addTextChangedListener
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -41,16 +40,19 @@ import kotlinx.android.synthetic.main.branchnames_adapter.view.*
 import kotlinx.android.synthetic.main.comment_adapter.view.*
 import kotlinx.android.synthetic.main.new_chat_adapter.view.*
 import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
+import java.util.HashMap
 
 
 class mainFeed : AppCompatActivity() {
 
     private lateinit var detector: GestureDetectorCompat
+    private lateinit var functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_feed)
 
+        functions = Firebase.functions
         val adapter = GroupAdapter<GroupieViewHolder>()
 
         var arrayPost = mutableListOf<postList>()
@@ -1341,6 +1343,7 @@ class post_class(
     var taggedBitmap: Bitmap? = null
     var untaggedBitmap: Bitmap? = null
     var showTagged = false
+    private var functions: FirebaseFunctions = Firebase.functions
 
     @SuppressLint("RestrictedApi", "ResourceType")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
@@ -1782,6 +1785,78 @@ class post_class(
             }
     }
 
+    private fun likeCloud(liking: Boolean, results: MutableList<String>): Task<Any?> {
+        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+        data.put("userName", myusername)
+        data.put("uid", uid)
+        data.put("noOfTags", results.size.toString())
+        var count = 0
+        for(tag in results){
+            var string = "tagNo" + count
+            data.put(string, tag)
+            count += 1
+            Log.d("cloud", tag)
+        }
+        while(count < 10){
+            var string = "tagNo" + count
+            data.put(string, "xxxxx")
+            count += 1
+        }
+//        if(liking){
+            return functions
+                .getHttpsCallable("likePost")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+//        }
+//        else{
+//
+//        }
+    }
+
+    private fun likeCaller(liking: Boolean){
+        var db = FirebaseFirestore.getInstance()
+        if(liking){
+            db.collection("Post").document(uid).collection("Tags")
+                .get()
+                .addOnCompleteListener {
+                    if(it.isSuccessful){
+                        var result = it.result
+                        var count = 0
+                        var list = mutableListOf<String>()
+                        for(doc in result.documents){
+                            if(doc.id != "Info" && doc["Confidence"].toString().toFloat() > 0.60f){
+                                count += 1
+                                list.add(doc.id)
+                            }
+                        }
+                        likeCloud(liking, list).addOnCompleteListener(OnCompleteListener { task ->
+                            if(task.isSuccessful){
+                                db.collection("Users").document(myusername)
+                                    .get()
+                                    .addOnSuccessListener {it2 ->
+                                        db.collection("Users").document(myusername)
+                                            .update("Tags", (it2["Tags"].toString().toInt() + count))
+                                            .addOnCompleteListener {
+                                                Log.d("cloud", "Liked")
+                                            }
+                                    }
+                            }
+                        })
+                    }
+                }
+        }
+    }
+
     private fun liked(liking: Boolean){
 //        adapter.clear()
         if(liking){
@@ -1806,6 +1881,7 @@ class post_class(
                         Log.d("mainfeed", "User updated - like updated")
                     }
                 }
+            likeCaller(liking)
         }
         else{
             db.collection("Users").document(myusername).collection("My Feed").document(uid)

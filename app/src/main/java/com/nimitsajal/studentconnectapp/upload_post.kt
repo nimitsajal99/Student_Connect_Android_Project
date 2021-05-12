@@ -42,7 +42,6 @@ import kotlinx.android.synthetic.main.activity_upload_post.*
 import kotlinx.android.synthetic.main.activity_upload_post.btnUpload
 import kotlinx.android.synthetic.main.toast_login_adapter.*
 import java.io.ByteArrayOutputStream
-import java.lang.Integer.min
 import java.util.*
 
 
@@ -629,14 +628,15 @@ class upload_post : AppCompatActivity() {
                         val entityId = labelObj["mid"]
                         val confidence = labelObj["score"]
                         var Text = text.toString().substring(1, text.toString().length - 1)
-                        if(isTagValid(Text)){
+                        if(isTagValid(Text, results)){
                             Log.d(
                                 "cloud",
                                 "text = $Text, confidence = $confidence, entityID = $entityId"
                             )
                         }
-                        if(confidence.toString().toFloat() > 0.50 && count < 10 && isTagValid(Text)){
-                            results.add(Text.toString())
+                        if(confidence.toString().toFloat() > 0.50 && count < 10 && isTagValid(Text, results)){
+                            var word = Text.toString().split(" ")
+                            results.add(word[0])
                             confidenceResult.add(confidence.toString())
                             count += 1
                         }
@@ -1028,7 +1028,7 @@ class upload_post : AppCompatActivity() {
 //        }
     }
 
-    private fun isTagValid(tag: String): Boolean{
+    private fun isTagValid(tag: String, results: MutableList<String>): Boolean{
         var blockedList = mutableListOf<String>("Tableware","Smile","Skin","Hairstyle","Facial expression","Happy","Gesture",
             "Leisure","Cosmetic dentistry","Beauty","Comfort","Thumb","Outerwear",
             "Vertebrate","White-collar worker","Fur","Hair","Head","Chin","Neck","Jaw",
@@ -1037,23 +1037,30 @@ class upload_post : AppCompatActivity() {
             "Trousers","Waist","Plaid","Lip","Beard","Facial hair","Moustache","Snapshot","Chest",
             "Flesh","Magenta","Sky","Water","Vision care","Eyewear","Shorts","Fun",
 
-            "Pink","Red","Blue","Green","Electric blue","Purple","Peach","Neon","Fawn", "Orange",
+            "Pink","Red","Blue","Green","Electric blue","Purple","Peach","Neon","Fawn", "Orange","White","Grey","Yellow",
 
-            "Pattern","Wood","Hardwood","Display case","Column","Light fixture",
-            "Varnish","Hybrid tea rose","Woody plant","Ground cover","Shrub","Annual plant","Rose order",
+            "Pattern","Wood","Hardwood","Column",
+            "Varnish","Hybrid tea rose","Woody plant","Shrub","Annual plant","Rose order",
             "Branch","Hybrid tea rose","Petal","Arm","Cool","Black hair","Long hair","Body jewelry","Facade","Signage",
-            "Neon sign","Electronic signage","Abdomen","Eye","Rite","Carmine","Twig","Wheel","Tire","Bumper",
+            "Neon sign","Abdomen","Eye","Rite","Carmine","Twig","Wheel","Tire","Bumper",
             "Wrinkle","Woody plant","Leaf","Human body","Elbow","Joint","Shoulder","Thigh","Knee","Grass","Human leg",
             "Hand","Circle","Number","Flooring","Floor","Gas","Room","Metal","Composite material","Ceiling",
             "Cheek","Curtain",
 
-            "Logo", "Communication Device", "Major appliance", "Material property", "Official", "Urban design",
+            "Logo", "Material property", "Official", "Urban design",
             "Sharing","Bone","Tap","Window","Face","Mammal","Carnivore","Gun dog","Beak","Organism","Flightless bird",
-            "Illustration","Tail","Liquid","Iris", "Ecoregion","Plate","Bowl")
+            "Illustration","Tail","Liquid","Iris", "Ecoregion","Plate","Bowl",
+
+            "Handwriting","Pole","Sitting","Brick","Door","Brickwork","Roof","Siding",
+            "Tread","Rolling","Fender","Rim",
+            "Peripheral","Layered hair","Sink","Plant stem","Trunk","Vehicle door","Hood","Windshield","Afterglow","Arecales")
         if(tag in blockedList){
             return false
         }
-        return true
+        else{
+            var word = tag.split(" ")
+            return word[0] !in results
+        }
     }
 }
 
