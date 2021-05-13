@@ -2885,3 +2885,196 @@ exports.likePost = functions.https.onCall((data, context) => {
     });
   }
 });
+
+exports.dislikePost = functions.https.onCall((data, context) => {
+  if (data.tagNo0 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo0);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo1 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo1);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo2 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo2);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo3 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo3);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo4 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo4);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo5 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo5);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo6 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo6);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo7 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo7);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo8 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo8);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+  if (data.tagNo9 != "xxxxx") {
+    const tag = admin.firestore().collection("Users").doc(data.userName)
+        .collection("Tags").doc(data.tagNo9);
+    tag.get().then(function(doc) {
+      if (doc.exists) {
+        console.log("Tag already exists", doc.id);
+        if (doc.data().Value > 1) {
+          tag.set({
+            "Value": (doc.data().Value - 1),
+            "Inbuilt": doc.data().Inbuilt,
+          });
+        } else {
+          tag.delete().then((doc) => {
+            console.log("Tag Deleted", data.tagName);
+          });
+        }
+      }
+    });
+  }
+});

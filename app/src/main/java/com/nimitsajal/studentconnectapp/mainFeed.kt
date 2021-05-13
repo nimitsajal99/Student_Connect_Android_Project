@@ -1802,7 +1802,7 @@ class post_class(
             data.put(string, "xxxxx")
             count += 1
         }
-//        if(liking){
+        if(liking){
             return functions
                 .getHttpsCallable("likePost")
                 .call(data)
@@ -1817,44 +1817,64 @@ class post_class(
                     val result = task.result?.data
                     result
                 }
-//        }
-//        else{
-//
-//        }
+        }
+        else{
+            return functions
+                .getHttpsCallable("dislikePost")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+        }
     }
 
     private fun likeCaller(liking: Boolean){
         var db = FirebaseFirestore.getInstance()
-        if(liking){
-            db.collection("Post").document(uid).collection("Tags")
-                .get()
-                .addOnCompleteListener {
-                    if(it.isSuccessful){
-                        var result = it.result
-                        var count = 0
-                        var list = mutableListOf<String>()
-                        for(doc in result.documents){
-                            if(doc.id != "Info" && doc["Confidence"].toString().toFloat() > 0.60f){
-                                count += 1
-                                list.add(doc.id)
-                            }
+        db.collection("Post").document(uid).collection("Tags")
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    var result = it.result
+                    var count = 0
+                    var list = mutableListOf<String>()
+                    for(doc in result.documents){
+                        if(doc.id != "Info" && doc["Confidence"].toString().toFloat() > 0.60f){
+                            count += 1
+                            list.add(doc.id)
                         }
-                        likeCloud(liking, list).addOnCompleteListener(OnCompleteListener { task ->
-                            if(task.isSuccessful){
-                                db.collection("Users").document(myusername)
-                                    .get()
-                                    .addOnSuccessListener {it2 ->
+                    }
+                    likeCloud(liking, list).addOnCompleteListener(OnCompleteListener { task ->
+                        if(task.isSuccessful){
+                            db.collection("Users").document(myusername)
+                                .get()
+                                .addOnSuccessListener {it2 ->
+                                    if(liking){
                                         db.collection("Users").document(myusername)
                                             .update("Tags", (it2["Tags"].toString().toInt() + count))
                                             .addOnCompleteListener {
                                                 Log.d("cloud", "Liked")
                                             }
                                     }
-                            }
-                        })
-                    }
+                                    else{
+                                        db.collection("Users").document(myusername)
+                                            .update("Tags", (it2["Tags"].toString().toInt() - count))
+                                            .addOnCompleteListener {
+                                                Log.d("cloud", "Liked")
+                                            }
+                                    }
+                                }
+                        }
+                    })
                 }
-        }
+            }
     }
 
     private fun liked(liking: Boolean){
@@ -1891,6 +1911,7 @@ class post_class(
                         Log.d("mainfeed", "User updated - like updated")
                     }
                 }
+            likeCaller(liking)
         }
     }
 }

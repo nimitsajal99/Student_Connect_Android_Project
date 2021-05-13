@@ -16,10 +16,15 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -36,6 +41,7 @@ import kotlinx.android.synthetic.main.post_adapter_cardiew.view.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.tvLikeCount
 import java.lang.System
+import java.util.HashMap
 
 
 class profilePage : AppCompatActivity() {
@@ -628,6 +634,7 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
 }
 
 class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String, var toggle: Boolean, var myUsername: String): Item<GroupieViewHolder>(){
+    private var functions: FirebaseFunctions = Firebase.functions
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         Picasso.get().load(url).into(viewHolder.itemView.postImageProfile, object : Callback {
@@ -731,6 +738,98 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
 //        }
     }
 
+    private fun likeCloud(liking: Boolean, results: MutableList<String>): Task<Any?> {
+        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+        data.put("userName", username)
+        data.put("uid", uid)
+        data.put("noOfTags", results.size.toString())
+        var count = 0
+        for(tag in results){
+            var string = "tagNo" + count
+            data.put(string, tag)
+            count += 1
+            Log.d("cloud", tag)
+        }
+        while(count < 10){
+            var string = "tagNo" + count
+            data.put(string, "xxxxx")
+            count += 1
+        }
+        if(liking){
+            return functions
+                .getHttpsCallable("likePost")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+        }
+        else{
+            return functions
+                .getHttpsCallable("dislikePost")
+                .call(data)
+//            .addOnCompleteListener { task ->
+//                val result = task.result?.data
+//                result
+//            }
+                .continueWith { task ->
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then result will throw an Exception which will be
+                    // propagated down.
+                    val result = task.result?.data
+                    result
+                }
+        }
+    }
+
+    private fun likeCaller(liking: Boolean){
+        var db = FirebaseFirestore.getInstance()
+        db.collection("Post").document(uid).collection("Tags")
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    var result = it.result
+                    var count = 0
+                    var list = mutableListOf<String>()
+                    for(doc in result.documents){
+                        if(doc.id != "Info" && doc["Confidence"].toString().toFloat() > 0.60f){
+                            count += 1
+                            list.add(doc.id)
+                        }
+                    }
+                    likeCloud(liking, list).addOnCompleteListener(OnCompleteListener { task ->
+                        if(task.isSuccessful){
+                            db.collection("Users").document(username)
+                                .get()
+                                .addOnSuccessListener {it2 ->
+                                    if(liking){
+                                        db.collection("Users").document(username)
+                                            .update("Tags", (it2["Tags"].toString().toInt() + count))
+                                            .addOnCompleteListener {
+                                                Log.d("cloud", "Liked")
+                                            }
+                                    }
+                                    else{
+                                        db.collection("Users").document(username)
+                                            .update("Tags", (it2["Tags"].toString().toInt() - count))
+                                            .addOnCompleteListener {
+                                                Log.d("cloud", "Liked")
+                                            }
+                                    }
+                                }
+                        }
+                    })
+                }
+            }
+    }
+
     private fun likePost(viewHolder: GroupieViewHolder, link: DocumentReference){
         link.get()
             .addOnSuccessListener {
@@ -743,6 +842,7 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                     Log.d("profilepage", "user updated")
                                 }
                             }
+                        likeCaller(false)
                         db.collection("Post").document(uid)
                             .get()
                             .addOnSuccessListener { it3 ->
@@ -788,6 +888,7 @@ class profile_post_class(val url:  String, var likeCount: Int, val commentCount:
                                     Log.d("profilepage", "user updated")
                                 }
                             }
+                        likeCaller(true)
                         db.collection("Post").document(uid)
                             .get()
                             .addOnSuccessListener { it3 ->

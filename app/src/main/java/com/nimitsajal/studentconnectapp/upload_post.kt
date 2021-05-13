@@ -472,6 +472,9 @@ class upload_post : AppCompatActivity() {
             data.put(str, "xxxxx")
             count += 1
         }
+        data.put("noOfFaces", faceDetect.size.toString())
+        count = 0
+        var smiles = 0
         Log.d("cloud", "iIncrement = $increment")
         val db = FirebaseFirestore.getInstance()
         db.collection("Users").document(userName)
@@ -483,10 +486,6 @@ class upload_post : AppCompatActivity() {
                         Log.d("others", "Tag updated - added")
                     }
             }
-
-        data.put("noOfFaces", faceDetect.size.toString())
-        count = 0
-        var smiles = 0
         for(face in faceDetect){
             var string = "faceId" + count
             data.put(string, face.faceId)
@@ -576,7 +575,6 @@ class upload_post : AppCompatActivity() {
             data.put(string, smile)
             count += 1
         }
-
         Log.d(
             "uploadCloud",
             "${data["description"]}, ${data["dp"]}, ${data["userName"]}, ${data["picture"]}, ${data["timeStamp"]}"
@@ -975,7 +973,7 @@ class upload_post : AppCompatActivity() {
                                             pattern.containsMatchIn(document["College"].toString())||
                                             pattern.containsMatchIn(document["Branch"].toString()) ||
                                             pattern.containsMatchIn(document["Semester"].toString()))
-                                    && !(document.id in uploadC[0].listselected))
+                                    && !(document.id in uploadC[0].listselected) && (document.id != username))
                                 {
 
                                 }
