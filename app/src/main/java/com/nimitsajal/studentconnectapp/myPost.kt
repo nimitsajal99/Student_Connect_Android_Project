@@ -44,7 +44,7 @@ class myPost : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_post)
 
-        functions = Firebase.functions
+        functions = FirebaseFunctions.getInstance("asia-south1")
 
         var username = ""
         var myUsername = intent.getStringExtra("username")

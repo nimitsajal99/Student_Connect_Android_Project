@@ -1343,7 +1343,7 @@ class post_class(
     var taggedBitmap: Bitmap? = null
     var untaggedBitmap: Bitmap? = null
     var showTagged = false
-    private var functions: FirebaseFunctions = Firebase.functions
+    private var functions: FirebaseFunctions = FirebaseFunctions.getInstance("asia-south1")
 
     @SuppressLint("RestrictedApi", "ResourceType")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {

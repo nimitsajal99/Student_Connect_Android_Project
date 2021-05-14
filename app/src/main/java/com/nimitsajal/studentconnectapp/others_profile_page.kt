@@ -42,7 +42,7 @@ class others_profile_page : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile_page)
-        functions = Firebase.functions
+        functions = FirebaseFunctions.getInstance("asia-south1")
 
         var username: String = ""
         var isFriend: Boolean = false

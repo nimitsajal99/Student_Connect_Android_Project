@@ -28,7 +28,7 @@ class eventPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_page)
 
-        functions = Firebase.functions
+        functions = FirebaseFunctions.getInstance("asia-south1")
         var username = intent.getStringExtra("username")
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()

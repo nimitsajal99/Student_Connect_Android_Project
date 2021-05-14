@@ -634,7 +634,7 @@ class details_class(val text: String): Item<GroupieViewHolder>(){
 }
 
 class profile_post_class(val url:  String, var likeCount: Int, val commentCount: Int, val description: String, val username: String, val db: FirebaseFirestore, var uid: String, var toggle: Boolean, var myUsername: String): Item<GroupieViewHolder>(){
-    private var functions: FirebaseFunctions = Firebase.functions
+    private var functions: FirebaseFunctions = FirebaseFunctions.getInstance("asia-south1")
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         Picasso.get().load(url).into(viewHolder.itemView.postImageProfile, object : Callback {

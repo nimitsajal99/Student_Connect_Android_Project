@@ -51,6 +51,7 @@ class upload_post : AppCompatActivity() {
     var selectedUri: Uri? = null
     var userDpUrl: String = ""
     private lateinit var functions: FirebaseFunctions
+    private lateinit var Functions: FirebaseFunctions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,8 +65,8 @@ class upload_post : AppCompatActivity() {
         var count = 0
 
         var username = intent.getStringExtra("username")
-        functions = Firebase.functions
-
+        functions = FirebaseFunctions.getInstance("asia-south1")
+        Functions = Firebase.functions
 
         val db = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
@@ -219,7 +220,7 @@ class upload_post : AppCompatActivity() {
             "cloud",
             "In annotateImage"
         )
-        return functions
+        return Functions
             .getHttpsCallable("annotateImage")
             .call(requestJson)
 //            .addOnCompleteListener {
@@ -1051,7 +1052,9 @@ class upload_post : AppCompatActivity() {
 
             "Handwriting","Pole","Sitting","Brick","Door","Brickwork","Roof","Siding",
             "Tread","Rolling","Fender","Rim",
-            "Peripheral","Layered hair","Sink","Plant stem","Trunk","Vehicle door","Hood","Windshield","Afterglow","Arecales")
+            "Peripheral","Layered hair","Sink","Plant stem","Trunk","Vehicle door","Hood","Windshield","Afterglow","Arecales",
+            "Adaptation","Wall","Lap","Liver", "Stuffed toy","Working animal","Terrestrial animal","Sun hat",
+            "Northern hardwood forest","Line","Shelving")
         if(tag in blockedList){
             return false
         }
