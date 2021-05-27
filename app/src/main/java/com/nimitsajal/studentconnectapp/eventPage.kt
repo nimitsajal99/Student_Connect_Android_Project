@@ -24,6 +24,10 @@ class eventPage : AppCompatActivity() {
     private lateinit var detector: GestureDetectorCompat
     private lateinit var functions: FirebaseFunctions
 
+    var mutualFriends:HashMap<String, Int> = HashMap<String, Int>()
+    var mutualTaggedUsers:HashMap<String, Int> = HashMap<String, Int>()
+    var friends:HashMap<String, Int> = HashMap<String, Int>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_page)
@@ -41,6 +45,7 @@ class eventPage : AppCompatActivity() {
                     Log.d("profilePage", username.toString())
                     detector = GestureDetectorCompat(this,DiaryGestureListener(username))
 //                    tagCaller(username!!, "Hello", false, db)
+                    suggestFriend(db, username!!)
                 }
                 else{
                     showToast("ERROR", 1)
@@ -326,5 +331,73 @@ class eventPage : AppCompatActivity() {
 
         goToFeed(username)
         return true
+    }
+
+    private fun suggestFriend(db: FirebaseFirestore, username: String){
+
+        db.collection("Users").document(username).collection("Friends")
+            .get()
+            .addOnSuccessListener {
+                for(friend in it.documents){
+                    if(friend.id != "Info"){
+                        friends.put(friend.id, 1)
+                    }
+
+                }
+                db.collection("Users").document(username).collection("Tagged Users")
+                    .get()
+                    .addOnSuccessListener { it3 ->
+                        for(taggedUser in it3.documents){
+                            if(taggedUser.id != "Info"){
+                                mutualTaggedUsers.put(taggedUser.id, taggedUser["Count"].toString().toInt())
+                            }
+                        }
+                        for(friend in friends){
+                            db.collection("Users").document(friend.key).collection("Friends")
+                                .get()
+                                .addOnSuccessListener { it1 ->
+                                    for(mutualfriends in it1.documents){
+                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys){
+                                            if(mutualfriends.id in mutualFriends.keys){
+                                                mutualFriends[mutualfriends.id] = mutualFriends[mutualfriends.id]!! + 1
+                                            }
+                                            else{
+                                                mutualFriends.put(mutualfriends.id, 1)
+                                            }
+                                        }
+                                    }
+                                    db.collection("Users").document(friend.key).collection("Tagged Users")
+                                        .get()
+                                        .addOnSuccessListener { it2 ->
+                                            for(mutualfriends in it2.documents){
+                                                if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys){
+                                                    if(mutualfriends.id in mutualTaggedUsers.keys){
+                                                        mutualTaggedUsers[mutualfriends.id] = mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString().toInt()
+                                                    }
+                                                    else{
+                                                        mutualTaggedUsers.put(mutualfriends.id, mutualfriends["Count"].toString().toInt())
+                                                    }
+                                                }
+                                            }
+                                        }
+                                }
+                        }
+                    }
+            }
+    }
+
+    private fun loadLog(){
+        Log.d("suggestion", "Friends")
+        for(friend in friends){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
+        Log.d("suggestion", "Mutual Friends")
+        for(friend in mutualFriends){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
+        Log.d("suggestion", "Mutual Tagged Users")
+        for(friend in mutualTaggedUsers){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
     }
 }

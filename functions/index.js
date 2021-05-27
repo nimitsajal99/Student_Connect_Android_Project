@@ -62,6 +62,10 @@ exports.createUser = functions.region("asia-south1")
             users.doc(data.userName).collection("Tags").doc("Info").set({
               "Info": "Info",
             });
+            users.doc(data.userName).collection("Tagged Users").doc("Info")
+                .set({
+                  "Info": "Info",
+                });
             users.doc(data.userName).collection("Medals").doc(data.collegeName)
                 .set({
                   "Info": "Info",
@@ -189,7 +193,6 @@ exports.uploadPost = functions.region("asia-south1")
                 .then((snapshot) => {
                   snapshot.forEach((doc) => {
                     if (doc.id != "Info") {
-                      console.log("Uploading picture in ", doc.id, " Feed");
                       users.doc(doc.id).collection("My Feed").doc(docRef.id)
                           .set({
                             "Liked": false,
@@ -199,7 +202,7 @@ exports.uploadPost = functions.region("asia-south1")
                   });
                 })
                 .catch((err) => {
-                  console.log("Error getting documents", err);
+                  console.log("Error getting Friends", err);
                 });
             if (data.tagNo0 != "xxxxx") {
               post.doc(docRef.id).collection("Tags").doc(data.tagNo0)
@@ -211,7 +214,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo0);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence0 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -230,7 +232,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence0 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -260,7 +261,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo1);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence1 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -279,7 +279,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence1 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -309,7 +308,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo2);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence2 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -328,7 +326,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence2 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -358,7 +355,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo3);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence3 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -377,7 +373,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence3 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -407,7 +402,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo4);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence4 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -426,7 +420,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence4 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -456,7 +449,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo5);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence5 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -475,7 +467,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence5 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -505,7 +496,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo6);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence6 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -524,7 +514,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence6 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -554,7 +543,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo7);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence7 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -573,7 +561,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence7 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -603,7 +590,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo8);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence8 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -622,7 +608,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence8 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -652,7 +637,6 @@ exports.uploadPost = functions.region("asia-south1")
                   .collection("Tags").doc(data.tagNo9);
               tag.get().then(function(docc) {
                 if (docc.exists) {
-                  console.log("Tag already exists", docc.id);
                   if (data.confidence9 > 0.75) {
                     tag.set({
                       "Value": (docc.data().Value + 3),
@@ -671,7 +655,6 @@ exports.uploadPost = functions.region("asia-south1")
                   }
                 } else {
                   // doc.data() will be undefined in this case
-                  console.log("No such document!");
                   if (data.confidence9 > 0.75) {
                     tag.set({
                       "Value": 3,
@@ -710,6 +693,20 @@ exports.uploadPost = functions.region("asia-south1")
                     .set({
                       "Liked": false,
                       "Time": time,
+                    });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId0).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId0).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId0).set({
+                              "Count": 1,
+                            });
+                      }
                     });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
@@ -902,6 +899,20 @@ exports.uploadPost = functions.region("asia-south1")
                     .set({
                       "Liked": false,
                       "Time": time,
+                    });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId1).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId1).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId1).set({
+                              "Count": 1,
+                            });
+                      }
                     });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
@@ -1096,6 +1107,20 @@ exports.uploadPost = functions.region("asia-south1")
                       "Liked": false,
                       "Time": time,
                     });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId2).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId2).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId2).set({
+                              "Count": 1,
+                            });
+                      }
+                    });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
                       .doc(data.faceId2).collection("Tags").doc(data.tagNo0);
@@ -1287,6 +1312,20 @@ exports.uploadPost = functions.region("asia-south1")
                     .set({
                       "Liked": false,
                       "Time": time,
+                    });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId3).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId3).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId3).set({
+                              "Count": 1,
+                            });
+                      }
                     });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
@@ -1480,6 +1519,20 @@ exports.uploadPost = functions.region("asia-south1")
                       "Liked": false,
                       "Time": time,
                     });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId4).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId4).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId4).set({
+                              "Count": 1,
+                            });
+                      }
+                    });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
                       .doc(data.faceId4).collection("Tags").doc(data.tagNo0);
@@ -1671,6 +1724,20 @@ exports.uploadPost = functions.region("asia-south1")
                     .set({
                       "Liked": false,
                       "Time": time,
+                    });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId5).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId5).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId5).set({
+                              "Count": 1,
+                            });
+                      }
                     });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
@@ -1864,6 +1931,20 @@ exports.uploadPost = functions.region("asia-south1")
                       "Liked": false,
                       "Time": time,
                     });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId6).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId6).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId6).set({
+                              "Count": 1,
+                            });
+                      }
+                    });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
                       .doc(data.faceId6).collection("Tags").doc(data.tagNo0);
@@ -2055,6 +2136,20 @@ exports.uploadPost = functions.region("asia-south1")
                     .set({
                       "Liked": false,
                       "Time": time,
+                    });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId7).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId7).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId7).set({
+                              "Count": 1,
+                            });
+                      }
                     });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
@@ -2248,6 +2343,20 @@ exports.uploadPost = functions.region("asia-south1")
                       "Liked": false,
                       "Time": time,
                     });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId8).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId8).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId8).set({
+                              "Count": 1,
+                            });
+                      }
+                    });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
                       .doc(data.faceId8).collection("Tags").doc(data.tagNo0);
@@ -2440,6 +2549,20 @@ exports.uploadPost = functions.region("asia-south1")
                       "Liked": false,
                       "Time": time,
                     });
+                users.doc(data.userName).collection("Tagged Users")
+                    .doc(data.faceId9).get().then(function(docc) {
+                      if (docc.exists) {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId9).set({
+                              "Count": (docc.data().Count + 1),
+                            });
+                      } else {
+                        users.doc(data.userName).collection("Tagged Users")
+                            .doc(data.faceId9).set({
+                              "Count": 1,
+                            });
+                      }
+                    });
                 if (data.tagNo0 != "xxxxx" && data.confidence0 > 0.60) {
                   const tag = admin.firestore().collection("Users")
                       .doc(data.faceId9).collection("Tags").doc(data.tagNo0);
@@ -2630,25 +2753,47 @@ exports.deletePost = functions.region("asia-south1")
               if (doc.id != "Info" && doc.data().Tagged == true) {
                 promises.push(users.doc(doc.id).collection("My Tags")
                     .doc(data.uid).delete());
+                promises.push(post.doc(data.uid).collection("Faces")
+                    .doc(doc.id).delete());
+              } else {
+                promises.push(post.doc(data.uid).collection("Faces")
+                    .doc(doc.id).delete());
               }
             });
-            promises.push(post.doc(data.uid).delete());
-            promises.push(users.doc(data.userName).collection("My Posts")
-                .doc(data.uid).delete());
-            return users.doc(data.userName).collection("Friends")
+            return post.doc(data.uid).collection("Comments")
                 .get()
-                .then((friends) => {
-                  friends.forEach((user) => {
-                    if (user.id != "Info") {
-                      promises.push(users.doc(user.id).collection("My Feed")
-                          .doc(data.uid).delete());
-                    }
+                .then((snap) => {
+                  snap.forEach((doc) => {
+                    promises.push(post.doc(data.uid).collection("Comments")
+                        .doc(doc.id).delete());
                   });
-                  return Promise.all(promises);
+                  return post.doc(data.uid).collection("Tags")
+                      .get()
+                      .then((tagsnap) => {
+                        tagsnap.forEach((doc) => {
+                          promises.push(post.doc(data.uid)
+                              .collection("Tags").doc(doc.id).delete());
+                        });
+                        promises.push(post.doc(data.uid).delete());
+                        promises.push(users.doc(data.userName)
+                            .collection("My Posts").doc(data.uid).delete());
+                        return users.doc(data.userName).collection("Friends")
+                            .get()
+                            .then((friends) => {
+                              friends.forEach((user) => {
+                                if (user.id != "Info") {
+                                  promises.push(users.doc(user.id)
+                                      .collection("My Feed")
+                                      .doc(data.uid).delete());
+                                }
+                              });
+                              return Promise.all(promises);
+                            });
+                      });
                 });
           })
           .then((metaData) => {
-            console.log("post deleted", data.uid, " metadata = ", metaData);
+            console.log("post deleted", data.uid);
           })
           .catch((error) => {
             console.error("Error while uploading picture: ", error);
@@ -2668,7 +2813,7 @@ exports.addTag = functions.region("asia-south1")
           });
         } else {
           // doc.data() will be undefined in this case
-          console.log("No such document!");
+          console.log("No such tag exists");
           tag.set({
             "Value": 1,
             "Inbuilt": false,
@@ -2684,15 +2829,15 @@ exports.removeTag = functions
           .collection("Tags").doc(data.tagName);
       tag.get().then(function(doc) {
         if (doc.exists) {
-          console.log("Tag already exists", doc.id);
           if (doc.data().Value > 1) {
+            console.log("Tag decremented", doc.id);
             tag.set({
               "Value": (doc.data().Value - 1),
               "Inbuilt": doc.data().Inbuilt,
             });
           } else {
+            console.log("Tag deleted");
             tag.delete().then((doc) => {
-              console.log("Tag Deleted", data.tagName);
             });
           }
         }
@@ -2706,14 +2851,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo0);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2726,14 +2869,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo1);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2746,14 +2887,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo2);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2766,14 +2905,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo3);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2786,14 +2923,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo4);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2806,14 +2941,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo5);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2826,14 +2959,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo6);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2846,14 +2977,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo7);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2866,14 +2995,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo8);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2886,14 +3013,12 @@ exports.likePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo9);
         tag.get().then(function(docc) {
           if (docc.exists) {
-            console.log("Tag already exists", docc.id);
             tag.set({
               "Value": (docc.data().Value + 1),
               "Inbuilt": docc.data().Inbuilt,
             });
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
             tag.set({
               "Value": 1,
               "Inbuilt": false,
@@ -2910,7 +3035,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo0);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -2918,7 +3042,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -2929,7 +3052,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo1);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -2937,7 +3059,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -2948,7 +3069,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo2);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -2956,7 +3076,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -2967,7 +3086,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo3);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -2975,7 +3093,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -2986,7 +3103,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo4);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -2994,7 +3110,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -3005,7 +3120,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo5);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -3013,7 +3127,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -3024,7 +3137,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo6);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -3032,7 +3144,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -3043,7 +3154,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo7);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -3051,7 +3161,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -3062,7 +3171,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo8);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -3070,7 +3178,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
@@ -3081,7 +3188,6 @@ exports.dislikePost = functions.region("asia-south1")
             .collection("Tags").doc(data.tagNo9);
         tag.get().then(function(doc) {
           if (doc.exists) {
-            console.log("Tag already exists", doc.id);
             if (doc.data().Value > 1) {
               tag.set({
                 "Value": (doc.data().Value - 1),
@@ -3089,7 +3195,6 @@ exports.dislikePost = functions.region("asia-south1")
               });
             } else {
               tag.delete().then((doc) => {
-                console.log("Tag Deleted", data.tagName);
               });
             }
           }
