@@ -16,7 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_event_page.*
 import kotlinx.android.synthetic.main.activity_main_feed.*
+import kotlinx.android.synthetic.main.activity_main_feed.btnChat
+import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
+import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
+import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import java.util.HashMap
 
 class eventPage : AppCompatActivity() {
@@ -27,6 +32,8 @@ class eventPage : AppCompatActivity() {
     var mutualFriends:HashMap<String, Int> = HashMap<String, Int>()
     var mutualTaggedUsers:HashMap<String, Int> = HashMap<String, Int>()
     var friends:HashMap<String, Int> = HashMap<String, Int>()
+    var tags = mutableListOf<Tags>()
+    var users = mutableListOf<Users>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +62,10 @@ class eventPage : AppCompatActivity() {
         }
 
         detector = GestureDetectorCompat(this,DiaryGestureListener(username))
+
+        btnLogResult.setOnClickListener {
+            loadLog(username!!, db)
+        }
 
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -335,6 +346,29 @@ class eventPage : AppCompatActivity() {
 
     private fun suggestFriend(db: FirebaseFirestore, username: String){
 
+        users.add(Users("Mutual Friends", 1))
+        users.add(Users("Tagged Users", 1))
+
+        db.collection("Users").document(username).collection("Tags")
+            .get()
+            .addOnSuccessListener {
+                for(tag in it.documents){
+                    if(tag.id != "Info"){
+                        tags.add(Tags(tag.id, tag["Value"].toString().toInt(), tag["Inbuilt"].toString().toBoolean()))
+                    }
+                }
+            }
+
+        db.collection("Users").document(username)
+            .get()
+            .addOnSuccessListener {
+                if(it.exists()){
+                    users.add(Users(it["Branch"].toString(), 3))
+                    users.add(Users(it["College"].toString(), 2))
+                    users.add(Users(it["University"].toString(), 1))
+                }
+            }
+
         db.collection("Users").document(username).collection("Friends")
             .get()
             .addOnSuccessListener {
@@ -348,7 +382,7 @@ class eventPage : AppCompatActivity() {
                     .get()
                     .addOnSuccessListener { it3 ->
                         for(taggedUser in it3.documents){
-                            if(taggedUser.id != "Info"){
+                            if(taggedUser.id != "Info" && taggedUser.id != username){
                                 mutualTaggedUsers.put(taggedUser.id, taggedUser["Count"].toString().toInt())
                             }
                         }
@@ -357,7 +391,7 @@ class eventPage : AppCompatActivity() {
                                 .get()
                                 .addOnSuccessListener { it1 ->
                                     for(mutualfriends in it1.documents){
-                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys){
+                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username){
                                             if(mutualfriends.id in mutualFriends.keys){
                                                 mutualFriends[mutualfriends.id] = mutualFriends[mutualfriends.id]!! + 1
                                             }
@@ -366,27 +400,86 @@ class eventPage : AppCompatActivity() {
                                             }
                                         }
                                     }
-                                    db.collection("Users").document(friend.key).collection("Tagged Users")
-                                        .get()
-                                        .addOnSuccessListener { it2 ->
-                                            for(mutualfriends in it2.documents){
-                                                if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys){
-                                                    if(mutualfriends.id in mutualTaggedUsers.keys){
-                                                        mutualTaggedUsers[mutualfriends.id] = mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString().toInt()
-                                                    }
-                                                    else{
-                                                        mutualTaggedUsers.put(mutualfriends.id, mutualfriends["Count"].toString().toInt())
-                                                    }
-                                                }
+                                }
+                            db.collection("Users").document(friend.key).collection("Tagged Users")
+                                .get()
+                                .addOnSuccessListener { it2 ->
+                                    for(mutualfriends in it2.documents){
+                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username){
+                                            if(mutualfriends.id in mutualTaggedUsers.keys){
+                                                mutualTaggedUsers[mutualfriends.id] = mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString().toInt()
+                                            }
+                                            else{
+                                                mutualTaggedUsers.put(mutualfriends.id, mutualfriends["Count"].toString().toInt())
                                             }
                                         }
+                                    }
                                 }
                         }
                     }
             }
     }
 
-    private fun loadLog(){
+    private fun loadUser(newUsername: String, username: String, db: FirebaseFirestore){
+        var newTags = mutableListOf<Tags>()
+        var newUsers = mutableListOf<Users>()
+
+        if(newUsername !in friends.keys && newUsername != username){
+            if(newUsername in mutualFriends.keys){
+                newUsers.add(Users("Mutual Friends", mutualFriends[newUsername]!!))
+            }
+            else{
+                newUsers.add(Users("Mutual Friends", 0))
+            }
+
+            if(newUsername in mutualTaggedUsers.keys){
+                newUsers.add(Users("Tagged Users", mutualTaggedUsers[newUsername]!!))
+            }
+            else{
+                newUsers.add(Users("Tagged Users", 0))
+            }
+
+            db.collection("Users").document(newUsername)
+                .get()
+                .addOnSuccessListener {
+                    if(it.exists()){
+                        newUsers.add(Users(it["Branch"].toString(), 1))
+                        newUsers.add(Users(it["College"].toString(), 1))
+                        newUsers.add(Users(it["University"].toString(), 1))
+
+                        db.collection("Users").document(newUsername).collection("Tags")
+                            .get()
+                            .addOnSuccessListener { it1 ->
+                                for(tag in it1.documents){
+                                    if(tag.id != "Info"){
+                                        newTags.add(Tags(tag.id, tag["Value"].toString().toInt(), tag["Inbuilt"].toString().toBoolean()))
+                                    }
+                                }
+                                loadUsers(newUsername, newTags, newUsers)
+                            }
+                    }
+                }
+        }
+    }
+
+    private fun loadUsers(username:String, tags: MutableList<Tags>, users:MutableList<Users>){
+        Log.d("suggestion", "------------------------------------------------------")
+        Log.d("suggestion", "Username = $username")
+        Log.d("suggestion", "Tags")
+        if(!tags.isEmpty()){
+            for(friend in tags){
+                friend.display()
+            }
+        }
+        Log.d("suggestion", "Users")
+        if(!users.isEmpty()){
+            for(friend in users){
+                friend.display()
+            }
+        }
+    }
+
+    private fun loadLog(username: String, db: FirebaseFirestore){
         Log.d("suggestion", "Friends")
         for(friend in friends){
             Log.d("suggestion", "${friend.key} = ${friend.value}")
@@ -399,5 +492,35 @@ class eventPage : AppCompatActivity() {
         for(friend in mutualTaggedUsers){
             Log.d("suggestion", "${friend.key} = ${friend.value}")
         }
+        Log.d("suggestion", "Tags")
+        for(friend in tags){
+            friend.display()
+        }
+        Log.d("suggestion", "Users")
+        for(friend in users){
+            friend.display()
+        }
+
+        db.collection("Users")
+            .get()
+            .addOnSuccessListener {
+                for(user in it.documents){
+                    if(user.id != "Info"){
+                        loadUser(user.id, username, db)
+                    }
+                }
+            }
+    }
+}
+
+data class Tags(var name: String, var value: Int, var inbuilt: Boolean){
+    public fun display(){
+        Log.d("suggestion", "${name} -> ${value} (${inbuilt})")
+    }
+}
+
+data class Users(var name: String, var value: Int){
+    public fun display(){
+        Log.d("suggestion", "${name} -> ${value}")
     }
 }

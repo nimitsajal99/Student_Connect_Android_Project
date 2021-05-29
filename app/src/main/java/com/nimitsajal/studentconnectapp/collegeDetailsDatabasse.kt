@@ -48,7 +48,7 @@ class collegeDetailsDatabase : AppCompatActivity() {
 
         val auth = FirebaseAuth.getInstance()
         val db = FirebaseFirestore.getInstance()
-        functions = Firebase.functions
+        functions = FirebaseFunctions.getInstance("asia-south1")
 
         storageReference = FirebaseStorage.getInstance().reference
 

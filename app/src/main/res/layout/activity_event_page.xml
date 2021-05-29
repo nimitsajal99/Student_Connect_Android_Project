@@ -88,6 +88,17 @@
         android:textSize="24sp"
         android:textStyle="italic"
         android:textColor="@color/base1"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <Button
+        android:id="@+id/btnLogResult"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="TEST"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
