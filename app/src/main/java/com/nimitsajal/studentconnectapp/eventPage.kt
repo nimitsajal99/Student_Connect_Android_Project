@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import java.util.HashMap
+import kotlin.math.pow
 
 class eventPage : AppCompatActivity() {
 
@@ -346,7 +347,7 @@ class eventPage : AppCompatActivity() {
 
     private fun suggestFriend(db: FirebaseFirestore, username: String){
 
-        users.add(Users("Mutual Friends", 1))
+        users.add(Users("Mutual Friends", 2))
         users.add(Users("Tagged Users", 1))
 
         db.collection("Users").document(username).collection("Tags")
@@ -422,9 +423,11 @@ class eventPage : AppCompatActivity() {
 
     private fun loadUser(newUsername: String, username: String, db: FirebaseFirestore){
         var newTags = mutableListOf<Tags>()
+        var newTagsLoc = mutableListOf<String>()
         var newUsers = mutableListOf<Users>()
 
         if(newUsername !in friends.keys && newUsername != username){
+            Log.d("suggestion", "In $newUsername")
             if(newUsername in mutualFriends.keys){
                 newUsers.add(Users("Mutual Friends", mutualFriends[newUsername]!!))
             }
@@ -453,30 +456,165 @@ class eventPage : AppCompatActivity() {
                                 for(tag in it1.documents){
                                     if(tag.id != "Info"){
                                         newTags.add(Tags(tag.id, tag["Value"].toString().toInt(), tag["Inbuilt"].toString().toBoolean()))
+                                        newTagsLoc.add(tag.id)
                                     }
                                 }
-                                loadUsers(newUsername, newTags, newUsers)
+//                                loadUsers(newUsername, newTags, newUsers)
+                                Log.d("suggestion", "------------------------------------------------------")
+                                Log.d("suggestion", "Username = $newUsername")
+                                Log.d("suggestion", "Tags")
+                                if(!newTags.isEmpty()){
+                                    for(friend in newTags){
+                                        friend.display()
+                                    }
+                                }
+                                Log.d("suggestion", "Users")
+                                if(!newUsers.isEmpty()){
+                                    for(friend in newUsers){
+                                        friend.display()
+                                    }
+                                }
+                                var userSinDistance = 0.0
+                                var count = 0
+                                var numerator = 0.0
+                                var denominator1 = 0.0
+                                var denominator2 = 0.0
+                                while(count < newUsers.size){
+                                    if(users[count].name == newUsers[count].name){
+                                        var x = 0
+                                        var y = 0
+                                        var w = 0
+                                        if(users[count].value > 0){
+                                            x = 1
+                                        }
+                                        if(newUsers[count].value > 0){
+                                            y = 1
+                                        }
+                                        w = newUsers[count].value + users[count].value
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    else{
+                                        var x = 1
+                                        var y = 0
+                                        var w = users[count].value
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    count += 1
+                                }
+                                denominator1 *= denominator2
+                                denominator1 = denominator1.toDouble().pow(0.5)
+                                if(denominator1 == 0.0){
+                                    numerator = 0.0
+                                }
+                                else{
+                                    numerator /= denominator1
+                                }
+                                userSinDistance = numerator
+                                Log.d("suggestion", "The Cosine Distance of User: $userSinDistance")
+                                var tagSinDistance = 0.0
+                                numerator = 0.0
+                                denominator1 = 0.0
+                                denominator2 = 0.0
+                                count = 0
+                                while(count < tags.size){
+                                    if(tags[count].name in newTagsLoc){
+                                        var loc = newTagsLoc.indexOf(tags[count].name)
+                                        var x = 0
+                                        var y = 0
+                                        var w = 0
+                                        if(tags[count].value > 0){
+                                            x = 1
+                                        }
+                                        if(newTags[loc].value > 0){
+                                            y = 1
+                                        }
+                                        w = newTags[loc].value + tags[count].value
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    else{
+                                        var x = 1
+                                        var y = 0
+                                        var w = tags[count].value
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    count += 1
+                                }
+                                denominator1 *= denominator2
+                                denominator1 = denominator1.toDouble().pow(0.5)
+                                if(denominator1 == 0.0){
+                                    numerator = 0.0
+                                }
+                                else{
+                                    numerator /= denominator1
+                                }
+                                tagSinDistance = numerator
+                                Log.d("suggestion", "The Cosine Distance of Tag: $tagSinDistance")
                             }
                     }
                 }
         }
     }
 
-    private fun loadUsers(username:String, tags: MutableList<Tags>, users:MutableList<Users>){
+    private fun loadUsers(username:String, newTags: MutableList<Tags>, newUsers:MutableList<Users>){
         Log.d("suggestion", "------------------------------------------------------")
         Log.d("suggestion", "Username = $username")
         Log.d("suggestion", "Tags")
-        if(!tags.isEmpty()){
-            for(friend in tags){
+        if(!newTags.isEmpty()){
+            for(friend in newTags){
                 friend.display()
             }
         }
         Log.d("suggestion", "Users")
-        if(!users.isEmpty()){
-            for(friend in users){
+        if(!newUsers.isEmpty()){
+            for(friend in newUsers){
                 friend.display()
             }
         }
+        var userSinDistance = 0
+        var count = 0
+        var numerator = 0.0
+        var denominator1 = 0.0
+        var denominator2 = 0.0
+        while(count < newUsers.size){
+            if(users[count].name == newUsers[count].name){
+                var x = 0
+                var y = 0
+                var w = 0
+                if(users[count].value > 0){
+                    x = 1
+
+                }
+                if(newUsers[count].value > 0){
+                    y = 1
+                }
+                w = newUsers[count].value * users[count].value
+                numerator += x * y * w
+                denominator1 += w * x * x
+                denominator2 += w * y * y
+            }
+        }
+        denominator1 *= denominator2
+        denominator1 = denominator1.toDouble().pow(0.5)
+        if(denominator1 == 0.0){
+            numerator = 0.0
+        }
+        else{
+            numerator /= denominator1
+        }
+
+        Log.d("suggestion", "The Cosine Distance of User: $numerator")
     }
 
     private fun loadLog(username: String, db: FirebaseFirestore){
@@ -505,6 +643,7 @@ class eventPage : AppCompatActivity() {
             .get()
             .addOnSuccessListener {
                 for(user in it.documents){
+                    Log.d("suggestion", "${it.documents.size}")
                     if(user.id != "Info"){
                         loadUser(user.id, username, db)
                     }
