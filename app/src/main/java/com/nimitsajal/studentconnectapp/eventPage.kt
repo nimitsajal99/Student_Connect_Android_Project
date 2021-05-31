@@ -35,6 +35,7 @@ class eventPage : AppCompatActivity() {
     var friends:HashMap<String, Int> = HashMap<String, Int>()
     var tags = mutableListOf<Tags>()
     var users = mutableListOf<Users>()
+    var result = mutableListOf<Result>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -427,7 +428,7 @@ class eventPage : AppCompatActivity() {
         var newUsers = mutableListOf<Users>()
 
         if(newUsername !in friends.keys && newUsername != username){
-            Log.d("suggestion", "In $newUsername")
+//            Log.d("suggestion", "In $newUsername")
             if(newUsername in mutualFriends.keys){
                 newUsers.add(Users("Mutual Friends", mutualFriends[newUsername]!!))
             }
@@ -462,18 +463,18 @@ class eventPage : AppCompatActivity() {
 //                                loadUsers(newUsername, newTags, newUsers)
                                 Log.d("suggestion", "------------------------------------------------------")
                                 Log.d("suggestion", "Username = $newUsername")
-                                Log.d("suggestion", "Tags")
-                                if(!newTags.isEmpty()){
-                                    for(friend in newTags){
-                                        friend.display()
-                                    }
-                                }
-                                Log.d("suggestion", "Users")
-                                if(!newUsers.isEmpty()){
-                                    for(friend in newUsers){
-                                        friend.display()
-                                    }
-                                }
+//                                Log.d("suggestion", "Tags")
+//                                if(!newTags.isEmpty()){
+//                                    for(friend in newTags){
+//                                        friend.display()
+//                                    }
+//                                }
+//                                Log.d("suggestion", "Users")
+//                                if(!newUsers.isEmpty()){
+//                                    for(friend in newUsers){
+//                                        friend.display()
+//                                    }
+//                                }
                                 var userSinDistance = 0.0
                                 var count = 0
                                 var numerator = 0.0
@@ -490,7 +491,10 @@ class eventPage : AppCompatActivity() {
                                         if(newUsers[count].value > 0){
                                             y = 1
                                         }
-                                        w = newUsers[count].value + users[count].value
+                                        w = (newUsers[count].value + 1) * (users[count].value + 1)
+//                                        if(w == 0) {
+//                                            w = users[count].value
+//                                        }
                                         numerator += x * y * w
                                         denominator1 += w * x * x
                                         denominator2 += w * y * y
@@ -534,7 +538,11 @@ class eventPage : AppCompatActivity() {
                                         if(newTags[loc].value > 0){
                                             y = 1
                                         }
-                                        w = newTags[loc].value + tags[count].value
+
+                                        w = (newTags[loc].value + 1) * (tags[count].value + 1)
+//                                        if(w == 0){
+//                                            w = tags[count].value
+//                                        }
                                         numerator += x * y * w
                                         denominator1 += w * x * x
                                         denominator2 += w * y * y
@@ -561,6 +569,7 @@ class eventPage : AppCompatActivity() {
                                 }
                                 tagSinDistance = numerator
                                 Log.d("suggestion", "The Cosine Distance of Tag: $tagSinDistance")
+                                result.add(Result(newUsername, userSinDistance, tagSinDistance))
                             }
                     }
                 }
@@ -618,35 +627,38 @@ class eventPage : AppCompatActivity() {
     }
 
     private fun loadLog(username: String, db: FirebaseFirestore){
-        Log.d("suggestion", "Friends")
-        for(friend in friends){
-            Log.d("suggestion", "${friend.key} = ${friend.value}")
-        }
-        Log.d("suggestion", "Mutual Friends")
-        for(friend in mutualFriends){
-            Log.d("suggestion", "${friend.key} = ${friend.value}")
-        }
-        Log.d("suggestion", "Mutual Tagged Users")
-        for(friend in mutualTaggedUsers){
-            Log.d("suggestion", "${friend.key} = ${friend.value}")
-        }
-        Log.d("suggestion", "Tags")
-        for(friend in tags){
-            friend.display()
-        }
-        Log.d("suggestion", "Users")
-        for(friend in users){
-            friend.display()
-        }
+//        Log.d("suggestion", "Friends")
+//        for(friend in friends){
+//            Log.d("suggestion", "${friend.key} = ${friend.value}")
+//        }
+//        Log.d("suggestion", "Mutual Friends")
+//        for(friend in mutualFriends){
+//            Log.d("suggestion", "${friend.key} = ${friend.value}")
+//        }
+//        Log.d("suggestion", "Mutual Tagged Users")
+//        for(friend in mutualTaggedUsers){
+//            Log.d("suggestion", "${friend.key} = ${friend.value}")
+//        }
+//        Log.d("suggestion", "Tags")
+//        for(friend in tags){
+//            friend.display()
+//        }
+//        Log.d("suggestion", "Users")
+//        for(friend in users){
+//            friend.display()
+//        }
 
         db.collection("Users")
             .get()
             .addOnSuccessListener {
                 for(user in it.documents){
-                    Log.d("suggestion", "${it.documents.size}")
+//                    Log.d("suggestion", "${it.documents.size}")
                     if(user.id != "Info"){
                         loadUser(user.id, username, db)
                     }
+                }
+                for(res in result){
+                    res.display()
                 }
             }
     }
@@ -661,5 +673,11 @@ data class Tags(var name: String, var value: Int, var inbuilt: Boolean){
 data class Users(var name: String, var value: Int){
     public fun display(){
         Log.d("suggestion", "${name} -> ${value}")
+    }
+}
+
+data class Result(var name: String, var user: Double, var tag: Double){
+    public fun display(){
+        Log.d("suggestion", "${name} \n user -> ${user} \n tag -> ${tag}")
     }
 }
