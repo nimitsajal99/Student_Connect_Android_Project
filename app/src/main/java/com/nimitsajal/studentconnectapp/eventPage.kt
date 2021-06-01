@@ -378,26 +378,45 @@ class eventPage : AppCompatActivity() {
                     if(friend.id != "Info"){
                         friends.put(friend.id, 1)
                     }
-
                 }
                 db.collection("Users").document(username).collection("Tagged Users")
                     .get()
                     .addOnSuccessListener { it3 ->
-                        for(taggedUser in it3.documents){
-                            if(taggedUser.id != "Info" && taggedUser.id != username){
-                                mutualTaggedUsers.put(taggedUser.id, taggedUser["Count"].toString().toInt())
+                        for (taggedUser in it3.documents) {
+                            if (taggedUser.id != "Info" && taggedUser.id != username) {
+                                mutualTaggedUsers.put(
+                                    taggedUser.id,
+                                    taggedUser["Count"].toString().toInt()
+                                )
                             }
                         }
-                        for(friend in friends){
+                        db.collection("Users").document(username).collection("Chat Users")
+                            .get()
+                            .addOnSuccessListener { it5 ->
+                                for (taggedUser in it5.documents) {
+                                    if (taggedUser.id != "Info" && taggedUser.id != username) {
+                                        if (taggedUser.id in mutualTaggedUsers.keys) {
+                                            mutualTaggedUsers[taggedUser.id] =
+                                                mutualTaggedUsers[taggedUser.id]!! + taggedUser["Count"].toString()
+                                                    .toInt()
+                                        } else {
+                                            mutualTaggedUsers.put(
+                                                taggedUser.id,
+                                                taggedUser["Count"].toString().toInt()
+                                            )
+                                        }
+                                    }
+                                }
+                        for (friend in friends) {
                             db.collection("Users").document(friend.key).collection("Friends")
                                 .get()
                                 .addOnSuccessListener { it1 ->
-                                    for(mutualfriends in it1.documents){
-                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username){
-                                            if(mutualfriends.id in mutualFriends.keys){
-                                                mutualFriends[mutualfriends.id] = mutualFriends[mutualfriends.id]!! + 1
-                                            }
-                                            else{
+                                    for (mutualfriends in it1.documents) {
+                                        if (mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username) {
+                                            if (mutualfriends.id in mutualFriends.keys) {
+                                                mutualFriends[mutualfriends.id] =
+                                                    mutualFriends[mutualfriends.id]!! + 1
+                                            } else {
                                                 mutualFriends.put(mutualfriends.id, 1)
                                             }
                                         }
@@ -406,18 +425,41 @@ class eventPage : AppCompatActivity() {
                             db.collection("Users").document(friend.key).collection("Tagged Users")
                                 .get()
                                 .addOnSuccessListener { it2 ->
-                                    for(mutualfriends in it2.documents){
-                                        if(mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username){
-                                            if(mutualfriends.id in mutualTaggedUsers.keys){
-                                                mutualTaggedUsers[mutualfriends.id] = mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString().toInt()
+                                    for (mutualfriends in it2.documents) {
+                                        if (mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username) {
+                                            if (mutualfriends.id in mutualTaggedUsers.keys) {
+                                                mutualTaggedUsers[mutualfriends.id] =
+                                                    mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString()
+                                                        .toInt()
+                                            } else {
+                                                mutualTaggedUsers.put(
+                                                    mutualfriends.id,
+                                                    mutualfriends["Count"].toString().toInt()
+                                                )
                                             }
-                                            else{
-                                                mutualTaggedUsers.put(mutualfriends.id, mutualfriends["Count"].toString().toInt())
+                                        }
+                                    }
+                                }
+                            db.collection("Users").document(friend.key).collection("Chat Users")
+                                .get()
+                                .addOnSuccessListener { it2 ->
+                                    for (mutualfriends in it2.documents) {
+                                        if (mutualfriends.id != "Info" && mutualfriends.id !in friends.keys && mutualfriends.id != username) {
+                                            if (mutualfriends.id in mutualTaggedUsers.keys) {
+                                                mutualTaggedUsers[mutualfriends.id] =
+                                                    mutualTaggedUsers[mutualfriends.id]!! + mutualfriends["Count"].toString()
+                                                        .toInt()
+                                            } else {
+                                                mutualTaggedUsers.put(
+                                                    mutualfriends.id,
+                                                    mutualfriends["Count"].toString().toInt()
+                                                )
                                             }
                                         }
                                     }
                                 }
                         }
+                    }
                     }
             }
     }
@@ -498,16 +540,16 @@ class eventPage : AppCompatActivity() {
                                         numerator += x * y * w
                                         denominator1 += w * x * x
                                         denominator2 += w * y * y
-//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
                                     }
                                     else{
                                         var x = 1
                                         var y = 0
-                                        var w = users[count].value
+                                        var w = users[count].value + 1
                                         numerator += x * y * w
                                         denominator1 += w * x * x
                                         denominator2 += w * y * y
-//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
                                     }
                                     count += 1
                                 }
@@ -551,7 +593,7 @@ class eventPage : AppCompatActivity() {
                                     else{
                                         var x = 1
                                         var y = 0
-                                        var w = tags[count].value
+                                        var w = tags[count].value + 1
                                         numerator += x * y * w
                                         denominator1 += w * x * x
                                         denominator2 += w * y * y
@@ -627,26 +669,26 @@ class eventPage : AppCompatActivity() {
     }
 
     private fun loadLog(username: String, db: FirebaseFirestore){
-//        Log.d("suggestion", "Friends")
-//        for(friend in friends){
-//            Log.d("suggestion", "${friend.key} = ${friend.value}")
-//        }
-//        Log.d("suggestion", "Mutual Friends")
-//        for(friend in mutualFriends){
-//            Log.d("suggestion", "${friend.key} = ${friend.value}")
-//        }
-//        Log.d("suggestion", "Mutual Tagged Users")
-//        for(friend in mutualTaggedUsers){
-//            Log.d("suggestion", "${friend.key} = ${friend.value}")
-//        }
-//        Log.d("suggestion", "Tags")
-//        for(friend in tags){
-//            friend.display()
-//        }
-//        Log.d("suggestion", "Users")
-//        for(friend in users){
-//            friend.display()
-//        }
+        Log.d("suggestion", "Friends")
+        for(friend in friends){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
+        Log.d("suggestion", "Mutual Friends")
+        for(friend in mutualFriends){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
+        Log.d("suggestion", "Mutual Tagged Users")
+        for(friend in mutualTaggedUsers){
+            Log.d("suggestion", "${friend.key} = ${friend.value}")
+        }
+        Log.d("suggestion", "Tags")
+        for(friend in tags){
+            friend.display()
+        }
+        Log.d("suggestion", "Users")
+        for(friend in users){
+            friend.display()
+        }
 
         db.collection("Users")
             .get()

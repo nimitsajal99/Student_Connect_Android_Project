@@ -739,7 +739,8 @@ class others_profile_page : AppCompatActivity() {
                 "From" to "System",
                 "To" to usernameOthers,
                 "Text" to "Say Hi",
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             val messageFrom = hashMapOf(

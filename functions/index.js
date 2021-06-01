@@ -47,6 +47,9 @@ exports.createUser = functions.region("asia-south1")
             users.doc(data.userName).collection("Chats").doc("Info").set({
               "Info": "Info",
             });
+            users.doc(data.userName).collection("Chat Users").doc("Info").set({
+              "Info": "Info",
+            });
             users.doc(data.userName).collection("Friends").doc("Info").set({
               "Info": "Info",
             });

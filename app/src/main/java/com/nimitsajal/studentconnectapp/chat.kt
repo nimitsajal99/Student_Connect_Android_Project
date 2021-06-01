@@ -268,20 +268,24 @@ class chat : AppCompatActivity() {
                     .addOnFailureListener {
                         showToast("Message not Sent", 1)
                     }
-                val message = hashMapOf(
-                    "From" to From,
-                    "To" to To,
-                    "Text" to text,
-                    "Time" to time,
-                    "ID" to it.id.toString()
-                )
-                send.update(message)
-                    .addOnFailureListener {
-                        showToast("Message not Updated", 1)
-                    }
-                recieve.update(message)
-                    .addOnFailureListener {
-                        showToast("Message not Updated", 1)
+                send.get()
+                    .addOnSuccessListener { it2 ->
+                        val message = hashMapOf(
+                            "From" to From,
+                            "To" to To,
+                            "Text" to text,
+                            "Time" to time,
+                            "ID" to it.id.toString(),
+                            "Count" to (it2["Count"].toString().toInt() + 1)
+                        )
+                        send.update(message)
+                            .addOnFailureListener {
+                                showToast("Message not Updated", 1)
+                            }
+                        recieve.update(message)
+                            .addOnFailureListener {
+                                showToast("Message not Updated", 1)
+                            }
                     }
             }
             .addOnFailureListener {

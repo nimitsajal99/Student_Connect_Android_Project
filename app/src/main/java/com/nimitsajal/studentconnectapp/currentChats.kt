@@ -350,11 +350,26 @@ class currentChats : AppCompatActivity() {
             adapter.setOnItemClickListener { item, view ->
                 val currentChat_class: CurrentChat_class = item as CurrentChat_class
                 val to = currentChat_class.username
-                val intent = Intent(this, chat::class.java)
-                intent.putExtra("from", username)
-                intent.putExtra("to", to)
-                startActivity(intent)
-                finish()
+                db.collection("Users").document(username).collection("Chats").document(to)
+                    .get()
+                    .addOnSuccessListener {
+                        if(it.exists()){
+                            var count = it["Count"].toString().toInt()
+                            count = (count / 1000) + 1
+                            val info = hashMapOf(
+                                    "Count" to count
+                                    )
+                            db.collection("Users").document(username).collection("Chat Users").document(to)
+                                .set(info)
+                                .addOnSuccessListener {
+                                    val intent = Intent(this, chat::class.java)
+                                    intent.putExtra("from", username)
+                                    intent.putExtra("to", to)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                        }
+                    }
             }
             rvCurrentChats.adapter = adapter
         }
