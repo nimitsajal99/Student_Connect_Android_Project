@@ -365,6 +365,7 @@ class eventPage : AppCompatActivity() {
             .get()
             .addOnSuccessListener {
                 if(it.exists()){
+                    users.add(Users(it["Semester"].toString(), 4))
                     users.add(Users(it["Branch"].toString(), 3))
                     users.add(Users(it["College"].toString(), 2))
                     users.add(Users(it["University"].toString(), 1))
@@ -489,6 +490,7 @@ class eventPage : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener {
                     if(it.exists()){
+                        newUsers.add(Users(it["Semester"].toString(), 1))
                         newUsers.add(Users(it["Branch"].toString(), 1))
                         newUsers.add(Users(it["College"].toString(), 1))
                         newUsers.add(Users(it["University"].toString(), 1))
@@ -523,7 +525,26 @@ class eventPage : AppCompatActivity() {
                                 var denominator1 = 0.0
                                 var denominator2 = 0.0
                                 while(count < newUsers.size){
-                                    if(users[count].name == newUsers[count].name){
+                                    if(users[count].name == newUsers[count].name && count != 2){
+                                        var x = 0
+                                        var y = 0
+                                        var w = 0
+                                        if(users[count].value > 0){
+                                            x = 1
+                                        }
+                                        if(newUsers[count].value > 0){
+                                            y = 1
+                                        }
+                                        w = (newUsers[count].value + 1) * (users[count].value + 1)
+//                                        if(w == 0) {
+//                                            w = users[count].value
+//                                        }
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    else if(count == 2 && users[count].name == newUsers[count].name && users[count+1].name == newUsers[count+1].name){
                                         var x = 0
                                         var y = 0
                                         var w = 0

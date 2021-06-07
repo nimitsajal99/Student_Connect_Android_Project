@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="2dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="5dp"
+    app:cardBackgroundColor="@color/base0card"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingTop="10dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="10dp"
+        tools:ignore="ExtraText">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circularDp"
+            android:layout_gravity="center"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:civ_border_color="@color/base2"
+            app:civ_border_width="5dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@color/base3"
+            android:layout_marginTop="3dp"
+            app:layout_constraintBottom_toTopOf="@id/tvUsername"/>
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/circularDp"
+            app:layout_constraintBottom_toTopOf="@id/tvName"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="ruttu"
+            android:textColor="@color/base3"
+            android:layout_marginTop="5sp"
+            />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername"
+            app:layout_constraintBottom_toTopOf="@id/btnProfile"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:text="Rutazeet Ritik Rout"
+            android:textColor="@color/base3"
+            android:layout_marginTop="7sp"
+            />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circularPercentage"
+            android:layout_gravity="center"
+            android:layout_width="60sp"
+            android:layout_height="60sp"
+            app:civ_border_color="@color/base2"
+            app:civ_border_width="4dp"
+            app:layout_constraintLeft_toLeftOf="@id/circularDp"
+            android:src="@color/base2"
+            android:layout_marginTop="3dp"
+            app:layout_constraintBottom_toBottomOf="@id/circularDp"/>
+
+        <TextView
+            android:id="@+id/tvPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/circularPercentage"
+            app:layout_constraintLeft_toLeftOf="@id/circularPercentage"
+            app:layout_constraintRight_toRightOf="@id/circularPercentage"
+            app:layout_constraintTop_toTopOf="@id/circularPercentage"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:text="95%"
+            android:textColor="@color/base3"
+            />
+
+        <Button
+            android:id="@+id/btnProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corners_buttons"
+            android:text="profile"
+            android:textColor="@color/base0"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/tvName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginLeft="10dp"
+            app:layout_goneMarginRight="10dp"
+            android:layout_marginTop="7dp"
+            />
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
