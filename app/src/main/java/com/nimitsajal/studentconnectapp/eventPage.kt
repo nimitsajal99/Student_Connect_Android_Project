@@ -1,6 +1,9 @@
 package com.nimitsajal.studentconnectapp
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -12,15 +15,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -30,7 +38,9 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnChat
 import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
+import kotlinx.android.synthetic.main.activity_my_post.*
 import kotlinx.android.synthetic.main.activity_profile_page.*
+import kotlinx.android.synthetic.main.profile_post_adapter.view.*
 import kotlinx.android.synthetic.main.suggestion_adapter.view.*
 import java.util.ArrayList
 import java.util.HashMap
@@ -47,6 +57,7 @@ class eventPage : AppCompatActivity() {
     var tags = mutableListOf<Tags>()
     var users = mutableListOf<Users>()
     var result: MutableList<Result> = mutableListOf()
+    var selected = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +118,7 @@ class eventPage : AppCompatActivity() {
 
         btnRefresh.setOnClickListener {
             btnRefresh.visibility = View.GONE
-            reload(adapter)
+            reload(adapter, db)
         }
     }
 
@@ -481,12 +492,12 @@ class eventPage : AppCompatActivity() {
             }
     }
 
-    private fun reload(adapter: GroupAdapter<GroupieViewHolder>){
+    private fun reload(adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore){
 //        var resultSort = result.sortByDescending { Result -> Result.aggregate }
 //        var multiplier = resultSort
         result.sortByDescending { it.aggregate }
         var multiplier = result[0].aggregate
-        multiplier = 98/multiplier
+        multiplier = (92..99).random()/multiplier
         var count = 0
         for(res in result){
             if(count > 6){
@@ -495,6 +506,114 @@ class eventPage : AppCompatActivity() {
             res.percentage = (res.aggregate * multiplier).toInt()
             adapter.add(Suggestion_class(res, friends))
             count += 1
+        }
+        adapter.setOnItemClickListener { item, view ->
+            val suggestion = item as Suggestion_class
+            tvMatch1.text = ""
+            tvMatch2.text = ""
+            selected = suggestion.result.name
+                db.collection("Users").document(suggestion.result.name).collection("Friends")
+                    .get()
+                    .addOnSuccessListener {
+                        var n1 = ""
+                        var n2 = ""
+                        var n = 0
+                        var linkPost = ""
+                        for(doc in it.documents){
+                            if(doc.id != "Info"){
+                                if(doc.id in friends.keys){
+                                    if(n == 0){
+                                        n1 = doc.id
+                                    }
+                                    else if(n == 1){
+                                        n2 = doc.id
+                                    }
+                                    n += 1
+                                }
+                            }
+                        }
+                        Log.d("recentPost", "Searching")
+                        db.collection("Users").document(suggestion.result.name).collection("My Posts")
+                            .orderBy("Time", Query.Direction.DESCENDING)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener { it2 ->
+                                information.visibility = View.VISIBLE
+                                if(it2.isEmpty){
+                                    Log.d("recentPost", "No Post")
+                                    Glide.with(this).load(R.drawable.no_post).into(ivRecentPost)
+                                }
+
+                                else{
+                                    linkPost = it2.documents[0].id
+                                    Log.d("recentPost", linkPost)
+                                    db.collection("Post").document(linkPost)
+                                        .get()
+                                        .addOnSuccessListener { it3 ->
+                                            if(it3.exists()){
+                                                linkPost = it3["Picture"].toString()
+                                                Log.d("recentPost", linkPost)
+//                                                Picasso.get().load(linkPost).into(ivRecentPost, object :
+//                                                    Callback {
+//                                                    override fun onSuccess() {
+//
+//                                                    }
+//                                                    override fun onError(e: java.lang.Exception?) {
+//                                                        Log.d("loading", "ERROR - $e")
+//                                                    }
+//                                                })
+
+                                                Glide.with(this).asBitmap()
+                                                    .load(linkPost)
+                                                    .into(ivRecentPost)
+                                            }
+                                        }
+                                }
+                                var str = ""
+                                if(n == 1){
+                                    str = "You have " + n1 + " as a Mutual Friend"
+                                }
+                                else if(n == 2){
+                                    str = "You have " + n1 + " and " + n2 + " as Mutual Friends"
+                                }
+                                else if(n > 2){
+                                    str = "You have " + n1 + ", " + n2 + " and " + (n-2) + " other Mutual Friends"
+                                }
+                                var str1 = ""
+                                var str2 = ""
+                                if(str != ""){
+                                    if(suggestion.result.topTags[0].length > str.length){
+                                        str2 = suggestion.result.topTags[0]
+                                        str1 = str
+                                    }
+                                    else{
+                                        str2 = str
+                                        str1 = suggestion.result.topTags[0]
+                                    }
+                                }
+                                else{
+                                    if(suggestion.result.topTags.size == 1){
+                                        str2 = suggestion.result.topTags[0]
+                                    }
+                                    else{
+                                        if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
+                                            str2 = suggestion.result.topTags[0]
+                                            str1 = suggestion.result.topTags[1]
+                                        }
+                                        else{
+                                            str1 = suggestion.result.topTags[0]
+                                            str2 = suggestion.result.topTags[1]
+                                        }
+                                    }
+                                }
+                                if(str1 != ""){
+                                    tvMatch1.text = str1
+                                }
+                                if(str2 != ""){
+                                    tvMatch2.text = str2
+                                }
+                            }
+                    }
         }
         rvSuggestion.adapter = adapter
     }

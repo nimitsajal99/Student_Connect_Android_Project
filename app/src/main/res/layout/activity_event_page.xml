@@ -92,6 +92,8 @@
         android:layout_marginLeft="2dp"/>
 
     <androidx.cardview.widget.CardView
+        android:visibility="gone"
+        android:id="@+id/information"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -143,7 +145,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="5dp"
-                android:src="@color/base2"
+                android:scaleType="centerCrop"
+                android:src="@drawable/no_post"
                 />
 
             </androidx.cardview.widget.CardView>
@@ -173,28 +176,32 @@
             >
 
             <TextView
+                android:id="@+id/tvMatch1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="You both study in 'Computer Science and Engineering' from 'BMS College of Engineering'"
+                android:text=""
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:textColor="@color/base4"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:gravity="center_vertical"/>
+                android:gravity="bottom"
+                android:paddingBottom="5dp"/>
 
             <TextView
+                android:id="@+id/tvMatch2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="You have common interests like Bachelor and Event"
+                android:text=""
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:textColor="@color/base4"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:gravity="center_vertical"/>
+                android:gravity="top"
+                android:paddingTop="5dp"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
