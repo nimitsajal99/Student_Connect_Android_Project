@@ -83,31 +83,146 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSuggestion"
         android:layout_width="match_parent"
-        android:layout_height="310dp"
+        android:layout_height="315dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="2dp"/>
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/circularRefresh"
-        android:layout_gravity="center"
-        android:layout_width="55sp"
-        android:layout_height="55sp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:src="@color/base3"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/rvSuggestion"/>
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardCornerRadius="2dp"
+        app:cardUseCompatPadding="true"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/base0card"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/rvSuggestion"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingBottom="3dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:weightSum="5">
+
+            <androidx.cardview.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="4"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:cardCornerRadius="2dp"
+                app:cardUseCompatPadding="true"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/base0card"
+                android:clickable="true"
+                android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivRecentPost"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:src="@color/base2"
+                />
+
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnAddFriend"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="Add as Friend"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/base0"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/rounded_corners_buttons"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You both study in 'Computer Science and Engineering' from 'BMS College of Engineering'"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/base4"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You have common interests like Bachelor and Event"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/base4"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <ImageView
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        app:layout_constraintLeft_toLeftOf="@id/circularRefresh"
-        app:layout_constraintRight_toRightOf="@id/circularRefresh"
-        app:layout_constraintBottom_toBottomOf="@id/circularRefresh"
-        app:layout_constraintTop_toTopOf="@id/circularRefresh"
+        android:id="@+id/btnRefresh"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/refresh"/>
+
+    <ImageView
+        android:id="@+id/btnRefreshBlocked"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/refresh_blocked"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -123,15 +238,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
-    <Button
-        android:id="@+id/btnLogResult"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="TEST"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomBar"

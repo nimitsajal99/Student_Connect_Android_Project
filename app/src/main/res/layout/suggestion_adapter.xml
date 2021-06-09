@@ -2,8 +2,8 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_width="200dp"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="2dp"
     app:cardUseCompatPadding="true"
@@ -14,7 +14,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:paddingLeft="4dp"
         android:paddingTop="10dp"
         android:paddingRight="4dp"
@@ -68,13 +68,13 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circularPercentage"
             android:layout_gravity="center"
-            android:layout_width="60sp"
-            android:layout_height="60sp"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
             app:civ_border_color="@color/base2"
             app:civ_border_width="4dp"
             app:layout_constraintLeft_toLeftOf="@id/circularDp"
             android:src="@color/base2"
-            android:layout_marginTop="3dp"
+            android:layout_margin="2dp"
             app:layout_constraintBottom_toBottomOf="@id/circularDp"/>
 
         <TextView
@@ -85,7 +85,7 @@
             app:layout_constraintLeft_toLeftOf="@id/circularPercentage"
             app:layout_constraintRight_toRightOf="@id/circularPercentage"
             app:layout_constraintTop_toTopOf="@id/circularPercentage"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:text="95%"
             android:textColor="@color/base3"
