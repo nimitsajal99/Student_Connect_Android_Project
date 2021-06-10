@@ -57,6 +57,7 @@ class eventPage : AppCompatActivity() {
     var tags = mutableListOf<Tags>()
     var users = mutableListOf<Users>()
     var result: MutableList<Result> = mutableListOf()
+    var selectedPosition = -1
     var selected = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +91,14 @@ class eventPage : AppCompatActivity() {
         }
 
         detector = GestureDetectorCompat(this,DiaryGestureListener(username))
+
+        btnAddFriend.setOnClickListener {
+            information.visibility = View.GONE
+            adapter.removeGroupAtAdapterPosition(selectedPosition)
+            selectedPosition = -1
+            selected = ""
+            rvSuggestion.adapter = adapter
+        }
 
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -493,6 +502,7 @@ class eventPage : AppCompatActivity() {
     }
 
     private fun reload(adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore){
+        information.visibility = View.GONE
 //        var resultSort = result.sortByDescending { Result -> Result.aggregate }
 //        var multiplier = resultSort
         result.sortByDescending { it.aggregate }
@@ -508,6 +518,7 @@ class eventPage : AppCompatActivity() {
             count += 1
         }
         adapter.setOnItemClickListener { item, view ->
+            selectedPosition = item.getPosition(item)
             val suggestion = item as Suggestion_class
             tvMatch1.text = ""
             tvMatch2.text = ""
@@ -585,32 +596,53 @@ class eventPage : AppCompatActivity() {
                                     if(suggestion.result.topTags[0].length > str.length){
                                         str2 = suggestion.result.topTags[0]
                                         str1 = str
+                                        tvMatch1.text = str1
+                                        tvMatch2.text = str2
                                     }
                                     else{
                                         str2 = str
                                         str1 = suggestion.result.topTags[0]
+                                        tvMatch1.text = str1
+                                        tvMatch2.text = str2
                                     }
                                 }
                                 else{
                                     if(suggestion.result.topTags.size == 1){
-                                        str2 = suggestion.result.topTags[0]
+                                        str1 = suggestion.result.topTags[0]
+                                        tvMatch1.text = str1
+                                        db.collection("Users").document(suggestion.result.name)
+                                            .get()
+                                            .addOnSuccessListener { it4 ->
+                                                if(it4.exists()){
+                                                    val str3 = (it4["Branch"].toString()).split("-")
+                                                    val str4 = (it4["College"].toString()).split("-")
+                                                    var str11 = str3[0]
+                                                    var str22 = str4[0]
+                                                    if(str3.size > 1){
+                                                        str11 = str3[1]
+                                                    }
+                                                    if(str4.size > 1){
+                                                        str22 = str4[1]
+                                                    }
+                                                    str2 = it4["Name"].toString() + " is pursuing " + str11 + " from " + str22
+                                                    tvMatch2.text = str2
+                                                }
+                                            }
                                     }
                                     else{
                                         if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
                                             str2 = suggestion.result.topTags[0]
                                             str1 = suggestion.result.topTags[1]
+                                            tvMatch1.text = str1
+                                            tvMatch2.text = str2
                                         }
                                         else{
                                             str1 = suggestion.result.topTags[0]
                                             str2 = suggestion.result.topTags[1]
+                                            tvMatch1.text = str1
+                                            tvMatch2.text = str2
                                         }
                                     }
-                                }
-                                if(str1 != ""){
-                                    tvMatch1.text = str1
-                                }
-                                if(str2 != ""){
-                                    tvMatch2.text = str2
                                 }
                             }
                     }
@@ -699,14 +731,27 @@ class eventPage : AppCompatActivity() {
                                         if(users[3].name != newUsers[3].name){
                                             if(count == 4){
                                                 val str = users[4].name.split("-")
-                                                topTags.add("You both study in${str[1]}")
+                                                if(str.size > 1){
+                                                    topTags.add("You both study in${str[1]}")
+                                                }
+                                                else{
+                                                    topTags.add("You both study in${str[0]}")
+                                                }
                                             }
                                         }
                                         else{
                                             if(count == 3){
                                                 val str1 = users[4].name.split("-")
                                                 val str2 = users[3].name.split("-")
-                                                topTags.add("You both study in${str2[1]} from${str1[1]}")
+                                                var str11 = str1[0]
+                                                var str22 = str2[0]
+                                                if(str1.size > 1){
+                                                    str11 = str1[1]
+                                                }
+                                                if(str2.size > 1){
+                                                    str22 = str2[1]
+                                                }
+                                                topTags.add("You both study in${str22} from${str11}")
                                             }
                                         }
 
