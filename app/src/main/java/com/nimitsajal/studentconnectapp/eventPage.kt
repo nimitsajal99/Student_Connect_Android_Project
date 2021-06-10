@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_main_feed.btnFeed
 import kotlinx.android.synthetic.main.activity_main_feed.btnLogout
 import kotlinx.android.synthetic.main.activity_main_feed.btnProfile
 import kotlinx.android.synthetic.main.activity_my_post.*
+import kotlinx.android.synthetic.main.activity_others_profile_page.*
 import kotlinx.android.synthetic.main.activity_profile_page.*
 import kotlinx.android.synthetic.main.profile_post_adapter.view.*
 import kotlinx.android.synthetic.main.suggestion_adapter.view.*
@@ -95,9 +96,11 @@ class eventPage : AppCompatActivity() {
         btnAddFriend.setOnClickListener {
             information.visibility = View.GONE
             adapter.removeGroupAtAdapterPosition(selectedPosition)
+            rvSuggestion.adapter = adapter
+            showToast("$selected added as a Friend", 2)
+            friend(username!!, selected, db)
             selectedPosition = -1
             selected = ""
-            rvSuggestion.adapter = adapter
         }
 
         btnLogout.setOnClickListener {
@@ -518,7 +521,7 @@ class eventPage : AppCompatActivity() {
             count += 1
         }
         adapter.setOnItemClickListener { item, view ->
-            selectedPosition = item.getPosition(item)
+            selectedPosition = adapter.getAdapterPosition(item)
             val suggestion = item as Suggestion_class
             tvMatch1.text = ""
             tvMatch2.text = ""
@@ -594,15 +597,19 @@ class eventPage : AppCompatActivity() {
                                 var str2 = ""
                                 if(str != ""){
                                     if(suggestion.result.topTags[0].length > str.length){
-                                        str2 = suggestion.result.topTags[0]
+                                        if(suggestion.result.topTags.size > 0){
+                                            str2 = suggestion.result.topTags[0]
+                                            tvMatch2.text = str2
+                                        }
                                         str1 = str
                                         tvMatch1.text = str1
-                                        tvMatch2.text = str2
                                     }
                                     else{
+                                        if(suggestion.result.topTags.size > 0){
+                                            str1 = suggestion.result.topTags[0]
+                                            tvMatch1.text = str1
+                                        }
                                         str2 = str
-                                        str1 = suggestion.result.topTags[0]
-                                        tvMatch1.text = str1
                                         tvMatch2.text = str2
                                     }
                                 }
@@ -630,17 +637,19 @@ class eventPage : AppCompatActivity() {
                                             }
                                     }
                                     else{
-                                        if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
-                                            str2 = suggestion.result.topTags[0]
-                                            str1 = suggestion.result.topTags[1]
-                                            tvMatch1.text = str1
-                                            tvMatch2.text = str2
-                                        }
-                                        else{
-                                            str1 = suggestion.result.topTags[0]
-                                            str2 = suggestion.result.topTags[1]
-                                            tvMatch1.text = str1
-                                            tvMatch2.text = str2
+                                        if(suggestion.result.topTags.size > 1){
+                                            if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
+                                                str2 = suggestion.result.topTags[0]
+                                                str1 = suggestion.result.topTags[1]
+                                                tvMatch1.text = str1
+                                                tvMatch2.text = str2
+                                            }
+                                            else{
+                                                str1 = suggestion.result.topTags[0]
+                                                str2 = suggestion.result.topTags[1]
+                                                tvMatch1.text = str1
+                                                tvMatch2.text = str2
+                                            }
                                         }
                                     }
                                 }
@@ -965,6 +974,132 @@ class eventPage : AppCompatActivity() {
                    btnRefreshBlocked.visibility = View.GONE
                     btnRefresh.visibility = View.VISIBLE
                 }, 3000)
+            }
+    }
+
+    private fun friend(username: String, usernameOthers: String, db: FirebaseFirestore){
+        var dpUsername = ""
+        var name = ""
+        var dpUsernameO = ""
+        var nameO = ""
+        db.collection("Users").document(username)
+            .get()
+            .addOnSuccessListener {
+                if(it != null){
+                    dpUsername = it.getString("Picture").toString()
+                    name = it.getString("Name").toString()
+                    Log.d("others", "user name = $name, dp = $dpUsername")
+                    val user = hashMapOf(
+                        "Picture" to dpUsername,
+                        "Name" to name
+                    )
+                    db.collection("Users").document(usernameOthers)
+                        .get()
+                        .addOnSuccessListener { it2 ->
+                            dpUsernameO = it2.getString("Picture").toString()
+                            nameO = it2.getString("Name").toString()
+                            val userOthers = hashMapOf(
+                                "Picture" to dpUsernameO,
+                                "Name" to nameO
+                            )
+                            addfriend(usernameOthers,db,userOthers,username)
+                            addfriend(username,db,user,usernameOthers)
+                        }
+                }
+            }
+    }
+
+    private fun addfriend(From: String, db: FirebaseFirestore, FromHash: HashMap<String, String>, To: String)
+    {
+        var percent = 0.0F
+        var list = mutableListOf<String>()
+        db.collection("Users").document(From)
+            .get()
+            .addOnSuccessListener { count ->
+                db.collection("Users").document(From).collection("Tags")
+                    .get()
+                    .addOnSuccessListener {
+                        if (it.size() != 0)
+                        {
+                            for (tag in it.documents)
+                            {
+
+//                                percent = tag["Value"].toString().toFloat()/count["Tags"].toString().toFloat()
+                                if (tag["Inbuilt"].toString().toBoolean())
+                                {
+                                    list.add(tag.id)
+                                }
+                                else if(count["Tags"].toString().toInt() > 25 && percent >= 0.20F)
+                                {
+                                    list.add(tag.id)
+                                }
+                            }
+                            FromHash.put("HashTags", list.size.toString())
+                            var i = 0
+                            while(i<list.size)
+                            {
+                                var string = "Tag" + i
+                                FromHash.put(string, list[i])
+                                Log.d("others", "$string -> ${list[i]}")
+//                                tagCaller(To,list[i],true,db)
+                                i+=1
+                            }
+                            db.collection("Users").document(To).collection("Friends").document(From)
+                                .set(FromHash)
+                                .addOnCompleteListener {it3 ->
+                                    if(it3.isSuccessful){
+                                        Log.d("others", "$From is added")
+                                    }
+                                    else{
+                                        Log.d("others", "inner user not entered = $it3")
+                                    }
+                                }
+                            db.collection("Users").document(To)
+                                .get()
+                                .addOnSuccessListener {
+                                    db.collection("Users").document(To)
+                                        .update("Tags", (it["Tags"].toString().toInt() + list.size))
+                                        .addOnSuccessListener {
+                                            Log.d("others", "Tag updated - added")
+                                        }
+                                }
+                            i = 0
+                            for(abc in list){
+                                db.collection("Users").document(To).collection("Tags").document(abc)
+                                    .get()
+                                    .addOnSuccessListener { it2 ->
+                                        if(it2.exists()){
+                                            db.collection("Users").document(To).collection("Tags").document(abc)
+                                                .update("Value", (it2["Value"].toString().toInt() + 1))
+                                                .addOnCompleteListener {
+                                                    Log.d("others", "$To updated - added, ${abc}")
+                                                }
+                                        }
+                                        else{
+                                            var data: HashMap<String, Any> = hashMapOf<String, Any>()
+                                            data.put("Inbuilt", false)
+                                            data.put("Value", 1)
+                                            db.collection("Users").document(To).collection("Tags").document(abc)
+                                                .set(data)
+                                                .addOnCompleteListener{
+                                                    Log.d("others", "$To updated - added, ${abc}")
+                                                }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        var data: HashMap<String, Any> = hashMapOf<String, Any>()
+                                        data.put("Inbuilt", false)
+                                        data.put("Value", 1)
+                                        db.collection("Users").document(To).collection("Tags").document(abc)
+                                            .set(data)
+                                            .addOnCompleteListener{
+                                                Log.d("others", "$To updated - added, ${abc}")
+                                            }
+                                    }
+                                i += 1
+                            }
+                        }
+                    }
             }
     }
 }

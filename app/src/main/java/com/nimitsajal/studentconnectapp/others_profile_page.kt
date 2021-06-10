@@ -152,6 +152,11 @@ class others_profile_page : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        moveTaskToBack(false)
+    }
+
     private fun goToEvent(username: String){
         val intent = Intent(this, eventPage::class.java)
         intent.putExtra("username", username)
@@ -612,7 +617,6 @@ class others_profile_page : AppCompatActivity() {
 //                .addOnCompleteListener{
 //                    if(it.isSuccessful){
 //                        Log.d("others", "userOther removed from user")
-//                    }
 //                }
 //            db.collection("Users").document(usernameOthers).collection("Friends").document(username)
 //                .delete()
