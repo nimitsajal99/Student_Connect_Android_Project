@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.text.Html
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -506,8 +507,6 @@ class eventPage : AppCompatActivity() {
 
     private fun reload(adapter: GroupAdapter<GroupieViewHolder>, db: FirebaseFirestore){
         information.visibility = View.GONE
-//        var resultSort = result.sortByDescending { Result -> Result.aggregate }
-//        var multiplier = resultSort
         result.sortByDescending { it.aggregate }
         var multiplier = result[0].aggregate
         multiplier = (92..99).random()/multiplier
@@ -546,77 +545,44 @@ class eventPage : AppCompatActivity() {
                                 }
                             }
                         }
-                        Log.d("recentPost", "Searching")
-                        db.collection("Users").document(suggestion.result.name).collection("My Posts")
-                            .orderBy("Time", Query.Direction.DESCENDING)
-                            .limit(1)
-                            .get()
-                            .addOnSuccessListener { it2 ->
-                                information.visibility = View.VISIBLE
-                                if(it2.isEmpty){
-                                    Log.d("recentPost", "No Post")
-                                    Glide.with(this).load(R.drawable.no_post).into(ivRecentPost)
-                                }
-
-                                else{
-                                    linkPost = it2.documents[0].id
-                                    Log.d("recentPost", linkPost)
-                                    db.collection("Post").document(linkPost)
-                                        .get()
-                                        .addOnSuccessListener { it3 ->
-                                            if(it3.exists()){
-                                                linkPost = it3["Picture"].toString()
-                                                Log.d("recentPost", linkPost)
-//                                                Picasso.get().load(linkPost).into(ivRecentPost, object :
-//                                                    Callback {
-//                                                    override fun onSuccess() {
-//
-//                                                    }
-//                                                    override fun onError(e: java.lang.Exception?) {
-//                                                        Log.d("loading", "ERROR - $e")
-//                                                    }
-//                                                })
-
-                                                Glide.with(this).asBitmap()
-                                                    .load(linkPost)
-                                                    .into(ivRecentPost)
-                                            }
-                                        }
-                                }
-                                var str = ""
-                                if(n == 1){
-                                    str = "You have " + n1 + " as a Mutual Friend"
-                                }
-                                else if(n == 2){
-                                    str = "You have " + n1 + " and " + n2 + " as Mutual Friends"
-                                }
-                                else if(n > 2){
-                                    str = "You have " + n1 + ", " + n2 + " and " + (n-2) + " other Mutual Friends"
-                                }
-                                var str1 = ""
-                                var str2 = ""
-                                if(str != ""){
-                                    if(suggestion.result.topTags[0].length > str.length){
-                                        if(suggestion.result.topTags.size > 0){
-                                            str2 = suggestion.result.topTags[0]
-                                            tvMatch2.text = str2
-                                        }
-                                        str1 = str
-                                        tvMatch1.text = str1
+                        if(n==0)
+                        {
+                            Log.d("recentPost", "Searching")
+                            db.collection("Users").document(suggestion.result.name).collection("My Posts")
+                                .orderBy("Time", Query.Direction.DESCENDING)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener { it2 ->
+                                    information.visibility = View.VISIBLE
+                                    if(it2.isEmpty){
+                                        Log.d("recentPost", "No Post")
+                                        Glide.with(this).load(R.drawable.no_post).into(ivRecentPost)
                                     }
+
                                     else{
-                                        if(suggestion.result.topTags.size > 0){
-                                            str1 = suggestion.result.topTags[0]
-                                            tvMatch1.text = str1
-                                        }
-                                        str2 = str
-                                        tvMatch2.text = str2
+                                        linkPost = it2.documents[0].id
+                                        Log.d("recentPost", linkPost)
+                                        db.collection("Post").document(linkPost)
+                                            .get()
+                                            .addOnSuccessListener { it3 ->
+                                                if(it3.exists()){
+                                                    linkPost = it3["Picture"].toString()
+                                                    Log.d("recentPost", linkPost)
+
+                                                    Glide.with(this).asBitmap()
+                                                        .load(linkPost)
+                                                        .into(ivRecentPost)
+                                                }
+                                            }
                                     }
-                                }
-                                else{
+
+                                    var str1 = ""
+                                    var str2 = ""
+
                                     if(suggestion.result.topTags.size == 1){
                                         str1 = suggestion.result.topTags[0]
-                                        tvMatch1.text = str1
+
+                                        tvMatch1.setText(Html.fromHtml(str1))
                                         db.collection("Users").document(suggestion.result.name)
                                             .get()
                                             .addOnSuccessListener { it4 ->
@@ -628,32 +594,162 @@ class eventPage : AppCompatActivity() {
                                                     if(str3.size > 1){
                                                         str11 = str3[1]
                                                     }
-                                                    if(str4.size > 1){
-                                                        str22 = str4[1]
-                                                    }
-                                                    str2 = it4["Name"].toString() + " is pursuing " + str11 + " from " + str22
-                                                    tvMatch2.text = str2
+
+                                                    str2 = "<font color = '#a64942'>" + it4["Name"].toString() + "</font> is pursuing <font color = '#a64942'>" + str11 + "</font> from <font color = '#a64942'> " + str22 + "</font>"
+                                                    tvMatch2.setText(Html.fromHtml(str2))
                                                 }
                                             }
                                     }
                                     else{
-                                        if(suggestion.result.topTags.size > 1){
-                                            if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
-                                                str2 = suggestion.result.topTags[0]
-                                                str1 = suggestion.result.topTags[1]
-                                                tvMatch1.text = str1
-                                                tvMatch2.text = str2
-                                            }
-                                            else{
-                                                str1 = suggestion.result.topTags[0]
-                                                str2 = suggestion.result.topTags[1]
-                                                tvMatch1.text = str1
-                                                tvMatch2.text = str2
-                                            }
+                                        if(suggestion.result.topTags[0].length > suggestion.result.topTags[1].length){
+                                            str2 = suggestion.result.topTags[0]
+                                            str1 = suggestion.result.topTags[1]
+
+                                            tvMatch1.setText(Html.fromHtml(str1))
+                                            tvMatch2.setText(Html.fromHtml(str2))
+                                        }
+                                        else{
+                                            str1 = suggestion.result.topTags[0]
+                                            str2 = suggestion.result.topTags[1]
+
+                                            tvMatch1.setText(Html.fromHtml(str1))
+                                            tvMatch2.setText(Html.fromHtml(str2))
                                         }
                                     }
+//                                    }
                                 }
-                            }
+                        }
+                        else if(n==1)
+                        {
+                            db.collection("Users").document(n1)
+                                .get()
+                                .addOnSuccessListener { it5->
+                                    n1 = it5["Name"].toString()
+                                    Log.d("recentPost", "Searching")
+                                    db.collection("Users").document(suggestion.result.name).collection("My Posts")
+                                        .orderBy("Time", Query.Direction.DESCENDING)
+                                        .limit(1)
+                                        .get()
+                                        .addOnSuccessListener { it2 ->
+                                            information.visibility = View.VISIBLE
+                                            if(it2.isEmpty){
+                                                Log.d("recentPost", "No Post")
+                                                Glide.with(this).load(R.drawable.no_post).into(ivRecentPost)
+                                            }
+
+                                            else{
+                                                linkPost = it2.documents[0].id
+                                                Log.d("recentPost", linkPost)
+                                                db.collection("Post").document(linkPost)
+                                                    .get()
+                                                    .addOnSuccessListener { it3 ->
+                                                        if(it3.exists()){
+                                                            linkPost = it3["Picture"].toString()
+                                                            Log.d("recentPost", linkPost)
+
+                                                            Glide.with(this).asBitmap()
+                                                                .load(linkPost)
+                                                                .into(ivRecentPost)
+                                                        }
+                                                    }
+                                            }
+
+                                            var str = ""
+                                            if(n == 1){
+                                                str = "You have <font color = '#a64942'>" + n1 + "</font> as a Mutual Friend"
+                                                Log.d("recentPost", "$str")
+
+                                            }
+                                            var str1 = ""
+                                            var str2 = ""
+                                            if(str != ""){
+                                                if(suggestion.result.topTags[0].length > str.length){
+                                                    str2 = suggestion.result.topTags[0]
+                                                    str1 = str
+
+                                                    tvMatch1.setText(Html.fromHtml(str1))
+                                                    tvMatch2.setText(Html.fromHtml(str2))
+                                                }
+                                                else{
+                                                    str2 = str
+                                                    str1 = suggestion.result.topTags[0]
+
+                                                    tvMatch1.setText(Html.fromHtml(str1))
+                                                    tvMatch2.setText(Html.fromHtml(str2))
+                                                }
+                                            }
+                                        }
+                                }
+                        }
+                        else if(n>1)
+                        {
+                            db.collection("Users").document(n1)
+                                .get()
+                                .addOnSuccessListener { it5 ->
+                                    n1 = it5["Name"].toString()
+                                    db.collection("Users").document(n2)
+                                        .get()
+                                        .addOnSuccessListener { it6 ->
+                                            n2 = it6["Name"].toString()
+                                            Log.d("recentPost", "Searching")
+                                            db.collection("Users").document(suggestion.result.name).collection("My Posts")
+                                                .orderBy("Time", Query.Direction.DESCENDING)
+                                                .limit(1)
+                                                .get()
+                                                .addOnSuccessListener { it2 ->
+                                                    information.visibility = View.VISIBLE
+                                                    if(it2.isEmpty){
+                                                        Log.d("recentPost", "No Post")
+                                                        Glide.with(this).load(R.drawable.no_post).into(ivRecentPost)
+                                                    }
+
+                                                    else{
+                                                        linkPost = it2.documents[0].id
+                                                        Log.d("recentPost", linkPost)
+                                                        db.collection("Post").document(linkPost)
+                                                            .get()
+                                                            .addOnSuccessListener { it3 ->
+                                                                if(it3.exists()){
+                                                                    linkPost = it3["Picture"].toString()
+                                                                    Log.d("recentPost", linkPost)
+                                                                    Glide.with(this).asBitmap()
+                                                                        .load(linkPost)
+                                                                        .into(ivRecentPost)
+                                                                }
+                                                            }
+                                                    }
+
+                                                    var str = ""
+                                                    if(n == 2){
+                                                        str = "You have <font color = '#a64942'>" + n1 + "</font> and <font color = '#a64942'>" + n2 + "</font> as Mutual Friends"
+                                                        Log.d("recentPost", "$str")
+                                                    }
+                                                    else if(n > 2){
+                                                        str = "You have <font color = '#a64942'>" + n1 + "</font>, <font color = '#a64942'>" + n2 + "</font> and " + (n-2) + " other Mutual Friends"
+                                                        Log.d("recentPost", "$str")
+                                                    }
+                                                    var str1 = ""
+                                                    var str2 = ""
+                                                    if(str != ""){
+                                                        if(suggestion.result.topTags[0].length > str.length){
+                                                            str2 = suggestion.result.topTags[0]
+                                                            str1 = str
+
+                                                            tvMatch1.setText(Html.fromHtml(str1))
+                                                            tvMatch2.setText(Html.fromHtml(str2))
+                                                        }
+                                                        else{
+                                                            str2 = str
+                                                            str1 = suggestion.result.topTags[0]
+
+                                                            tvMatch1.setText(Html.fromHtml(str1))
+                                                            tvMatch2.setText(Html.fromHtml(str2))
+                                                        }
+                                                    }
+                                                }
+                                        }
+                                }
+                        }
                     }
         }
         rvSuggestion.adapter = adapter
@@ -740,12 +836,7 @@ class eventPage : AppCompatActivity() {
                                         if(users[3].name != newUsers[3].name){
                                             if(count == 4){
                                                 val str = users[4].name.split("-")
-                                                if(str.size > 1){
-                                                    topTags.add("You both study in${str[1]}")
-                                                }
-                                                else{
-                                                    topTags.add("You both study in${str[0]}")
-                                                }
+                                                topTags.add("You both study in<font color = '#a64942'> ${str[0]}</font>")
                                             }
                                         }
                                         else{
@@ -757,10 +848,7 @@ class eventPage : AppCompatActivity() {
                                                 if(str1.size > 1){
                                                     str11 = str1[1]
                                                 }
-                                                if(str2.size > 1){
-                                                    str22 = str2[1]
-                                                }
-                                                topTags.add("You both study in${str22} from${str11}")
+                                                topTags.add("You both study in<font color = '#a64942'>${str22}</font> from<font color = '#a64942'> ${str11}</font>")
                                             }
                                         }
 
@@ -875,14 +963,16 @@ class eventPage : AppCompatActivity() {
                                 tagSinDistance = numerator
 //                                Log.d("suggestion", "The Cosine Distance of Tag: $tagSinDistance")
                                 if(p2 == -1 && p1 != -1){
-                                    topTags.add("You have a common interest in ${t1}")
+                                    topTags.add("You have a common interest in <font color = '#a64942'>${t1}</font>")
                                 }
                                 else if(p1 > -1){
-                                    topTags.add("You have common interests like $t1 and $t2")
+                                    topTags.add("You have common interests like <font color = '#a64942'>$t1</font> and <font color = '#a64942'>$t2</font>")
                                 }
                                 var aggregate = (7*tagSinDistance + 5*userSinDistance)/12
-                                result.add(Result(newUsername, userSinDistance, tagSinDistance, aggregate, 0, newUsers[0].value, topTags))
-                                result[result.size-1].display()
+                                if(aggregate != 0.0){
+                                    result.add(Result(newUsername, userSinDistance, tagSinDistance, aggregate, 0, newUsers[0].value, topTags))
+                                    result[result.size-1].display()
+                                }
                             }
                     }
                 }
@@ -973,7 +1063,7 @@ class eventPage : AppCompatActivity() {
                 Handler().postDelayed({
                    btnRefreshBlocked.visibility = View.GONE
                     btnRefresh.visibility = View.VISIBLE
-                }, 3000)
+                }, 1000)
             }
     }
 

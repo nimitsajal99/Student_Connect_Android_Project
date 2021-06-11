@@ -59,6 +59,8 @@ class collegeDetailsDatabase : AppCompatActivity() {
 
         btnRegister.setOnClickListener {
             btnRegister.isEnabled = false
+            btnRegister.visibility = View.GONE
+            pbSignup.visibility = View.VISIBLE
             performRegister(auth)
             displaySavedData()
         }
@@ -450,24 +452,32 @@ class collegeDetailsDatabase : AppCompatActivity() {
         if(university_name == "University")
         {
             btnRegister.isEnabled = true
+            pbSignup.visibility = View.GONE
+            btnRegister.visibility = View.VISIBLE
             showToast("Enter The University", 3)
             return
         }
         if(college_name == "College")
         {
             btnRegister.isEnabled = true
+            pbSignup.visibility = View.GONE
+            btnRegister.visibility = View.VISIBLE
             showToast("Enter The College", 3)
             return
         }
         if(branch_name == "Branch")
         {
             btnRegister.isEnabled = true
+            pbSignup.visibility = View.GONE
+            btnRegister.visibility = View.VISIBLE
             showToast("Enter The Branch", 3)
             return
         }
         if(semester_name == "Semester")
         {
             btnRegister.isEnabled = true
+            pbSignup.visibility = View.GONE
+            btnRegister.visibility = View.VISIBLE
             showToast("Enter The Semester", 3)
             return
         }
