@@ -281,7 +281,8 @@ class newChat : AppCompatActivity() {
             "To" to to,
             "Text" to "Say Hi",
             "Name" to toName,
-            "Time" to time
+            "Time" to time,
+            "Count" to 0
         )
 
         val messageTo = hashMapOf(
@@ -289,7 +290,8 @@ class newChat : AppCompatActivity() {
             "To" to to,
             "Text" to "Say Hi",
             "Name" to fromName,
-            "Time" to time
+            "Time" to time,
+            "Count" to 0
         )
 
         val info = hashMapOf(

@@ -752,7 +752,8 @@ class others_profile_page : AppCompatActivity() {
                 "To" to usernameOthers,
                 "Text" to "Say Hi",
                 "Name" to usernameOthers,
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             val messageTo = hashMapOf(
@@ -760,7 +761,8 @@ class others_profile_page : AppCompatActivity() {
                 "To" to usernameOthers,
                 "Text" to "Say Hi",
                 "Name" to username,
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             val info = hashMapOf(
@@ -811,7 +813,8 @@ class others_profile_page : AppCompatActivity() {
                 "From" to "System",
                 "To" to usernameOthers,
                 "Text" to "Say Hi",
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             val messageFrom = hashMapOf(
@@ -819,7 +822,8 @@ class others_profile_page : AppCompatActivity() {
                 "To" to usernameOthers,
                 "Text" to "Why don't you add $usernameOthers as a Friend",
                 "Name" to usernameOthers,
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             val messageTo = hashMapOf(
@@ -827,7 +831,8 @@ class others_profile_page : AppCompatActivity() {
                 "To" to usernameOthers,
                 "Text" to "$username is not in your Friend List",
                 "Name" to username,
-                "Time" to FieldValue.serverTimestamp()
+                "Time" to FieldValue.serverTimestamp(),
+                "Count" to 0
             )
 
             db.collection("Users").document(username).collection("Chats").document(usernameOthers)
