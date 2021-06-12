@@ -968,9 +968,61 @@ class eventPage : AppCompatActivity() {
                                 else if(p1 > -1){
                                     topTags.add("You have common interests like <font color = '#a64942'>$t1</font> and <font color = '#a64942'>$t2</font>")
                                 }
-                                var aggregate = (7*tagSinDistance + 5*userSinDistance)/12
+                                var tagOtherSinDistance = 0.0
+                                numerator = 0.0
+                                denominator1 = 0.0
+                                denominator2 = 0.0
+                                count = 0
+                                var tagsLoc = mutableListOf<String>()
+                                for(tag in tags){
+                                    tagsLoc.add(tag.name)
+                                }
+                                while(count < newTags.size){
+                                    if(newTags[count].name in tagsLoc){
+                                        var loc = tagsLoc.indexOf(newTags[count].name)
+                                        var x = 0
+                                        var y = 0
+                                        var w = 0
+                                        if(newTags[count].value > 0){
+                                            x = 1
+                                        }
+                                        if(tags[loc].value > 0){
+                                            y = 1
+                                        }
+
+                                        w = (tags[loc].value + 1) * (newTags[count].value + 1)
+
+//                                        if(w == 0){
+//                                            w = tags[count].value
+//                                        }
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    else{
+                                        var x = 1
+                                        var y = 0
+                                        var w = newTags[count].value + 1
+                                        numerator += x * y * w
+                                        denominator1 += w * x * x
+                                        denominator2 += w * y * y
+//                                        Log.d("suggestion", "Added Values $numerator / $denominator1 * $denominator2")
+                                    }
+                                    count += 1
+                                }
+                                denominator1 *= denominator2
+                                denominator1 = denominator1.toDouble().pow(0.5)
+                                if(denominator1 == 0.0){
+                                    numerator = 0.0
+                                }
+                                else{
+                                    numerator /= denominator1
+                                }
+                                tagOtherSinDistance = numerator
+                                var aggregate = (16*tagSinDistance + 9*userSinDistance + 3*tagOtherSinDistance)/28
                                 if(aggregate != 0.0){
-                                    result.add(Result(newUsername, userSinDistance, tagSinDistance, aggregate, 0, newUsers[0].value, topTags))
+                                    result.add(Result(newUsername, userSinDistance, tagSinDistance, aggregate, 0, newUsers[0].value, topTags, tagOtherSinDistance))
                                     result[result.size-1].display()
                                 }
                             }
@@ -1063,7 +1115,7 @@ class eventPage : AppCompatActivity() {
                 Handler().postDelayed({
                    btnRefreshBlocked.visibility = View.GONE
                     btnRefresh.visibility = View.VISIBLE
-                }, 1000)
+                }, 1500)
             }
     }
 
@@ -1208,10 +1260,10 @@ data class Users(var name: String, var value: Int){
     }
 }
 
-data class Result(var name: String, var user: Double, var tag: Double, var aggregate: Double, var percentage: Int, var mutual: Int, var topTags: MutableList<String>){
+data class Result(var name: String, var user: Double, var tag: Double, var aggregate: Double, var percentage: Int, var mutual: Int, var topTags: MutableList<String>, var tagOthers: Double){
 
     public fun display(){
-        Log.d("suggestion", "${name} \n user -> ${user} \n tag -> ${tag} \n aggregate -> $aggregate \n percentage -> $percentage \n mutual -> $mutual \n topTags -> ${topTags.toString()}")
+        Log.d("suggestion", "${name} \n user -> ${user} \n tag -> ${tag} \n tagothers -> $tagOthers \n aggregate -> $aggregate \n mutual -> $mutual")
     }
 }
 

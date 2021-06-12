@@ -43,7 +43,7 @@
             app:layout_constraintBottom_toTopOf="@id/tvName"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:textSize="18sp"
+            android:textSize="19sp"
             android:textStyle="bold"
             android:text="ruttu"
             android:textColor="@color/base3"
